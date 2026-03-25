@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { put } from "@vercel/blob";
 
 export async function GET() {
   try {
@@ -23,16 +22,56 @@ export async function GET() {
     const additionalGB: number = dbUser.additionalStorageGB ?? 0;
     const totalLimit = baseLimit + additionalGB * 1024 * 1024 * 1024;
 
-    const result = await prisma.$queryRaw<{ total: bigint }[]>`
+    // 1. Ticket file attachment sizes (tracked in size column)
+    const attachmentResult = await prisma.$queryRaw<{ total: bigint }[]>`
       SELECT COALESCE(SUM(a.size), 0) as total
       FROM "Attachment" a
       JOIN "Ticket" t ON a."ticketId" = t.id
       JOIN "Workspace" w ON t."workspaceId" = w.id
       WHERE w."adminId" = ${dbUser.id}
     `;
-    const usedBytes = Number(result[0]?.total ?? 0);
+    const attachmentBytes = Number(attachmentResult[0]?.total ?? 0);
 
-    return NextResponse.json({ usedBytes, totalLimit, planLimit: baseLimit, additionalLimit: additionalGB * 1024 * 1024 * 1024, plan });
+    // 2. Ticket text content (descriptions + comments)
+    const ticketContentResult = await prisma.$queryRaw<{ total: bigint }[]>`
+      SELECT COALESCE(
+        SUM(
+          OCTET_LENGTH(COALESCE(t.description, '')) +
+          COALESCE((SELECT SUM(OCTET_LENGTH(COALESCE(c.text, ''))) FROM "Comment" c WHERE c."ticketId" = t.id), 0)
+        ), 0
+      ) as total
+      FROM "Ticket" t
+      JOIN "Workspace" w ON t."workspaceId" = w.id
+      WHERE w."adminId" = ${dbUser.id}
+    `;
+    const ticketTextBytes = Number(ticketContentResult[0]?.total ?? 0);
+
+    // 3. Notebook page content (HTML text + any embedded images or content)
+    const noteContentResult = await prisma.$queryRaw<{ total: bigint }[]>`
+      SELECT COALESCE(SUM(OCTET_LENGTH(COALESCE(np.content, ''))), 0) as total
+      FROM "NotePage" np
+      JOIN "NoteSection" ns ON np."sectionId" = ns.id
+      JOIN "Workspace" w ON ns."workspaceId" = w.id
+      WHERE w."adminId" = ${dbUser.id}
+    `;
+    const noteBytes = Number(noteContentResult[0]?.total ?? 0);
+
+    const usedBytes = attachmentBytes + ticketTextBytes + noteBytes;
+
+    const breakdown = {
+      attachmentBytes,
+      ticketTextBytes,
+      noteBytes,
+    };
+
+    return NextResponse.json({ 
+      usedBytes, 
+      totalLimit, 
+      planLimit: baseLimit, 
+      additionalLimit: additionalGB * 1024 * 1024 * 1024, 
+      plan,
+      breakdown
+    });
   } catch (error: any) {
     console.error("Storage usage error:", error?.message);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

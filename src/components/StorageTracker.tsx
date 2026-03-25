@@ -7,6 +7,18 @@ interface StorageData {
   usedBytes: number;
   totalLimit: number;
   plan: string;
+  breakdown?: {
+    attachmentBytes: number;
+    ticketTextBytes: number;
+    noteBytes: number;
+  };
+}
+
+function fmt(bytes: number): string {
+  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${bytes} B`;
 }
 
 export default function StorageTracker() {
@@ -16,43 +28,62 @@ export default function StorageTracker() {
   useEffect(() => {
     fetch("/api/user/storage-usage")
       .then((res) => res.json())
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      })
+      .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
   if (loading || !data) return null;
 
-  const usedMB = Math.round(data.usedBytes / (1024 * 1024));
-  const totalMB = Math.round(data.totalLimit / (1024 * 1024));
-  const percentage = Math.min(100, Math.max(0, (usedMB / totalMB) * 100));
+  const used = data.usedBytes ?? 0;
+  const total = data.totalLimit ?? 1;
+  const percentage = Math.min(100, Math.max(0, (used / total) * 100));
+  const isNearLimit = percentage > 85;
+  const isCritical = percentage > 95;
 
   return (
     <div className="px-4 py-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-3">
-        <HardDrive size={16} className="text-purple-400" />
-        <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Storage Usage</span>
+        <HardDrive size={14} className={isCritical ? "text-red-400" : isNearLimit ? "text-amber-400" : "text-purple-400"} />
+        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Storage</span>
       </div>
       
-      <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden mb-2">
+      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-2">
         <div 
-          className={`h-full transition-all duration-500 rounded-full ${
-            percentage > 90 ? "bg-red-500" : percentage > 70 ? "bg-amber-500" : "bg-gradient-to-r from-purple-500 to-indigo-500"
+          className={`h-full transition-all duration-700 rounded-full ${
+            isCritical ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-gradient-to-r from-purple-500 to-indigo-500"
           }`}
           style={{ width: `${percentage}%` }}
-        ></div>
+        />
       </div>
       
-      <div className="flex justify-between items-end">
-        <div className="text-[10px] text-slate-400 font-medium">
-          {usedMB} MB of {totalMB} MB used
-        </div>
-        <div className="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-bold">
+      <div className="flex justify-between items-center">
+        <span className="text-[10px] text-slate-400">{fmt(used)} / {fmt(total)}</span>
+        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+          isCritical ? "bg-red-500/20 text-red-300" : "bg-purple-500/20 text-purple-300"
+        }`}>
           {data.plan}
-        </div>
+        </span>
       </div>
+
+      {data.breakdown && (
+        <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+          {data.breakdown.attachmentBytes > 0 && (
+            <div className="flex justify-between text-[9px] text-slate-500">
+              <span>Files</span><span>{fmt(data.breakdown.attachmentBytes)}</span>
+            </div>
+          )}
+          {data.breakdown.noteBytes > 0 && (
+            <div className="flex justify-between text-[9px] text-slate-500">
+              <span>Notes</span><span>{fmt(data.breakdown.noteBytes)}</span>
+            </div>
+          )}
+          {data.breakdown.ticketTextBytes > 0 && (
+            <div className="flex justify-between text-[9px] text-slate-500">
+              <span>Tickets</span><span>{fmt(data.breakdown.ticketTextBytes)}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
