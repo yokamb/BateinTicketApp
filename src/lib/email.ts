@@ -33,3 +33,12 @@ export async function sendVerificationEmail(email: string, token: string) {
     `,
   });
 }
+
+export async function sendEmailNotification(to: string, subject: string, text: string) {
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM || "noreply@batein.com",
+    to,
+    subject,
+    text,
+  });
+}
