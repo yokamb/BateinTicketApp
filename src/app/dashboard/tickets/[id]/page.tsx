@@ -1,0 +1,55 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import TicketDetailClient from "./TicketDetailClient";
+
+export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const session = await getServerSession(authOptions);
+  const user = session?.user as any;
+  if (!user) redirect("/login");
+
+  const ticket = await prisma.ticket.findUnique({
+    where: { id },
+    include: {
+      creator: true,
+      workspace: true,
+      comments: {
+        include: { user: true },
+        orderBy: { createdAt: "asc" }
+      },
+      attachments: true,
+      linkedFrom: { include: { source: true } },
+      linkedTo: { include: { target: true } }
+    }
+  });
+
+  if (!ticket) {
+    redirect("/dashboard/tickets");
+  }
+
+  // Security check
+  let hasAccess = false;
+  if (user.role === "ADMIN") {
+      hasAccess = ticket.workspace.adminId === user.id;
+  } else {
+      const access = await prisma.instanceAccess.findUnique({
+          where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
+      });
+      hasAccess = !!access;
+  }
+
+  if (!hasAccess) {
+    redirect("/dashboard/tickets");
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto pb-12 animate-fade-in">
+        <TicketDetailClient 
+            ticket={ticket} 
+            currentUser={user} 
+        />
+    </div>
+  );
+}

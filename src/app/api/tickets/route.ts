@@ -1,0 +1,85 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { sendEmailNotification } from "@/lib/email";
+
+export async function POST(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    const user = session?.user as any;
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { title, description, priority, type, workspaceId, approverId } = await req.json();
+
+    // Verification check
+    let hasAccess = false;
+    const ws = await prisma.workspace.findUnique({ where: { id: workspaceId } });
+    
+    if (ws?.adminId === user.id) {
+        hasAccess = true;
+    } else {
+        const access = await prisma.instanceAccess.findUnique({
+            where: { workspaceId_userId: { workspaceId, userId: user.id } }
+        });
+        hasAccess = !!access;
+    }
+
+    if (!hasAccess) return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+    
+    // Check plan limits
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const plan = dbUser?.plan || "FREE";
+    if (plan === "FREE") {
+        const userTicketCount = await prisma.ticket.count({ where: { creatorId: user.id } });
+        if (userTicketCount >= 50) {
+            return NextResponse.json({ error: "Free plan allows up to 50 tickets. Please upgrade your workspace or subscription." }, { status: 403 });
+        }
+    }
+
+    const tType = type || "INCIDENT";
+    const prefix = tType === "CHANGE" ? "CHG" : tType === "REQUEST" ? "REQ" : "INC";
+    const ticketCount = await prisma.ticket.count();
+    const seqNum = 1000 + ticketCount;
+    const shortId = `${prefix}${String(seqNum).padStart(7, '0')}`;
+
+    // Optional: check if workspace requires change approval
+    let initialStatus = "OPEN";
+    if (tType === "CHANGE" && ws?.requiresChangeApproval) {
+        initialStatus = "PENDING";
+    }
+
+    const ticket = await prisma.ticket.create({
+      data: {
+        title,
+        description: description || "",
+        priority: priority || "MEDIUM",
+        type: tType,
+        shortId,
+        status: initialStatus,
+        approverId: (tType === "CHANGE" && ws?.requiresChangeApproval && approverId) ? approverId : null,
+        workspaceId,
+        creatorId: user.id,
+      },
+      include: {
+        workspace: { include: { admin: true } },
+        creator: true
+      }
+    });
+
+    // Send email to the Freelancer (Admin of the workspace)
+    if (user.id !== ticket.workspace.adminId) {
+       await sendEmailNotification(
+           ticket.workspace.admin.email as string,
+           `New Ticket Created: ${ticket.title}`,
+           `Customer ${ticket.creator.name} created a new ticket.\n\nPriority: ${ticket.priority}\n\n${ticket.description}`
+       );
+    } else {
+       // Send to all customers in the workspace? (Optional MVP, let's just assume one customer for now or none)
+    }
+
+    return NextResponse.json(ticket, { status: 201 });
+  } catch (e: any) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
