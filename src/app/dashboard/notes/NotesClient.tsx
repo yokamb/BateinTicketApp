@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Folder, File, Save, Trash2 } from "lucide-react";
 
-// Quill needs to be loaded dynamically to avoid SSR issues
-const NativeQuill = dynamic(() => import("./NativeQuill"), { ssr: false });
+const BlockNoteEditorComponent = dynamic(() => import("./BlockNoteEditorComponent"), { ssr: false });
 
 export default function NotesClient({ workspaces, currentUser }: { workspaces: any[]; currentUser: any }) {
   const [selectedWorkspace, setSelectedWorkspace] = useState(workspaces[0]?.id || "");
@@ -210,18 +209,13 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
               </div>
             </div>
             {/* Editor Area */}
-            <div className="flex-1 overflow-y-auto bg-white notes-editor-container">
-               <NativeQuill 
+            <div className="flex-1 overflow-hidden bg-white">
+               <BlockNoteEditorComponent
+                 key={selectedPage.id}
+                 pageId={selectedPage.id}
                  value={pageContent} 
                  onChange={setPageContent} 
-                 className="h-full"
                />
-               <style jsx global>{`
-                 .notes-editor-container .quill { height: 100%; display: flex; flex-direction: column; }
-                 .notes-editor-container .ql-container { flex: 1; overflow-y: auto; font-size: 15px; font-family: inherit; }
-                 .notes-editor-container .ql-editor { padding: 2rem; }
-                 .notes-editor-container .ql-toolbar { border-left: none; border-right: none; border-top: none; background: #f8fafc; padding: 12px; }
-               `}</style>
             </div>
           </>
         ) : (
