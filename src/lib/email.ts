@@ -5,10 +5,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendVerificationEmail(email: string, token: string) {
   try {
     const rawUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const baseUrl = (rawUrl).trim();
+    const baseUrl = rawUrl.trim().replace(/\/$/, "");
     const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
 
     console.log(`[Email] Attempting to send verification to: ${email}`);
+    console.log(`[Email] Final Verify URL: ${verifyUrl}`);
     
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "noreply@batein.com",
@@ -22,7 +23,7 @@ export async function sendVerificationEmail(email: string, token: string) {
           </div>
           <div style="background: white; border-radius: 12px; padding: 32px; border: 1px solid #e2e8f0;">
             <p style="color: #475569; margin: 0 0 24px;">Click the button below to verify your email address. This link expires in 24 hours.</p>
-            <a href="${verifyUrl}" style="display: block; text-align: center; padding: 14px 24px; background: linear-gradient(135deg, #6366f1, #06b6d4); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 16px;">
+            <a href="${verifyUrl}" style="display: block; text-align: center; padding: 14px 24px; background-color: #6366f1; color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 16px;">
               Verify Email Address
             </a>
             <p style="color: #94a3b8; font-size: 12px; margin-top: 20px; text-align: center;">
