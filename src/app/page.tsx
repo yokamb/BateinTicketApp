@@ -31,7 +31,7 @@ export default function LandingPage() {
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-purple-300 text-sm font-medium mb-8 backdrop-blur-sm">
           <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse"></span>
-          The Ultimate Ticketing OS for Freelancers
+          The Ultimate Ticketing OS & Project tracker for Freelancers
         </div>
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
           Manage clients like a <br />
@@ -40,7 +40,7 @@ export default function LandingPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-          Create isolated workspaces for your clients, handle Incidents, track Change approvals, and get paid faster. Stop using chaotic emails for client support.
+          Create isolated workspaces, handle Incidents with ITIL naming, track Change approvals, and manage projects. Stop using chaotic emails for client support.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full text-white font-bold text-lg hover:from-purple-500 hover:to-indigo-500 transition-all shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(168,85,247,0.6)] flex items-center justify-center gap-2 group">
@@ -61,7 +61,7 @@ export default function LandingPage() {
             <p className="text-slate-400 text-lg">Powerful features wrapped in an elegant, minimal interface.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-purple-500/50 transition-colors group">
               <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
                 <Layers size={24} />
@@ -80,10 +80,34 @@ export default function LandingPage() {
 
             <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-indigo-500/50 transition-colors group">
               <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
+                <Briefcase size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Project Tracker</h3>
+              <p className="text-slate-400 leading-relaxed">Let clients follow progress in real-time. Share milestones, task updates, and timelines directly within their dedicated workspace.</p>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-blue-500/50 transition-colors group">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
                 <Zap size={24} />
               </div>
               <h3 className="text-xl font-bold mb-3 text-white">ITIL-Ready Naming</h3>
               <p className="text-slate-400 leading-relaxed">Automatically organize work streams with industry-standard tags like INC- (Incidents), REQ- (Requests), and CHG- (Changes).</p>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-emerald-500/50 transition-colors group">
+              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                <MessageSquare size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Email Notifications</h3>
+              <p className="text-slate-400 leading-relaxed">Stay updated with automated Resend alerts. Get notified instantly for new tickets, status changes, and client comments.</p>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-yellow-500/50 transition-colors group">
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center text-yellow-400 mb-6 group-hover:scale-110 transition-transform">
+                <PenTool size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Secure Authentication</h3>
+              <p className="text-slate-400 leading-relaxed">Professional security for you and your clients. Dual-option login via Google OAuth or verified email registration.</p>
             </div>
           </div>
         </div>
