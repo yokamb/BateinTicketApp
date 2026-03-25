@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Logo from "@/components/Logo";
+import StorageTracker from "@/components/StorageTracker";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -66,6 +67,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
           )}
         </nav>
+        
+        <div className="px-4 mb-4">
+          <StorageTracker />
+        </div>
+
         <div className="p-4 border-t border-white/10 flex flex-col gap-3">
           <div className="flex items-center gap-3 relative group cursor-pointer p-2 -mx-2 rounded-xl hover:bg-white/5 transition-colors">
             <Link href="/dashboard/profile" className="absolute inset-0 z-10"></Link>

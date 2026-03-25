@@ -214,8 +214,11 @@ export default function LandingPage() {
                   <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Tickets</li>
                   <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Notebooks</li>
                   <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Priority 24/7 Support</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 10 GB Storage</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 5 GB Storage</li>
                   <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 10 MB Max File Size</li>
+                  <li className="mt-4 pt-4 border-t border-white/10 text-xs text-purple-300 font-medium italic">
+                    Additional storage: $1 per 1GB
+                  </li>
                </ul>
                <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Max</Link>
             </div>

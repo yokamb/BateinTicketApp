@@ -41,6 +41,7 @@ model User {
   role          String    @default("CUSTOMER")
   plan          String    @default("FREE")
   paypalSubscriptionId String?
+  additionalStorageGB   Int       @default(0)
   
   accounts      Account[]
   sessions      Session[]
@@ -172,6 +173,7 @@ model TicketLink {
 model Attachment {
   id        String   @id @default(cuid())
   fileUrl   String
+  size      BigInt   @default(0)
   ticketId  String
   ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   

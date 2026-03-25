@@ -146,6 +146,13 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Client-side size check (5MB for FREE/PRO, 10MB for MAX)
+    const MAX_SIZE = 10 * 1024 * 1024; // We'll let server enforce plan-based limits
+    if (file.size > MAX_SIZE) {
+      alert(`File too large. Maximum allowed size is 10MB.`);
+      return;
+    }
+
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -158,13 +165,15 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
       if (res.ok) {
         router.refresh();
       } else {
-        alert("Failed to upload file");
+        const data = await res.json();
+        alert(data.error || "Failed to upload file");
       }
     } catch (e) {
       console.error(e);
+      alert("Failed to upload file. Please try again.");
     } finally {
       setIsUploading(false);
-      if (e.target) e.target.value = ''; // reset input
+      if (e.target) e.target.value = '';
     }
   };
 
