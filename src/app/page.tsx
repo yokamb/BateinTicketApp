@@ -173,43 +173,51 @@ export default function LandingPage() {
             <p className="text-slate-400 text-lg">Start for free. Upgrade when you need more power.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Free */}
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10">
+            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col">
                <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
                <div className="text-4xl font-black text-white mb-6">$0<span className="text-lg text-slate-400 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-slate-400">
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> 1 Workspace Limit</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> Basic Ticketing</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> Standard Support</li>
+               <ul className="space-y-3 mb-8 text-slate-400 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 1 Workspace</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Up to 50 Tickets</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 1 Notebook (5 Pages)</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Share with 2 Customers</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 100 MB Storage</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 5 MB Max File Size</li>
                </ul>
-               <Link href="/register" className="block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Started</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Started</Link>
             </div>
 
             {/* Pro */}
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-purple-900/40 to-indigo-900/20 border-2 border-purple-500 transform md:-translate-y-4 shadow-[0_0_30px_rgba(168,85,247,0.2)]">
-               <div className="inline-block px-3 py-1 bg-purple-500 text-white text-xs font-bold rounded-full mb-4">MOST POPULAR</div>
+            <div className="p-8 rounded-3xl bg-gradient-to-b from-purple-900/40 to-indigo-900/20 border-2 border-purple-500 transform md:-translate-y-4 shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col">
+               <div className="inline-block px-3 py-1 bg-purple-500 text-white text-xs font-bold rounded-full mb-4 self-start">RECOMMENDED</div>
                <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                <div className="text-4xl font-black text-white mb-6">$2<span className="text-lg text-purple-200 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-purple-100">
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-white"/> Up to 10 Workspaces</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-white"/> File Attachments</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-white"/> Priority Support</li>
+               <ul className="space-y-3 mb-8 text-purple-100 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 10 Workspaces</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Tickets</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Notebooks</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Customer Sharing</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 1 GB Storage</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 5 MB Max File Size</li>
                </ul>
-               <Link href="/register" className="block w-full text-center py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white font-bold transition-colors shadow-lg shadow-purple-500/30">Upgrade Now</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white font-bold transition-colors shadow-lg shadow-purple-500/30">Upgrade Now</Link>
             </div>
 
             {/* Max */}
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10">
+            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col">
                <h3 className="text-2xl font-bold text-white mb-2">Max</h3>
                <div className="text-4xl font-black text-white mb-6">$6<span className="text-lg text-slate-400 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-slate-400">
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> Unlimited Workspaces</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> Change Approvals</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> Custom Domains</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={16} className="text-purple-400"/> 24/7 Support</li>
+               <ul className="space-y-3 mb-8 text-slate-400 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Workspaces</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Tickets</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Notebooks</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Priority 24/7 Support</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 10 GB Storage</li>
+                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 10 MB Max File Size</li>
                </ul>
-               <Link href="/register" className="block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Max</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Max</Link>
             </div>
           </div>
         </div>

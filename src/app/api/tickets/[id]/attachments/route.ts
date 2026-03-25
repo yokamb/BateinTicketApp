@@ -17,6 +17,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "No file received." }, { status: 400 });
     }
 
+    // Check plan limits for file size
+    const user = session.user as any;
+    const dbUser = await prisma.user.findFirst({
+      where: {
+        id: user.id
+      }
+    });
+    const plan = dbUser?.plan || "FREE";
+    const maxSize = (plan === "MAX") ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+    
+    if (file.size > maxSize) {
+      return NextResponse.json({ 
+        error: `File too large. Your ${plan} plan allows up to ${maxSize / (1024 * 1024)}MB per file.` 
+      }, { status: 400 });
+    }
+
     // Upload to Vercel Blob (persistent CDN storage)
     const blob = await put(file.name, file, {
       access: "public",

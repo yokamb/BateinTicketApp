@@ -30,6 +30,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
     }
 
+    // Check plan limits for customer sharing
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const plan = dbUser?.plan || "FREE";
+    
+    if (plan === "FREE") {
+      const customerCount = await prisma.instanceAccess.count({
+        where: { workspaceId }
+      });
+      if (customerCount >= 2) {
+        return NextResponse.json({ 
+          error: "Free plan is limited to 2 customers per workspace. Please upgrade to Pro or Max." 
+        }, { status: 403 });
+      }
+    }
+
     // Check if user exists
     let customerUser = await prisma.user.findUnique({
       where: { email },
