@@ -33,13 +33,13 @@ export default function LandingPage() {
           <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse"></span>
           The Ultimate Ticketing OS & Project tracker for Freelancers
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-8 leading-[1.1]">
           Manage clients like a <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">
             Fortune 500 agency.
           </span>
         </h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-lg text-slate-400 max-w-xl mx-auto mb-12 leading-relaxed">
           Create isolated workspaces, handle Incidents with ITIL naming, track Change approvals, and manage projects. Stop using chaotic emails for client support.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -57,8 +57,8 @@ export default function LandingPage() {
       <section id="features" className="relative z-10 py-24 bg-black/40 border-y border-white/5 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Everything you need to deliver.</h2>
-            <p className="text-slate-400 text-lg">Powerful features wrapped in an elegant, minimal interface.</p>
+            <h2 className="text-2xl md:text-4xl font-bold mb-4">Everything you need to deliver.</h2>
+            <p className="text-slate-400 text-base">Powerful features wrapped in an elegant, minimal interface.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -119,8 +119,8 @@ export default function LandingPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6 animate-lightbulb shadow-2xl shadow-yellow-500/50">
              <Star className="text-white" size={32} fill="currentColor" />
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">Loved by Top Professionals</h2>
-          <p className="text-slate-400 text-lg">Real feedback from freelancers and agencies using Batein.</p>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">Loved by Top Professionals</h2>
+          <p className="text-slate-400 text-base">Real feedback from freelancers and agencies using Batein.</p>
         </div>
 
         {/* Cloud/Lightbulb Floating Container */}
@@ -169,8 +169,8 @@ export default function LandingPage() {
       <section id="pricing" className="relative z-10 py-24 bg-black/40 border-t border-white/5 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-slate-400 text-lg">Start for free. Upgrade when you need more power.</p>
+            <h2 className="text-2xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-slate-400 text-base">Start for free. Upgrade when you need more power.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -229,7 +229,7 @@ export default function LandingPage() {
       {/* Footer CTA */}
       <section className="relative z-10 py-32 bg-gradient-to-b from-transparent to-purple-900/20 border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-6xl font-black mb-8">Ready to elevate your client experience?</h2>
+          <h2 className="text-3xl md:text-5xl font-black mb-8">Ready to elevate your client experience?</h2>
           <Link href="/register" className="inline-flex items-center gap-2 px-10 py-5 bg-white text-slate-900 rounded-full font-extrabold text-xl hover:bg-slate-200 transition-colors shadow-2xl shadow-white/10 hover:scale-105 transform">
             Get Started For Free
           </Link>
