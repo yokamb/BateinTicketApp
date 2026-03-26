@@ -69,10 +69,10 @@ export default function BlockNoteEditorComponent({ value, onChange, pageId }: Pr
           height: 100%;
         }
         .blocknote-container .bn-editor {
-          padding: 2rem 3rem;
+          padding: 1.5rem 2rem;
           min-height: 100%;
           font-family: inherit;
-          font-size: 15px;
+          font-size: 14px;
         }
         .blocknote-container .bn-block-group {
           width: 100%;

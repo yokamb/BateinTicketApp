@@ -34,27 +34,24 @@ export default async function TicketsPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Support Tickets</h1>
-          <p className="text-slate-500 mt-1">Manage and track issues across all instances.</p>
-        </div>
-        
-        {/* Only show "New Ticket" here if Customer has 1 workspace or we want a global create button */}
-        {user.role === "CUSTOMER" && userWorkspaces.length > 0 && (
-          <Link
-            href={`/dashboard/tickets/new?workspaceId=${userWorkspaces[0].id}`}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+    <div className="p-6 md:p-8 max-w-6xl mx-auto w-full">
+      <div className="space-y-4 animate-fade-in text-sm text-slate-900">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Support Tickets</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Manage and track customer requests.</p>
+          </div>
+          <Link 
+            href="/dashboard/tickets/new" 
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-2"
           >
-            + Create Ticket
+            Create Ticket
           </Link>
-        )}
-      </div>
-      
-      <div className="bg-white rounded-2xl p-0 sm:p-6 border-0 sm:border border-slate-200 shadow-none sm:shadow-sm">
-         {/* the workspaceId="" prevents the list from showing 'New Ticket' if we don't have a specific workspace context here. We added a global button instead above. */}
-        <TicketList tickets={tickets} workspaceId={""} isAdmin={user.role === "ADMIN"} />
+        </div>
+        <div className="bg-white rounded-xl p-0 sm:p-4 border-0 sm:border border-slate-200 shadow-none sm:shadow-sm">
+           {/* the workspaceId="" prevents the list from showing 'New Ticket' if we don't have a specific workspace context here. We added a global button instead above. */}
+          <TicketList tickets={tickets} workspaceId={""} isAdmin={user.role === "ADMIN"} />
+        </div>
       </div>
     </div>
   );

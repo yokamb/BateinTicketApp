@@ -23,15 +23,17 @@ export default async function WorkspacesPage() {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Customer Workspaces</h1>
-          <p className="text-slate-500 mt-1">Manage isolated instances for your clients.</p>
+    <div className="p-6 md:p-8 max-w-6xl mx-auto w-full">
+      <div className="space-y-4 animate-fade-in text-sm text-slate-900">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Workspaces</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Manage your customer instances and their dedicated support spaces.</p>
+          </div>
         </div>
+        
+        <ClientWorkspaces initialWorkspaces={workspaces} />
       </div>
-      
-      <ClientWorkspaces initialWorkspaces={workspaces} />
     </div>
   );
 }

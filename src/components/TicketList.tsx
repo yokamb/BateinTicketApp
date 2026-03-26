@@ -30,7 +30,7 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
   const tabs = [
     { id: "ALL", label: "All Tickets" },
     { id: "OPEN", label: "Open" },
-    { id: "IN_PROGRESS", label: "In Progress" },
+    { id: "IN_PROGRESS", label: "InProgress" },
     { id: "RESOLVED", label: "Resolved" },
     { id: "CLOSED", label: "Closed" },
   ];
@@ -67,13 +67,13 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
 
   if (tickets.length === 0) {
     return (
-      <div className="py-12 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 mt-4">
-        <FileText className="mx-auto h-12 w-12 text-slate-400 mb-3" />
-        <h3 className="text-sm font-medium text-slate-900">No tickets found</h3>
-        <p className="text-xs text-slate-500 mt-1 mb-4">Get started by creating a new ticket.</p>
+      <div className="py-8 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50 mt-4">
+        <FileText className="mx-auto h-8 w-8 text-slate-400 mb-2" />
+        <h3 className="text-xs font-medium text-slate-900">No tickets found</h3>
+        <p className="text-[10px] text-slate-500 mt-0.5 mb-3">Get started by creating a new ticket.</p>
         <Link
           href={`/dashboard/tickets/new?workspaceId=${workspaceId}`}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
         >
           Create First Ticket
         </Link>
@@ -82,64 +82,58 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
   }
 
   return (
-    <div className="space-y-4">
-       <div className="flex border-b border-slate-200 mb-6 overflow-x-auto no-scrollbar">
+    <div className="space-y-3 text-sm">
+       <div className="flex border-b border-slate-200 mb-4 overflow-x-auto no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors flex items-center gap-2 ${activeTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
+            className={`px-3 py-2 text-[13px] font-semibold whitespace-nowrap border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
           >
             {tab.label}
-            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}>{getTabCount(tab.id)}</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'}`}>{getTabCount(tab.id)}</span>
           </button>
         ))}
        </div>
 
-       <div className="flex justify-between items-center pb-2 mb-4">
-        <span className="text-sm text-slate-500">{filteredTickets.length} matching tickets</span>
-        <div className="flex items-center gap-3">
+       <div className="flex justify-between items-center pb-1 mb-3">
+        <span className="text-[11px] text-slate-500 uppercase tracking-wider font-bold">{filteredTickets.length} matching tickets</span>
+        <div className="flex items-center gap-2">
           <button
             onClick={handleExportCSV}
             disabled={filteredTickets.length === 0}
-            className="text-slate-600 font-medium hover:text-slate-900 text-sm flex items-center gap-1.5 border border-slate-200 px-3 py-1.5 rounded-lg bg-white shadow-sm hover:shadow transition-all disabled:opacity-50"
+            className="text-slate-600 font-medium hover:text-slate-900 text-[11px] flex items-center gap-1.5 border border-slate-200 px-2.5 py-1 rounded-lg bg-white shadow-sm hover:shadow transition-all disabled:opacity-50"
           >
-            <Download size={14} />
+            <Download size={12} />
             Export CSV
           </button>
-          <Link
-            href={`/dashboard/tickets/new?workspaceId=${workspaceId}`}
-            className="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1 shadow-sm transition-colors"
-          >
-            + New Ticket
-          </Link>
         </div>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {filteredTickets.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-sm bg-slate-50 rounded-xl border border-dashed border-slate-200">No tickets matching this status.</div>
+          <div className="py-6 text-center text-slate-500 text-xs bg-slate-50 rounded-lg border border-dashed border-slate-200">No tickets matching this status.</div>
         ) : filteredTickets.map((ticket) => (
           <Link
             key={ticket.id}
             href={`/dashboard/tickets/${ticket.id}`}
-            className="block w-full text-left bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all rounded-xl p-4 group"
+            className="block w-full text-left bg-white border border-slate-200 hover:border-indigo-300 hover:shadow shadow-sm transition-all rounded-lg p-3 group"
           >
-            <div className="flex justify-between items-start mb-2">
-              <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors line-clamp-1">
-                 <span className="text-indigo-500 font-mono text-sm mr-2">{ticket.shortId}</span> 
+            <div className="flex justify-between items-start mb-0.5">
+              <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition-colors line-clamp-1">
+                 <span className="text-indigo-500 font-mono text-[11px] mr-1.5">{ticket.shortId}</span> 
                  {ticket.title}
               </h4>
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(ticket.status)} shrink-0 ml-4`}>
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)} shrink-0 ml-3`}>
                 {getStatusIcon(ticket.status)}
                 {ticket.status.replace("_", " ")}
               </span>
             </div>
-            <p className="text-sm text-slate-500 line-clamp-2 mb-3 leading-relaxed">
+            <p className="text-xs text-slate-500 line-clamp-1 mb-2 leading-relaxed opacity-80">
               {ticket.description}
             </p>
-            <div className="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-50">
-              <span className="flex items-center gap-1">
-                <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[10px]">
+            <div className="flex justify-between items-center text-[10px] text-slate-400 pt-2 border-t border-slate-50">
+              <span className="flex items-center gap-1.5">
+                <span className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[8px]">
                   {ticket.creator?.name?.[0] || 'U'}
                 </span>
                 {ticket.creator?.name}
@@ -152,3 +146,4 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
     </div>
   );
 }
+

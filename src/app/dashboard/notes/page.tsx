@@ -19,8 +19,8 @@ export default async function NotesPage() {
   }
 
   return (
-    <div className="absolute inset-0 bg-slate-50 p-4 md:p-8 animate-fade-in flex flex-col font-sans z-20">
-      <div className="flex-1 min-h-0 flex flex-col border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+    <div className="h-full w-full animate-fade-in flex flex-col font-sans z-20">
+      <div className="flex-1 min-h-0 flex flex-col bg-white">
         <NotesClient workspaces={userWorkspaces} currentUser={user} />
       </div>
     </div>

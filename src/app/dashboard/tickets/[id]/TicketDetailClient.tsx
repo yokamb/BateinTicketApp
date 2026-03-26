@@ -178,44 +178,44 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 text-sm font-sans">
       {/* Header Info */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6 pb-6 border-b border-slate-100">
-          <div className="flex-1 pr-4">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 md:p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-3 mb-4 pb-4 border-b border-slate-100">
+          <div className="flex-1 pr-3">
             {isEditing ? (
-              <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full text-2xl font-bold bg-slate-50 border border-indigo-300 px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 mb-2" />
+              <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full text-base font-bold bg-slate-50 border border-indigo-300 px-2 py-1.5 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 mb-2" />
             ) : (
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">{editTitle}</h1>
+              <h1 className="text-base font-bold text-slate-900 mb-1">{editTitle}</h1>
             )}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-               <span className="flex items-center gap-1 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-md text-indigo-700 font-bold uppercase tracking-widest shadow-sm">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+               <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-indigo-700 font-black uppercase tracking-tighter shadow-sm text-[10px]">
                  {ticket.shortId}
                </span>
-               <span className="bg-slate-100 px-2 py-1 rounded text-slate-600 font-semibold text-[10px] uppercase tracking-wider border border-slate-200">
+               <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-bold text-[9px] uppercase tracking-wider border border-slate-200">
                  {ticket.type}
                </span>
-               <span>Workspace: <strong className="text-slate-700">{ticket.workspace?.name}</strong></span>
-               <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
-               <span>By: {ticket.creator?.name}</span>
+               <span>In <strong className="text-slate-700">{ticket.workspace?.name}</strong></span>
+               <span>Created {new Date(ticket.createdAt).toLocaleDateString()}</span>
+               <span>By <strong className="text-slate-700">{ticket.creator?.name}</strong></span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 shrink-0">
+          <div className="flex flex-wrap gap-1.5 shrink-0">
             {isEditing ? (
               <>
-                <button onClick={() => { setIsEditing(false); setEditTitle(ticket.title); setEditDesc(ticket.description || ""); }} className="flex items-center gap-1 px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-bold transition-colors">Cancel</button>
-                <button onClick={handleSaveDetails} disabled={isUpdating} className="flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-bold transition-colors shadow-sm">{isUpdating ? "Saving..." : "Save"}</button>
+                <button onClick={() => { setIsEditing(false); setEditTitle(ticket.title); setEditDesc(ticket.description || ""); }} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Cancel</button>
+                <button onClick={handleSaveDetails} disabled={isUpdating} className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-bold transition-colors shadow-sm">{isUpdating ? "Saving..." : "Save"}</button>
               </>
             ) : (
-              <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-bold transition-colors">Edit</button>
+              <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Edit</button>
             )}
             {isAdmin && (
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-1 px-3 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
                 title="Delete Ticket"
               >
-                <Trash2 size={16} /> 
+                <Trash2 size={14} /> 
               </button>
             )}
           </div>
@@ -223,69 +223,37 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
 
         {/* Approval Controls */}
         {ticket.type === "CHANGE" && ticket.workspace?.requiresChangeApproval && ticket.approvalStatus !== "PENDING" && (
-           <div className="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center gap-3">
-              <span className="text-sm font-semibold uppercase text-slate-500">Approval Status:</span>
-              <span className={`px-3 py-1 text-xs font-bold rounded-md ${ticket.approvalStatus === "APPROVED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+           <div className="mb-4 p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-3">
+              <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">Approval:</span>
+              <span className={`px-2 py-0.5 text-[10px] font-black rounded uppercase ${ticket.approvalStatus === "APPROVED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                  {ticket.approvalStatus}
               </span>
            </div>
         )}
 
-        {ticket.type === "CHANGE" && ticket.workspace?.requiresChangeApproval && ticket.approvalStatus === "PENDING" && currentUser.id === ticket.approverId && (
-           <div className="mb-6 p-5 rounded-xl border-2 border-indigo-200 bg-indigo-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                 <h3 className="font-bold text-indigo-900">Approval Required</h3>
-                 <p className="text-sm text-indigo-700 mb-0">You are the assigned approver for this Change.</p>
-              </div>
-              <div className="flex gap-2 shrink-0">
-                 <button 
-                  onClick={() => handleUpdate("approvalStatus", "APPROVED")} 
-                  disabled={isUpdating}
-                  className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 shadow-sm transition-colors"
-                 >
-                   Approve
-                 </button>
-                 <button 
-                  onClick={() => handleUpdate("approvalStatus", "REJECTED")} 
-                  disabled={isUpdating}
-                  className="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-sm transition-colors"
-                 >
-                   Reject
-                 </button>
-              </div>
-           </div>
-        )}
-
-        {ticket.type === "CHANGE" && ticket.workspace?.requiresChangeApproval && ticket.approvalStatus === "PENDING" && currentUser.id !== ticket.approverId && (
-           <div className="mb-6 p-4 rounded-xl border border-amber-200 bg-amber-50">
-              <h3 className="font-bold text-amber-900">Pending Approval</h3>
-              <p className="text-sm text-amber-700">Waiting for the assigned Approver to review this Change request.</p>
-           </div>
-        )}
-
         {/* Status and Priority Controls */}
-        <div className="flex flex-wrap gap-6 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-semibold uppercase text-slate-500 mb-2">Status</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <div>
+            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Status</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               disabled={!isEditing || isUpdating}
-              className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-50 disabled:bg-slate-50"
+              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 text-xs focus:ring-1 focus:ring-indigo-500 outline-none disabled:opacity-50"
             >
               <option value="OPEN">Open</option>
-              <option value="IN_PROGRESS">In Progress</option>
+              <option value="IN_PROGRESS">InProgress</option>
               <option value="RESOLVED">Resolved</option>
               <option value="CLOSED">Closed</option>
             </select>
           </div>
-          <div className="flex-1 min-w-[200px]">
-             <label className="block text-xs font-semibold uppercase text-slate-500 mb-2">Priority</label>
+          <div>
+             <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Priority</label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
               disabled={!isEditing || isUpdating}
-              className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-50 disabled:bg-slate-50"
+              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-700 text-xs focus:ring-1 focus:ring-indigo-500 outline-none disabled:opacity-50"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
@@ -297,78 +265,75 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
 
         {/* Description */}
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-3">Description</h3>
+          <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">Description</h3>
           {isEditing ? (
-            <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={6} className="w-full text-slate-700 bg-white border border-indigo-300 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 resize-y text-sm font-medium">{editDesc}</textarea>
+            <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={5} className="w-full text-slate-700 bg-white border border-indigo-300 px-3 py-2 rounded-xl outline-none focus:ring-1 focus:ring-indigo-500 resize-y text-xs font-medium"></textarea>
           ) : (
-            <div className="prose prose-slate max-w-none text-slate-700 whitespace-pre-wrap bg-slate-50 p-6 rounded-xl border border-slate-100 text-sm">
+            <div className="prose prose-slate max-w-none text-slate-700 whitespace-pre-wrap bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed opacity-90 font-medium">
               {editDesc || <span className="text-slate-400 italic">No description provided.</span>}
             </div>
           )}
         </div>
 
         {/* Attachments & Links Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 border-t border-slate-100 pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 border-t border-slate-100 pt-6">
             {/* Attachments */}
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Attachments</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Attachments</h3>
                 <div>
-                   <label className="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
-                     {isUploading ? "Uploading..." : "+ Upload File"}
+                   <label className="cursor-pointer text-[10px] font-black uppercase bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-1 rounded transition-colors tracking-tighter">
+                     {isUploading ? "..." : "+ Upload"}
                      <input type="file" className="hidden" disabled={isUploading} onChange={handleFileUpload} />
                    </label>
                 </div>
               </div>
-              {ticket.attachments && ticket.attachments.length > 0 ? (
-                <ul className="space-y-2">
-                  {ticket.attachments.map((att: any) => (
-                    <li key={att.id} className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-lg text-sm">
-                       <a href={att.fileUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline truncate max-w-[80%] inline-block">
-                          {att.fileUrl.split('/').pop()}
-                       </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-slate-500 italic">No attachments added.</p>
-              )}
+              <ul className="space-y-1.5">
+                {ticket.attachments?.map((att: any) => (
+                  <li key={att.id} className="flex justify-between items-center px-2 py-1.5 bg-slate-50 border border-slate-100 rounded text-[11px] font-medium">
+                     <a href={att.fileUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline truncate max-w-[80%]">
+                        {att.fileUrl.split('/').pop()}
+                     </a>
+                  </li>
+                ))}
+                {!ticket.attachments?.length && <p className="text-[10px] text-slate-400 italic">None</p>}
+              </ul>
             </div>
 
             {/* Linked Tickets */}
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Linked Tickets</h3>
-              <form onSubmit={handleLinkTicket} className="flex gap-2 mb-4">
+              <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-3">Linked</h3>
+              <form onSubmit={handleLinkTicket} className="flex gap-1.5 mb-3">
                  <input 
                    type="text" 
                    value={targetTicketId}
                    onChange={e => setTargetTicketId(e.target.value)}
-                   placeholder="Enter ticket ID..." 
-                   className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-indigo-500"
+                   placeholder="ID..." 
+                   className="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded outline-none focus:border-indigo-400"
                  />
-                 <button type="submit" disabled={isLinking} className="px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-70">
+                 <button type="submit" disabled={isLinking} className="px-2.5 py-1 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 disabled:opacity-70 uppercase tracking-tighter">
                    Link
                  </button>
               </form>
-              <ul className="space-y-2 text-sm">
+              <ul className="space-y-1 text-xs">
                 {ticket.linkedTo?.map((link: any) => (
-                   <li key={link.target.id} className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-                      <span className="text-slate-500 text-xs uppercase mr-2">Linked to</span>
-                      <a href={`/dashboard/tickets/${link.target.id}`} className="font-semibold text-indigo-600 hover:underline">
-                         {link.target.title}
-                      </a>
+                   <li key={link.target.id} className="px-2 py-1 bg-slate-50 border border-slate-100 rounded flex items-center justify-between gap-2">
+                       <span className="text-slate-400 text-[9px] uppercase font-bold shrink-0">To</span>
+                       <a href={`/dashboard/tickets/${link.target.id}`} className="font-bold text-indigo-600 hover:underline truncate text-[11px]">
+                          {link.target.title}
+                       </a>
                    </li>
                 ))}
                 {ticket.linkedFrom?.map((link: any) => (
-                   <li key={link.source.id} className="p-3 bg-slate-50 border border-slate-100 rounded-lg">
-                      <span className="text-slate-500 text-xs uppercase mr-2">Linked from</span>
-                      <a href={`/dashboard/tickets/${link.source.id}`} className="font-semibold text-indigo-600 hover:underline">
-                         {link.source.title}
-                      </a>
+                   <li key={link.source.id} className="px-2 py-1 bg-slate-50 border border-slate-100 rounded flex items-center justify-between gap-2">
+                       <span className="text-slate-400 text-[9px] uppercase font-bold shrink-0">From</span>
+                       <a href={`/dashboard/tickets/${link.source.id}`} className="font-bold text-indigo-600 hover:underline truncate text-[11px]">
+                          {link.source.title}
+                       </a>
                    </li>
                 ))}
                 {(!ticket.linkedTo?.length && !ticket.linkedFrom?.length) && (
-                   <p className="text-xs text-slate-500 italic">No linked tickets.</p>
+                   <p className="text-[10px] text-slate-400 italic">None</p>
                 )}
               </ul>
             </div>
@@ -376,60 +341,57 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
       </div>
 
       {/* Discussion/Comments */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-           <MessageSquare size={20} className="text-slate-400" />
-           <h3 className="text-lg font-semibold text-slate-900">Discussion</h3>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/30 flex items-center gap-2">
+           <MessageSquare size={16} className="text-slate-400" />
+           <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Discussion</h3>
         </div>
         
-        <div className="p-6 space-y-6">
-          {ticket.comments.length === 0 ? (
-            <p className="text-center text-slate-500 text-sm py-8 italic border border-dashed border-slate-200 rounded-xl">No comments yet. Start the conversation!</p>
-          ) : (
-            <div className="space-y-6">
-              {ticket.comments.map((comment: any) => (
-                <div key={comment.id} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0 text-sm">
-                    {comment.user.name?.[0] || 'U'}
-                  </div>
-                  <div className="flex-1 bg-slate-50 p-4 rounded-2xl rounded-tl-sm border border-slate-100">
-                    <div className="flex justify-between items-baseline mb-2">
-                       <p className="font-semibold text-sm text-slate-900">{comment.user.name}</p>
-                       <span className="text-xs text-slate-400">{new Date(comment.createdAt).toLocaleString()}</span>
-                    </div>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{comment.text}</p>
-                  </div>
+        <div className="p-4 md:p-6 space-y-4">
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {ticket.comments.map((comment: any) => (
+              <div key={comment.id} className="flex gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0 text-xs">
+                  {comment.user.name?.[0] || 'U'}
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex justify-between items-baseline mb-1">
+                     <p className="font-bold text-[11px] text-slate-700">{comment.user.name}</p>
+                     <span className="text-[10px] text-slate-400">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{comment.text}</p>
+                </div>
+              </div>
+            ))}
+            {ticket.comments.length === 0 && <p className="text-center text-slate-400 text-xs py-4 italic">No comments yet.</p>}
+          </div>
 
-          <div className="pt-6 border-t border-slate-100 mt-6">
-             <form onSubmit={handleAddComment} className="flex flex-col gap-3">
+          <div className="pt-4 border-t border-slate-100 mt-4">
+             <form onSubmit={handleAddComment} className="flex flex-col gap-2">
                <textarea
                  value={commentText}
                  onChange={(e) => setCommentText(e.target.value)}
-                 className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm resize-y min-h-[100px]"
+                 className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500/30 text-xs resize-y min-h-[60px] font-medium bg-slate-50/20"
                  placeholder="Leave a comment..."
                />
-               <div className="flex justify-end gap-3 flex-wrap">
+               <div className="flex justify-end gap-2 flex-wrap">
                  {isEditing && (
                    <button
                      type="button"
                      onClick={handleSaveAndClose}
                      disabled={isUpdating}
-                     className="flex items-center gap-2 px-6 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-colors disabled:opacity-70 text-sm shadow-sm"
+                     className="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold transition-colors disabled:opacity-70 text-xs shadow-sm uppercase tracking-tighter"
                    >
-                     {isUpdating ? "Saving..." : "Save Ticket"}
+                     {isUpdating ? "..." : "Save & Exit"}
                    </button>
                  )}
                  <button
                    type="submit"
                    disabled={isCommenting || !commentText.trim()}
-                   className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors disabled:opacity-70 text-sm shadow-sm"
+                   className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-colors disabled:opacity-70 text-xs shadow-sm uppercase tracking-tighter"
                  >
-                   <Send size={16} /> 
-                   {isCommenting ? "Posting..." : "Post Comment"}
+                   <Send size={14} /> 
+                   {isCommenting ? "..." : "Post"}
                  </button>
                </div>
              </form>
@@ -437,5 +399,6 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
         </div>
       </div>
     </div>
+
   );
 }
