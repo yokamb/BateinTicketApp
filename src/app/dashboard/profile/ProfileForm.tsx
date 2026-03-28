@@ -1,16 +1,38 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Lock, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
+import { Save, Lock, Eye, EyeOff, Plus, Trash2, Edit2, Info } from "lucide-react";
 import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
 import { ROLE_TICKET_MAPPINGS } from "@/lib/constants/roles";
+import { Modal, Button, Group, Text, Box, Badge, Card, ActionIcon, Tooltip, Title } from "@mantine/core";
+import { RoleSelector } from "@/components/onboarding/RoleSelector";
+import { useEffect } from "react";
 
 export default function ProfileForm({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");
   const [professionalRole, setProfessionalRole] = useState(user.professionalRole || "");
+  const [roleConfig, setRoleConfig] = useState<any>(null);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{text: string, type: "success"|"error"} | null>(null);
+
+  useEffect(() => {
+    if (professionalRole) {
+      fetchRoleConfig(professionalRole);
+    }
+  }, [professionalRole]);
+
+  const fetchRoleConfig = async (roleName: string) => {
+    try {
+      const res = await fetch("/api/roles");
+      const data = await res.json();
+      const config = data.find((r: any) => r.roleName === roleName);
+      setRoleConfig(config);
+    } catch (e) {
+      console.error("Failed to fetch role config", e);
+    }
+  };
 
   // Change Password state
   const [pwSection, setPwSection] = useState(false);
@@ -45,6 +67,25 @@ export default function ProfileForm({ user }: { user: any }) {
       setMessage({ text: err.message || "Something went wrong", type: "error" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRoleSelect = async (role: any) => {
+    setProfessionalRole(role.roleName);
+    setRoleConfig(role);
+    setIsRoleModalOpen(false);
+    
+    // Auto-save role change
+    try {
+      await fetch("/api/user/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ professionalRole: role.roleName }),
+      });
+      setMessage({ text: "Role updated successfully!", type: "success" });
+      router.refresh();
+    } catch (e) {
+      console.error("Failed to save role", e);
     }
   };
 
@@ -115,19 +156,83 @@ export default function ProfileForm({ user }: { user: any }) {
           <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow" />
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Professional Role</label>
-          <select 
-            value={professionalRole} 
-            onChange={e => setProfessionalRole(e.target.value)} 
-            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white transition-shadow"
+        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <label className="block text-sm font-bold text-slate-800 mb-4">Professional Role & Ticket Labels</label>
+          
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-3">
+                <Box className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-2xl shadow-sm border border-indigo-200">
+                  {roleConfig?.issueIcon || "👤"}
+                </Box>
+                <div>
+                   <Text fw={800} size="lg" className="text-slate-900 leading-tight">
+                    {professionalRole || "No Role Selected"}
+                   </Text>
+                   <Text size="xs" color="dimmed">Global ticket naming convention</Text>
+                </div>
+              </div>
+
+              {roleConfig && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Issues</Text>
+                    <Group gap="xs">
+                       <Text size="lg">{roleConfig.issueIcon}</Text>
+                       <Text fw={600} size="sm">{roleConfig.issueLabel}</Text>
+                    </Group>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Requests</Text>
+                    <Group gap="xs">
+                       <Text size="lg">{roleConfig.requestIcon}</Text>
+                       <Text fw={600} size="sm">{roleConfig.requestLabel}</Text>
+                    </Group>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Changes</Text>
+                    <Group gap="xs">
+                       <Text size="lg">{roleConfig.changeIcon}</Text>
+                       <Text fw={600} size="sm">{roleConfig.changeLabel}</Text>
+                    </Group>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Button 
+              variant="light" 
+              color="indigo" 
+              leftSection={<Edit2 size={16} />}
+              onClick={() => setIsRoleModalOpen(true)}
+              className="mt-4 md:mt-0"
+              radius="md"
+            >
+              Change Role
+            </Button>
+          </div>
+
+          <Modal 
+            opened={isRoleModalOpen} 
+            onClose={() => setIsRoleModalOpen(false)} 
+            title={<Title order={4}>Select Your Professional Role</Title>}
+            size="lg"
+            radius="lg"
+            padding="xl"
+            overlayProps={{
+              backgroundOpacity: 0.55,
+              blur: 3,
+            }}
+            styles={{
+              header: { backgroundColor: 'transparent' },
+              content: { backgroundColor: '#0f172a', color: 'white' }
+            }}
           >
-            <option value="" disabled>Select your role</option>
-            {ROLE_TICKET_MAPPINGS.map(r => (
-              <option key={r.role} value={r.role}>{r.role}</option>
-            ))}
-          </select>
-          <p className="text-xs text-slate-500 mt-1.5">This determines your default ticket types (e.g., Bug Report vs Incident).</p>
+            <RoleSelector 
+              selectedRoleName={professionalRole}
+              onSelect={handleRoleSelect}
+            />
+          </Modal>
         </div>
 
         {/* Subscription */}

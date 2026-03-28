@@ -50,7 +50,7 @@ export default async function TicketsPage() {
         </div>
         <div className="bg-white rounded-xl p-0 sm:p-4 border-0 sm:border border-slate-200 shadow-none sm:shadow-sm">
            {/* the workspaceId="" prevents the list from showing 'New Ticket' if we don't have a specific workspace context here. We added a global button instead above. */}
-          <TicketList tickets={tickets} workspaceId={""} isAdmin={user.role === "ADMIN"} />
+          <TicketList tickets={tickets} workspaceId={""} isAdmin={user.role === "ADMIN"} professionalRole={user.professionalRole} />
         </div>
       </div>
     </div>

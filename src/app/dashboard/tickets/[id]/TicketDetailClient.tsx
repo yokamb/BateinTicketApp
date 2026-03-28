@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, AlertCircle, Clock, CheckCircle, MessageSquare, Send } from "lucide-react";
+import { TicketTypeBadge } from "@/components/TicketTypeBadge";
 
 export default function TicketDetailClient({ ticket, currentUser }: { ticket: any, currentUser: any }) {
   const [status, setStatus] = useState(ticket.status);
@@ -192,9 +193,7 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
                <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-indigo-700 font-black uppercase tracking-tighter shadow-sm text-[10px]">
                  {ticket.shortId}
                </span>
-               <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-bold text-[9px] uppercase tracking-wider border border-slate-200">
-                 {ticket.type}
-               </span>
+               <TicketTypeBadge type={ticket.type} professionalRole={currentUser.professionalRole} size="sm" />
                <span>In <strong className="text-slate-700">{ticket.workspace?.name}</strong></span>
                <span>Created {new Date(ticket.createdAt).toLocaleDateString()}</span>
                <span>By <strong className="text-slate-700">{ticket.creator?.name}</strong></span>

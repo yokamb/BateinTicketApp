@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AlertCircle, Clock, CheckCircle, FileText, Download } from "lucide-react";
+import { TicketTypeBadge } from "./TicketTypeBadge";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -24,7 +25,7 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets: any[], workspaceId: string, isAdmin: boolean }) {
+export default function TicketList({ tickets, workspaceId, isAdmin, professionalRole }: { tickets: any[], workspaceId: string, isAdmin: boolean, professionalRole?: string }) {
   const [activeTab, setActiveTab] = useState("ALL");
 
   const tabs = [
@@ -124,9 +125,7 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
                  {ticket.title}
               </h4>
               <div className="flex gap-2 shrink-0 ml-3">
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tight bg-slate-100 text-slate-600 border border-slate-200">
-                  {ticket.type}
-                </span>
+                <TicketTypeBadge type={ticket.type} professionalRole={professionalRole} />
                 <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)}`}>
                   {getStatusIcon(ticket.status)}
                   {ticket.status.replace("_", " ")}

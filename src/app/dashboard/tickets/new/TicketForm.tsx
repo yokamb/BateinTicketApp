@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 
@@ -14,6 +14,7 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
   const [error, setError] = useState("");
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [typesLoading, setTypesLoading] = useState(false);
+  const [userRoleConfig, setUserRoleConfig] = useState<any>(null);
   const router = useRouter();
 
   const fetchTicketTypes = async (wsId: string) => {
@@ -33,9 +34,25 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
     }
   };
 
-  useState(() => {
+  const fetchRoleConfig = async () => {
+    try {
+      const res = await fetch("/api/roles");
+      const data = await res.json();
+      const profileRes = await fetch("/api/user/profile");
+      const profileData = await profileRes.json();
+      if (profileData.professionalRole) {
+        const config = data.find((r: any) => r.roleName === profileData.professionalRole);
+        setUserRoleConfig(config);
+      }
+    } catch (e) {
+      console.error("Failed to fetch user role config", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoleConfig();
     if (workspaceId) fetchTicketTypes(workspaceId);
-  });
+  }, [workspaceId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +139,12 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
                 ticketTypes.map((t: any) => (
                     <option key={t.id} value={t.label}>{t.label}</option>
                 ))
+              ) : userRoleConfig ? (
+                <>
+                    <option value="INCIDENT">{userRoleConfig.issueIcon} {userRoleConfig.issueLabel}</option>
+                    <option value="REQUEST">{userRoleConfig.requestIcon} {userRoleConfig.requestLabel}</option>
+                    <option value="CHANGE">{userRoleConfig.changeIcon} {userRoleConfig.changeLabel}</option>
+                </>
               ) : (
                 <>
                     <option value="INCIDENT">Incident</option>

@@ -13,7 +13,7 @@ function validatePassword(password: string): string | null {
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, userType } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -39,6 +39,11 @@ export async function POST(req: Request) {
         passwordHash: hashedPassword,
         role: "ADMIN",
         emailVerified: null,
+        profile: {
+          create: {
+            subSpecialty: userType === "freelancer" ? "Freelance" : "Company"
+          }
+        }
       },
     });
 

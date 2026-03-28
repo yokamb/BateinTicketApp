@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { TicketTypeBadge } from "@/components/TicketTypeBadge";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -82,7 +83,7 @@ export default async function DashboardPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="text-[9px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">{ticket.shortShortId || ticket.shortId}</span>
-                          <span className={`text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded-full ${ticket.type === "INCIDENT" ? "bg-red-100 text-red-700" : ticket.type === "CHANGE" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"}`}>{ticket.type}</span>
+                          <TicketTypeBadge type={ticket.type} professionalRole={user.professionalRole} />
                           <span className="text-[10px] text-slate-500">in {ticket.workspace.name}</span>
                         </div>
                         <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors text-sm truncate leading-tight">
