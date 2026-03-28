@@ -12,7 +12,30 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
   const [approverId, setApproverId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [ticketTypes, setTicketTypes] = useState<any[]>([]);
+  const [typesLoading, setTypesLoading] = useState(false);
   const router = useRouter();
+
+  const fetchTicketTypes = async (wsId: string) => {
+    if (!wsId) return;
+    setTypesLoading(true);
+    try {
+      const res = await fetch(`/api/ticket-types?workspaceId=${wsId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTicketTypes(data);
+        if (data.length > 0) setType(data[0].label);
+      }
+    } catch (e) {
+      console.error("Failed to fetch ticket types", e);
+    } finally {
+      setTypesLoading(false);
+    }
+  };
+
+  useState(() => {
+    if (workspaceId) fetchTicketTypes(workspaceId);
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,12 +112,23 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
             <label className="block text-sm font-semibold text-slate-700 mb-1">Ticket Type</label>
             <select
               value={type}
+              disabled={typesLoading}
               onChange={(e) => setType(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white disabled:opacity-50"
             >
-              <option value="INCIDENT">Incident</option>
-              <option value="REQUEST">Request</option>
-              <option value="CHANGE">Change</option>
+              {typesLoading ? (
+                <option>Loading types...</option>
+              ) : ticketTypes.length > 0 ? (
+                ticketTypes.map((t: any) => (
+                    <option key={t.id} value={t.label}>{t.label}</option>
+                ))
+              ) : (
+                <>
+                    <option value="INCIDENT">Incident</option>
+                    <option value="REQUEST">Request</option>
+                    <option value="CHANGE">Change</option>
+                </>
+              )}
             </select>
         </div>
 
@@ -104,7 +138,10 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
                 <select
                   value={workspaceId}
                   required
-                  onChange={(e) => setWorkspaceId(e.target.value)}
+                  onChange={(e) => {
+                    setWorkspaceId(e.target.value);
+                    fetchTicketTypes(e.target.value);
+                  }}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
                 >
                     <option value="" disabled>Select a Workspace</option>

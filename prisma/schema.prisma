@@ -47,6 +47,8 @@ model User {
   sessions      Session[]
 
   // SaaS Relations
+  professionalRole String?
+  
   workspacesOwned Workspace[]    @relation("WorkspaceAdmin")
   workspaces      InstanceAccess[]
   ticketsCreated  Ticket[]       @relation("TicketCreator")
@@ -104,6 +106,7 @@ model Workspace {
   customers   InstanceAccess[]
   approvers   WorkspaceApprover[]
   tickets     Ticket[]
+  ticketTypes TicketType[]
   noteSections NoteSection[]
 
   createdAt   DateTime @default(now())
@@ -158,6 +161,19 @@ model Ticket {
 
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+}
+
+model TicketType {
+  id          String   @id @default(cuid())
+  label       String
+  category    String   // ISSUE, REQUEST, CHANGE
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([workspaceId, label])
 }
 
 model TicketLink {

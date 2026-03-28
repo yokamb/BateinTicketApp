@@ -8,7 +8,7 @@ export async function PUT(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
-    const { name, email } = await req.json();
+    const { name, email, professionalRole } = await req.json();
     if (!name || !email) return NextResponse.json({ error: "Name and email required" }, { status: 400 });
 
     const user = session.user as any;
@@ -21,7 +21,7 @@ export async function PUT(req: Request) {
 
     const updated = await prisma.user.update({
         where: { id: user.id },
-        data: { name, email }
+        data: { name, email, professionalRole }
     });
 
     return NextResponse.json({ message: "Profile updated successfully", user: updated }, { status: 200 });

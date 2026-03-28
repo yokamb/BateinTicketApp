@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import InviteCustomerForm from "./InviteCustomerForm";
 import TicketList from "@/components/TicketList";
 import ApproverSettings from "./ApproverSettings";
+import TicketTypeSettings from "./TicketTypeSettings";
 
 export default async function WorkspaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -61,6 +62,9 @@ export default async function WorkspaceDetailPage({ params }: { params: Promise<
 
         {/* Right Col: Customers & Settings */}
         <div className="space-y-6">
+          {/* Ticket Type Settings */}
+          <TicketTypeSettings workspaceId={workspace.id} />
+
           {/* Approver Settings */}
           <ApproverSettings workspace={workspace} />
 

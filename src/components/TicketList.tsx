@@ -123,10 +123,15 @@ export default function TicketList({ tickets, workspaceId, isAdmin }: { tickets:
                  <span className="text-indigo-500 font-mono text-[11px] mr-1.5">{ticket.shortId}</span> 
                  {ticket.title}
               </h4>
-              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)} shrink-0 ml-3`}>
-                {getStatusIcon(ticket.status)}
-                {ticket.status.replace("_", " ")}
-              </span>
+              <div className="flex gap-2 shrink-0 ml-3">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tight bg-slate-100 text-slate-600 border border-slate-200">
+                  {ticket.type}
+                </span>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)}`}>
+                  {getStatusIcon(ticket.status)}
+                  {ticket.status.replace("_", " ")}
+                </span>
+              </div>
             </div>
             <p className="text-xs text-slate-500 line-clamp-1 mb-2 leading-relaxed opacity-80">
               {ticket.description}

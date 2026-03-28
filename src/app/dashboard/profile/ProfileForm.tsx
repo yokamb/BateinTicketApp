@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Lock, Eye, EyeOff } from "lucide-react";
+import { Save, Lock, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
+import { ROLE_TICKET_MAPPINGS } from "@/lib/constants/roles";
 
 export default function ProfileForm({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");
+  const [professionalRole, setProfessionalRole] = useState(user.professionalRole || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{text: string, type: "success"|"error"} | null>(null);
 
@@ -30,7 +32,7 @@ export default function ProfileForm({ user }: { user: any }) {
       const res = await fetch("/api/user/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ name, email, professionalRole }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -112,6 +114,20 @@ export default function ProfileForm({ user }: { user: any }) {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-2">Professional Role</label>
+          <select 
+            value={professionalRole} 
+            onChange={e => setProfessionalRole(e.target.value)} 
+            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white transition-shadow"
+          >
+            <option value="" disabled>Select your role</option>
+            {ROLE_TICKET_MAPPINGS.map(r => (
+              <option key={r.role} value={r.role}>{r.role}</option>
+            ))}
+          </select>
+          <p className="text-xs text-slate-500 mt-1.5">This determines your default ticket types (e.g., Bug Report vs Incident).</p>
         </div>
 
         {/* Subscription */}
