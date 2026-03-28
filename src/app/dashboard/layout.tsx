@@ -41,7 +41,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Tickets", href: "/dashboard/tickets", icon: Ticket },
     { name: "Notes", href: "/dashboard/notes", icon: NotebookIcon },
-    { name: "Workspaces", href: "/dashboard/workspaces", icon: Briefcase, restricted: user.plan === "FREE" || !user.plan, badge: "PRO" },
+    { name: "Workspaces", href: "/dashboard/workspaces", icon: Briefcase },
   ];
 
   return (
@@ -70,25 +70,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => (
             <div key={item.name}>
-              {item.restricted ? (
-                <div title="Upgrade to Pro" className="flex items-center justify-between px-3 py-2 opacity-40 cursor-not-allowed">
-                  <div className="flex items-center gap-2.5">
-                    <item.icon size={17} className="shrink-0" />
-                    <span className="font-medium">{item.name}</span>
-                  </div>
-                  <span className="text-[9px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                    {item.badge}
-                  </span>
-                </div>
-              ) : (
-                <Link 
-                  href={item.href} 
-                  className="flex items-center gap-2.5 px-3 py-2 text-[#444] hover:bg-[#efefef] hover:text-[#0d0d0d] rounded-lg font-medium transition-colors group text-sm"
-                >
-                  <item.icon size={17} className="shrink-0 text-[#666] group-hover:text-[#111]" />
-                  {item.name}
-                </Link>
-              )}
+              <Link 
+                href={item.href} 
+                className="flex items-center gap-2.5 px-3 py-2 text-[#444] hover:bg-[#efefef] hover:text-[#0d0d0d] rounded-lg font-medium transition-colors group text-sm"
+              >
+                <item.icon size={17} className="shrink-0 text-[#666] group-hover:text-[#111]" />
+                {item.name}
+              </Link>
             </div>
           ))}
 

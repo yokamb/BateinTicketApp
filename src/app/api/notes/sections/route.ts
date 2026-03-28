@@ -35,8 +35,8 @@ export async function POST(req: Request) {
 
     if (dbUser.plan === "FREE") {
       const existingCount = await prisma.noteSection.count({ where: { workspaceId } });
-      if (existingCount >= 1) {
-        return NextResponse.json({ error: "Free plan is limited to 1 Note Section. Please upgrade." }, { status: 403 });
+      if (existingCount >= 2) {
+        return NextResponse.json({ error: "Free plan is limited to 2 Note Sections. Please upgrade." }, { status: 403 });
       }
     }
 

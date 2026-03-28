@@ -25,8 +25,8 @@ export async function POST(req: Request) {
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
     const plan = dbUser?.plan || "FREE";
 
-    if (plan === "FREE" && workspaceCount >= 1) {
-      return NextResponse.json({ error: "Free plan allows only 1 workspace. Please upgrade to Pro or Max." }, { status: 403 });
+    if (plan === "FREE" && workspaceCount >= 2) {
+      return NextResponse.json({ error: "Free plan allows only 2 workspaces. Please upgrade to Pro or Max." }, { status: 403 });
     }
     
     if (plan === "PRO" && workspaceCount >= 10) {

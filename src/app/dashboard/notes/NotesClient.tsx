@@ -18,6 +18,18 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
   const [pageContent, setPageContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  // Creation States
+  const [isCreatingSection, setIsCreatingSection] = useState(false);
+  const [isCreatingPage, setIsCreatingPage] = useState(false);
+  const [newSectionName, setNewSectionName] = useState("");
+  const [newPageTitle, setNewPageTitle] = useState("");
+  const [sectionError, setSectionError] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [sectionLoading, setSectionLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [sectionSuccess, setSectionSuccess] = useState(false);
+  const [pageSuccess, setPageSuccess] = useState(false);
+
   useEffect(() => {
     if (selectedWorkspace) fetchSections();
   }, [selectedWorkspace]);
@@ -38,41 +50,64 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
     finally { setLoading(false); }
   };
 
-  const handleCreateSection = async () => {
-    const name = prompt("Enter section name:");
-    if (!name) return;
+  const handleCreateSection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSectionName.trim()) return;
+    setSectionLoading(true);
+    setSectionError(null);
     try {
       const res = await fetch("/api/notes/sections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, workspaceId: selectedWorkspace })
+        body: JSON.stringify({ name: newSectionName, workspaceId: selectedWorkspace })
       });
+      const data = await res.json();
       if (res.ok) {
-        fetchSections();
+        setNewSectionName("");
+        setSectionSuccess(true);
+        setTimeout(() => {
+          setIsCreatingSection(false);
+          setSectionSuccess(false);
+          fetchSections();
+        }, 1200);
       } else {
-        const d = await res.json();
-        alert(d.error || "Failed to create section");
+        setSectionError(data.error || "Failed to create section");
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      setSectionError("An unexpected error occurred");
+      console.error(e); 
+    }
+    finally { setSectionLoading(false); }
   };
 
-  const handleCreatePage = async () => {
-    if (!selectedSection) return;
-    const title = prompt("Enter page title:");
-    if (!title) return;
+  const handleCreatePage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedSection || !newPageTitle.trim()) return;
+    setPageLoading(true);
+    setPageError(null);
     try {
       const res = await fetch("/api/notes/pages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, sectionId: selectedSection.id, workspaceId: selectedWorkspace })
+        body: JSON.stringify({ title: newPageTitle, sectionId: selectedSection.id, workspaceId: selectedWorkspace })
       });
+      const data = await res.json();
       if (res.ok) {
-        fetchSections();
+        setNewPageTitle("");
+        setPageSuccess(true);
+        setTimeout(() => {
+          setIsCreatingPage(false);
+          setPageSuccess(false);
+          fetchSections();
+        }, 1200);
       } else {
-        const d = await res.json();
-        alert(d.error || "Failed to create page");
+        setPageError(data.error || "Failed to create page");
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      setPageError("An unexpected error occurred");
+      console.error(e); 
+    }
+    finally { setPageLoading(false); }
   };
 
   const handleSelectPage = async (page: any) => {
@@ -134,7 +169,7 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
         <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sections</h3>
-            <button onClick={handleCreateSection} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded transition-colors" title="New Section">
+            <button onClick={() => setIsCreatingSection(true)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded transition-colors" title="New Section">
                <Plus size={14} />
             </button>
           </div>
@@ -159,7 +194,7 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
             <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
               <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-100">
                 <h3 className="text-xs font-black text-slate-800 uppercase tracking-tight truncate pr-2">{selectedSection.name}</h3>
-                <button onClick={handleCreatePage} className="text-[10px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-0.5 rounded font-black transition-colors shadow-sm shrink-0 flex items-center gap-1 uppercase tracking-tighter">
+                <button onClick={() => setIsCreatingPage(true)} className="text-[10px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-0.5 rounded font-black transition-colors shadow-sm shrink-0 flex items-center gap-1 uppercase tracking-tighter">
                    <Plus size={12} /> New
                 </button>
               </div>
@@ -232,6 +267,110 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
         )}
       </div>
 
+
+      {/* Section Creation Modal */}
+      {isCreatingSection && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5 relative animate-fade-in-up">
+            <h3 className="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">Create New Notebook</h3>
+            <form onSubmit={handleCreateSection} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-black text-slate-500 mb-1 uppercase tracking-wide">Notebook Title</label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={newSectionName}
+                  onChange={(e) => { setNewSectionName(e.target.value); setSectionError(null); }}
+                  className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition-all shadow-sm"
+                  placeholder="e.g. Project Specs"
+                />
+              </div>
+
+              {sectionError && (
+                <div className="p-2.5 bg-red-50 border border-red-100 rounded-lg text-red-600 text-[11px] font-bold leading-tight animate-shake text-center">
+                  {sectionError}
+                </div>
+              )}
+
+              {sectionSuccess && (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-600 text-[11px] font-bold leading-tight flex items-center justify-center gap-2">
+                   Notebook created!
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => { setIsCreatingSection(false); setSectionError(null); }}
+                  className="px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-100 rounded-lg font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={sectionLoading || sectionSuccess}
+                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-black transition-all disabled:opacity-70 text-xs shadow-md shadow-indigo-200"
+                >
+                  {sectionLoading ? "Creating..." : sectionSuccess ? "Refining..." : "Create Notebook"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Page Creation Modal */}
+      {isCreatingPage && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5 relative animate-fade-in-up">
+            <h3 className="text-base font-bold text-slate-900 mb-3 uppercase tracking-tight">New Page in {selectedSection?.name}</h3>
+            <form onSubmit={handleCreatePage} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-black text-slate-500 mb-1 uppercase tracking-wide">Page Title</label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={newPageTitle}
+                  onChange={(e) => { setNewPageTitle(e.target.value); setPageError(null); }}
+                  className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition-all shadow-sm"
+                  placeholder="e.g. Meeting Transcript"
+                />
+              </div>
+
+              {pageError && (
+                <div className="p-2.5 bg-red-50 border border-red-100 rounded-lg text-red-600 text-[11px] font-bold leading-tight animate-shake text-center">
+                  {pageError}
+                </div>
+              )}
+
+              {pageSuccess && (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-600 text-[11px] font-bold leading-tight text-center">
+                   Page ready! Opening...
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => { setIsCreatingPage(false); setPageError(null); }}
+                  className="px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-100 rounded-lg font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={pageLoading || pageSuccess}
+                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-black transition-all disabled:opacity-70 text-xs shadow-md shadow-indigo-200"
+                >
+                  {pageLoading ? "Adding..." : pageSuccess ? "Opening..." : "Add Page"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

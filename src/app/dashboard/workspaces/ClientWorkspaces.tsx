@@ -9,12 +9,15 @@ export default function ClientWorkspaces({ initialWorkspaces }: { initialWorkspa
   const [isCreating, setIsCreating] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch("/api/workspaces", {
@@ -22,13 +25,23 @@ export default function ClientWorkspaces({ initialWorkspaces }: { initialWorkspa
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
+      
+      const data = await res.json();
+
       if (res.ok) {
         setName("");
-        setIsCreating(false);
-        router.refresh();
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsCreating(false);
+          setIsSuccess(false);
+          router.refresh();
+        }, 1500);
+      } else {
+        setError(data.error || "Failed to create workspace");
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      setError("An unexpected error occurred");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -60,25 +73,38 @@ export default function ClientWorkspaces({ initialWorkspaces }: { initialWorkspa
                   type="text"
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => { setName(e.target.value); setError(null); }}
                   className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none text-sm"
                   placeholder="Acme Corp"
                 />
               </div>
+
+              {error && (
+                <div className="p-2 bg-red-50 border border-red-100 rounded-lg text-red-600 text-[11px] font-medium leading-tight">
+                  {error}
+                </div>
+              )}
+
+              {isSuccess && (
+                <div className="p-2 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-600 text-[11px] font-medium leading-tight">
+                  Workspace created successfully! Refreshing...
+                </div>
+              )}
+
               <div className="flex justify-end gap-2 mt-4">
                 <button
                   type="button"
-                  onClick={() => setIsCreating(false)}
+                  onClick={() => { setIsCreating(false); setError(null); }}
                   className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || isSuccess}
                   className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-70 text-xs"
                 >
-                  {loading ? "Creating..." : "Create"}
+                  {loading ? "Creating..." : isSuccess ? "Done!" : "Create"}
                 </button>
               </div>
             </form>

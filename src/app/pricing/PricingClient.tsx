@@ -45,7 +45,7 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
       name: "Free",
       id: "FREE",
       price: "$0",
-      features: ["1 Workspace Limit", "Basic Ticketing", "Standard Support"],
+      features: ["2 Workspaces", "2 Notebooks", "50 Tickets", "100 MB Storage"],
       ...getPlanButtonProps("FREE")
     },
     {
