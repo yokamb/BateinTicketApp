@@ -1,0 +1,23 @@
+
+> saas-ticketing@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.2.1 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 4.8s
+  Running TypeScript ...
+Failed to type check.
+
+./src/app/api/auth/register/route.ts:35:38
+Type error: Parameter 'tx' implicitly has an 'any' type.
+
+  33 |
+  34 |     // Create user and profile in a transaction to be absolutely type-safe and robust
+> 35 |     await prisma.$transaction(async (tx) => {
+     |                                      ^
+  36 |       const newUser = await tx.user.create({
+  37 |         data: {
+  38 |           name,
+Next.js build worker exited with code: 1 and signal: null

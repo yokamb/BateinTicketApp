@@ -22,9 +22,9 @@ export async function GET(req: Request) {
 
     // If no custom types, use defaults based on user role
     if (ticketTypes.length === 0) {
-      const user = await prisma.user.findUnique({
-        where: { id: (session.user as any).id },
-        select: { professionalRole: true },
+      const user = await (prisma as any).user.findUnique({
+        where: { id: (session.user as any).id } as any,
+        select: { professionalRole: true } as any,
       });
 
       const roleMapping = ROLE_TICKET_MAPPINGS.find(m => m.role === user?.professionalRole) || ROLE_TICKET_MAPPINGS[0];

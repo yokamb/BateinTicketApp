@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user and profile in a transaction to be absolutely type-safe and robust
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       const newUser = await tx.user.create({
         data: {
           name,
