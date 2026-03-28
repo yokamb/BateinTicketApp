@@ -17,8 +17,13 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
+      return;
     }
-  }, [status, router]);
+
+    if (status === "authenticated" && (session?.user as any)?.professionalRole) {
+      router.replace("/dashboard");
+    }
+  }, [status, session, router]);
 
   const handleComplete = async () => {
     if (!selectedRole) return;
