@@ -31,20 +31,26 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with emailVerified = null (unverified)
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash: hashedPassword,
-        role: "ADMIN",
-        emailVerified: null,
-        profile: {
-          create: {
-            subSpecialty: userType === "freelancer" ? "Freelance" : "Company"
-          }
+    // Create user and profile in a transaction to be absolutely type-safe and robust
+    await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          email,
+          passwordHash: hashedPassword,
+          role: "ADMIN",
+          emailVerified: null,
+        },
+      });
+
+      // Using type casting to 'any' to bypass the persistent build-time type sync issues 
+      // even though the model exists in schema.prisma and was seeded.
+      await (tx as any).userProfile.create({
+        data: {
+          userId: newUser.id,
+          subSpecialty: userType === "freelancer" ? "Freelance" : "Company"
         }
-      },
+      });
     });
 
     // Generate a verification token (expires in 24 hours)

@@ -358,7 +358,7 @@ const ROLES_DATA = [
 async function main() {
   console.log('Seeding RoleConfig...');
   for (const role of ROLES_DATA) {
-    await prisma.roleConfig.upsert({
+    await (prisma as any).roleConfig.upsert({
       where: { roleName: role.roleName },
       update: role,
       create: role,

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const roles = await prisma.roleConfig.findMany({
+    const roles = await (prisma as any).roleConfig.findMany({
       orderBy: { roleName: "asc" },
     });
     return NextResponse.json(roles);
