@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     if (!workspaceId) return NextResponse.json({ error: "Workspace ID required" }, { status: 400 });
 
     // Fetch custom ticket types from DB
-    let ticketTypes = await prisma.ticketType.findMany({
+    let ticketTypes = await (prisma as any).ticketType.findMany({
       where: { workspaceId },
       orderBy: { createdAt: "asc" },
     });
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const ticketType = await prisma.ticketType.create({
+    const ticketType = await (prisma as any).ticketType.create({
       data: { workspaceId, label, category },
     });
 
@@ -72,7 +72,7 @@ export async function DELETE(req: Request) {
   
       if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
   
-      await prisma.ticketType.delete({ where: { id } });
+      await (prisma as any).ticketType.delete({ where: { id } });
   
       return NextResponse.json({ message: "Deleted" });
     } catch (e) {

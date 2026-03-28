@@ -13,12 +13,12 @@ export default async function DashboardPage() {
   let recentTickets: any[] = [];
 
   if (user.role === "ADMIN") {
-    workspaceCount = await prisma.workspace.count({ where: { adminId: user.id } });
-    activeTicketsCount = await prisma.ticket.count({ 
+    workspaceCount = await (prisma as any).workspace.count({ where: { adminId: user.id } });
+    activeTicketsCount = await (prisma as any).ticket.count({ 
       where: { workspace: { adminId: user.id }, status: { not: "CLOSED" } }
     });
     
-    recentTickets = await prisma.ticket.findMany({
+    recentTickets = await (prisma as any).ticket.findMany({
       where: { workspace: { adminId: user.id }, status: { not: "CLOSED" } },
       orderBy: { updatedAt: "desc" },
       take: 10,

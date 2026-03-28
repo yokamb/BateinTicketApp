@@ -14,12 +14,12 @@ export async function POST(req: Request) {
 
     // Verification check
     let hasAccess = false;
-    const ws = await prisma.workspace.findUnique({ where: { id: workspaceId } });
+    const ws = await (prisma as any).workspace.findUnique({ where: { id: workspaceId } });
     
     if (ws?.adminId === user.id) {
         hasAccess = true;
     } else {
-        const access = await prisma.instanceAccess.findUnique({
+        const access = await (prisma as any).instanceAccess.findUnique({
             where: { workspaceId_userId: { workspaceId, userId: user.id } }
         });
         hasAccess = !!access;
@@ -28,10 +28,10 @@ export async function POST(req: Request) {
     if (!hasAccess) return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
     
     // Check plan limits
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const dbUser = await (prisma as any).user.findUnique({ where: { id: user.id } });
     const plan = dbUser?.plan || "FREE";
     if (plan === "FREE") {
-        const userTicketCount = await prisma.ticket.count({ where: { creatorId: user.id } });
+        const userTicketCount = await (prisma as any).ticket.count({ where: { creatorId: user.id } });
         if (userTicketCount >= 50) {
             return NextResponse.json({ error: "Free plan allows up to 50 tickets. Please upgrade your workspace or subscription." }, { status: 403 });
         }
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     const tType = type || "INCIDENT";
     const prefix = tType === "CHANGE" ? "CHG" : tType === "REQUEST" ? "REQ" : "INC";
-    const ticketCount = await prisma.ticket.count();
+    const ticketCount = await (prisma as any).ticket.count();
     const seqNum = 1000 + ticketCount;
     const shortId = `${prefix}${String(seqNum).padStart(7, '0')}`;
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         initialStatus = "PENDING";
     }
 
-    const ticket = await prisma.ticket.create({
+    const ticket = await (prisma as any).ticket.create({
       data: {
         title,
         description: description || "",

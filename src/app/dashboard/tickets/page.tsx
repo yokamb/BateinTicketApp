@@ -12,21 +12,21 @@ export default async function TicketsPage() {
   let userWorkspaces: any[] = [];
   
   if (user.role === "ADMIN") {
-    tickets = await prisma.ticket.findMany({
+    tickets = await (prisma as any).ticket.findMany({
       where: { workspace: { adminId: user.id } },
       include: { creator: true, workspace: true },
       orderBy: { createdAt: "desc" }
     });
   } else {
     // customers see tickets in their granted workspaces
-    tickets = await prisma.ticket.findMany({
+    tickets = await (prisma as any).ticket.findMany({
       where: { workspace: { customers: { some: { userId: user.id } } } },
       include: { creator: true, workspace: true },
       orderBy: { createdAt: "desc" }
     });
     
     // fetch the customer's workspaces to know where they can create tickets
-    const accesses = await prisma.instanceAccess.findMany({
+    const accesses = await (prisma as any).instanceAccess.findMany({
       where: { userId: user.id },
       include: { workspace: true }
     });
