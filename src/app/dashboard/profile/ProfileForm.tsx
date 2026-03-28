@@ -1,12 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Lock, Eye, EyeOff, Plus, Trash2, Edit2, Info } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Save, Lock, Eye, EyeOff, Edit2 } from "lucide-react";
 import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
-import { ROLE_TICKET_MAPPINGS } from "@/lib/constants/roles";
-import { Modal, Button, Group, Text, Box, Badge, Card, ActionIcon, Tooltip, Title } from "@mantine/core";
+import { Modal, Button, Group, Text, Box, Title } from "@mantine/core";
 import { RoleSelector } from "@/components/onboarding/RoleSelector";
-import { useEffect } from "react";
 
 export default function ProfileForm({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
@@ -45,6 +44,7 @@ export default function ProfileForm({ user }: { user: any }) {
   const [pwMessage, setPwMessage] = useState<{text: string, type: "success"|"error"} | null>(null);
 
   const router = useRouter();
+  const { update: updateSession } = useSession();
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +82,7 @@ export default function ProfileForm({ user }: { user: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ professionalRole: role.roleName }),
       });
+      await updateSession?.({ professionalRole: role.roleName });
       setMessage({ text: "Role updated successfully!", type: "success" });
       router.refresh();
     } catch (e) {
@@ -139,6 +140,12 @@ export default function ProfileForm({ user }: { user: any }) {
     }
   };
 
+  const defaultPalette = ["#6366f1", "#0ea5e9", "#f97316"];
+  const rolePalette = roleConfig?.colorScheme
+    ? roleConfig.colorScheme.split(",").map((c: string) => c.trim())
+    : defaultPalette;
+  const getRoleColor = (index: number) => rolePalette[index] || defaultPalette[index];
+
   return (
     <div className="space-y-8">
       {/* Profile Form */}
@@ -175,22 +182,31 @@ export default function ProfileForm({ user }: { user: any }) {
 
               {roleConfig && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Issues</Text>
+                  <div
+                    className="p-3 rounded-lg border shadow-sm text-white"
+                    style={{ backgroundColor: getRoleColor(0), borderColor: getRoleColor(0) }}
+                  >
+                    <Text size="10px" fw={700} className="uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>Issues</Text>
                     <Group gap="xs">
                        <Text size="lg">{roleConfig.issueIcon}</Text>
                        <Text fw={600} size="sm">{roleConfig.issueLabel}</Text>
                     </Group>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Requests</Text>
+                  <div
+                    className="p-3 rounded-lg border shadow-sm text-white"
+                    style={{ backgroundColor: getRoleColor(1), borderColor: getRoleColor(1) }}
+                  >
+                    <Text size="10px" fw={700} className="uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>Requests</Text>
                     <Group gap="xs">
                        <Text size="lg">{roleConfig.requestIcon}</Text>
                        <Text fw={600} size="sm">{roleConfig.requestLabel}</Text>
                     </Group>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                    <Text size="10px" fw={700} color="dimmed" className="uppercase tracking-widest mb-1">Changes</Text>
+                  <div
+                    className="p-3 rounded-lg border shadow-sm text-white"
+                    style={{ backgroundColor: getRoleColor(2), borderColor: getRoleColor(2) }}
+                  >
+                    <Text size="10px" fw={700} className="uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>Changes</Text>
                     <Group gap="xs">
                        <Text size="lg">{roleConfig.changeIcon}</Text>
                        <Text fw={600} size="sm">{roleConfig.changeLabel}</Text>
@@ -208,9 +224,11 @@ export default function ProfileForm({ user }: { user: any }) {
               className="mt-4 md:mt-0"
               radius="md"
             >
-              Change Role
+              Edit Role
             </Button>
           </div>
+
+          <p className="text-xs text-slate-500 mt-3">Update your role anytime to instantly refresh ticket labels, icons, and colors.</p>
 
           <Modal 
             opened={isRoleModalOpen} 

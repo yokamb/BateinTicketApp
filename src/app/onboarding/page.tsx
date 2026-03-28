@@ -34,7 +34,7 @@ export default function OnboardingPage() {
       });
       
       if (res.ok) {
-        await update(); // Refresh session
+        await update({ professionalRole: selectedRole.roleName });
         router.push("/dashboard");
       }
     } catch (e) {
@@ -108,6 +108,10 @@ export default function OnboardingPage() {
                   onSelect={(role) => setSelectedRole(role)} 
                   selectedRoleName={selectedRole?.roleName}
                 />
+
+                <Text size="xs" className="text-indigo-200/60 text-center">
+                  Change role anytime under Settings → Profile.
+                </Text>
 
                 <Group justify="center" mt="xl">
                   <Button variant="subtle" color="indigo" onClick={() => setActive(0)}>Back</Button>

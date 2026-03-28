@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge, Text, Group } from "@mantine/core";
+import { Badge, Text } from "@mantine/core";
 
 interface RoleConfig {
   roleName: string;
@@ -39,41 +39,77 @@ export function TicketTypeBadge({ type, professionalRole, size = "xs" }: TicketT
     }
   }, [professionalRole]);
 
-  const getLabel = () => {
-    if (!roleConfig) return type;
-    if (type === "INCIDENT") return roleConfig.issueLabel;
-    if (type === "REQUEST") return roleConfig.requestLabel;
-    if (type === "CHANGE") return roleConfig.changeLabel;
-    return type;
-  };
+  const normalizedType = (type || "").toUpperCase();
+  const matchesIssue = roleConfig
+    ? normalizedType === "INCIDENT" || type === roleConfig.issueLabel
+    : normalizedType === "INCIDENT";
+  const matchesRequest = roleConfig
+    ? normalizedType === "REQUEST" || type === roleConfig.requestLabel
+    : normalizedType === "REQUEST";
+  const matchesChange = roleConfig
+    ? normalizedType === "CHANGE" || type === roleConfig.changeLabel
+    : normalizedType === "CHANGE";
 
-  const getIcon = () => {
-    if (!roleConfig) return null;
-    if (type === "INCIDENT") return roleConfig.issueIcon;
-    if (type === "REQUEST") return roleConfig.requestIcon;
-    if (type === "CHANGE") return roleConfig.changeIcon;
-    return null;
-  };
+  const palette = roleConfig?.colorScheme
+    ? roleConfig.colorScheme.split(",").map((c) => c.trim())
+    : [];
 
-  const getColor = () => {
-    if (type === "INCIDENT") return "red";
-    if (type === "REQUEST") return "blue";
-    if (type === "CHANGE") return "orange";
+  const label = roleConfig
+    ? matchesIssue
+      ? roleConfig.issueLabel
+      : matchesRequest
+      ? roleConfig.requestLabel
+      : matchesChange
+      ? roleConfig.changeLabel
+      : type
+    : type;
+
+  const icon = roleConfig
+    ? matchesIssue
+      ? roleConfig.issueIcon
+      : matchesRequest
+      ? roleConfig.requestIcon
+      : matchesChange
+      ? roleConfig.changeIcon
+      : null
+    : null;
+
+  const colorHex = roleConfig
+    ? matchesIssue
+      ? palette[0]
+      : matchesRequest
+      ? palette[1]
+      : matchesChange
+      ? palette[2]
+      : undefined
+    : undefined;
+
+  const getFallbackColor = () => {
+    if (matchesIssue) return "red";
+    if (matchesRequest) return "blue";
+    if (matchesChange) return "orange";
     return "gray";
   };
 
   return (
     <Badge 
-      variant="light" 
-      color={getColor()} 
+      variant={colorHex ? "filled" : "light"}
+      color={colorHex ? undefined : getFallbackColor()} 
       size={size}
-      className={`font-black uppercase tracking-tighter rounded-full`}
-      leftSection={getIcon() ? <Text size="12px">{getIcon()}</Text> : null}
+      className={`font-black uppercase tracking-tighter rounded-full ${colorHex ? "border-none" : ""}`}
+      leftSection={icon ? <Text size="12px">{icon}</Text> : null}
       styles={{
-        label: { paddingLeft: getIcon() ? '4px' : '0px' }
+        root: colorHex
+          ? {
+              backgroundColor: colorHex,
+              borderColor: colorHex,
+              color: "#fff",
+            }
+          : undefined,
+        label: { paddingLeft: icon ? '4px' : '0px' }
       }}
     >
-      {getLabel()}
+      {label}
     </Badge>
   );
 }
