@@ -41,44 +41,44 @@ export default function StorageTracker() {
   const isCritical = percentage > 95;
 
   return (
-    <div className="px-4 py-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <HardDrive size={14} className={isCritical ? "text-red-400" : isNearLimit ? "text-amber-400" : "text-purple-400"} />
-        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Storage</span>
+    <div className="px-3 py-3 bg-[#efefef] border border-[#e0e0e0] rounded-xl">
+      <div className="flex items-center gap-2 mb-2.5">
+        <HardDrive size={13} className={isCritical ? "text-red-500" : isNearLimit ? "text-amber-500" : "text-[#888]"} />
+        <span className="text-[10px] font-semibold text-[#888] uppercase tracking-wider">Storage</span>
       </div>
       
-      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden mb-2">
+      <div className="h-1 w-full bg-[#d5d5d5] rounded-full overflow-hidden mb-2">
         <div 
           className={`h-full transition-all duration-700 rounded-full ${
-            isCritical ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-gradient-to-r from-purple-500 to-indigo-500"
+            isCritical ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-[#0d0d0d]"
           }`}
           style={{ width: `${percentage}%` }}
         />
       </div>
       
       <div className="flex justify-between items-center">
-        <span className="text-[10px] text-slate-400">{fmt(used)} / {fmt(total)}</span>
+        <span className="text-[10px] text-[#888]">{fmt(used)} / {fmt(total)}</span>
         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-          isCritical ? "bg-red-500/20 text-red-300" : "bg-purple-500/20 text-purple-300"
+          isCritical ? "bg-red-100 text-red-600" : "bg-[#e0e0e0] text-[#555]"
         }`}>
           {data.plan}
         </span>
       </div>
 
       {data.breakdown && (
-        <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+        <div className="mt-2 pt-2 border-t border-[#e0e0e0] space-y-0.5">
           {data.breakdown.attachmentBytes > 0 && (
-            <div className="flex justify-between text-[9px] text-slate-500">
+            <div className="flex justify-between text-[9px] text-[#999]">
               <span>Files</span><span>{fmt(data.breakdown.attachmentBytes)}</span>
             </div>
           )}
           {data.breakdown.noteBytes > 0 && (
-            <div className="flex justify-between text-[9px] text-slate-500">
+            <div className="flex justify-between text-[9px] text-[#999]">
               <span>Notes</span><span>{fmt(data.breakdown.noteBytes)}</span>
             </div>
           )}
           {data.breakdown.ticketTextBytes > 0 && (
-            <div className="flex justify-between text-[9px] text-slate-500">
+            <div className="flex justify-between text-[9px] text-[#999]">
               <span>Tickets</span><span>{fmt(data.breakdown.ticketTextBytes)}</span>
             </div>
           )}

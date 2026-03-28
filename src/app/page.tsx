@@ -1,241 +1,177 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle, Shield, Zap, Layers, MessageSquare, Briefcase, Star, PenTool } from "lucide-react";
 import Logo from "@/components/Logo";
+import { DynamicReviews } from "@/components/landing/DynamicReviews";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0A0514] text-white selection:bg-purple-500/30 overflow-hidden font-sans">
-      {/* Abstract Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
-      <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-indigo-600/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-[-20%] left-[20%] w-[800px] h-[800px] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[150px] animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-white text-[#0d0d0d] selection:bg-indigo-100 overflow-hidden font-sans antialiased relative">
+      {/* Background blobs - RESTORED BUT SUBTLE */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Navigation */}
-      <nav className="relative z-10 border-b border-white/5 bg-white/5 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <nav className="fixed top-0 w-full z-50 border-b border-[#f0f0f0] bg-white/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Logo />
+            <Logo className="scale-90 origin-left" />
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="/login" className="text-sm font-medium text-purple-200 hover:text-white transition-colors">
+          <div className="flex items-center gap-4 text-sm">
+            <Link href="/login" className="font-medium text-[#666] hover:text-[#0d0d0d] transition-colors">
               Log in
             </Link>
-            <Link href="/register" className="text-sm font-bold bg-white text-slate-900 px-5 py-2.5 rounded-full hover:bg-purple-50 transition-colors shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-              Get Started Free
+            <Link href="/register" className="font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-500/20 transition-all active:scale-95 shadow-md">
+              Get Started
             </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-purple-300 text-sm font-medium mb-8 backdrop-blur-sm">
-          <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse"></span>
-          The Ultimate Ticketing OS & Project tracker for Freelancers
+      <main className="relative z-10 max-w-5xl mx-auto px-6 pt-32 pb-24 text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold mb-8 border border-indigo-100/50">
+          <span className="flex h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+          The Ultimate Ticketing OS for Freelancers
         </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-8 leading-[1.1]">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-[1.15] text-[#0d0d0d]">
           Manage clients like a <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">
-            Fortune 500 agency.
-          </span>
+          <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Fortune 500 agency.</span>
         </h1>
-        <p className="text-lg text-slate-400 max-w-xl mx-auto mb-12 leading-relaxed">
+        <p className="text-lg text-[#555] max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
           Create isolated workspaces, handle Incidents with ITIL naming, track Change approvals, and manage projects. Stop using chaotic emails for client support.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full text-white font-bold text-lg hover:from-purple-500 hover:to-indigo-500 transition-all shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(168,85,247,0.6)] flex items-center justify-center gap-2 group">
+          <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl text-white font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/40 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98]">
             Start Free Trial
             <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
           </Link>
-          <Link href="#features" className="w-full sm:w-auto px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-white font-bold text-lg transition-all backdrop-blur-sm">
+          <Link href="#features" className="w-full sm:w-auto px-8 py-4 bg-white border border-[#e5e5e5] hover:border-indigo-200 hover:bg-indigo-50/20 rounded-2xl text-[#0d0d0d] font-bold text-lg transition-all shadow-sm">
             View Features
           </Link>
         </div>
       </main>
 
       {/* Feature Highlights */}
-      <section id="features" className="relative z-10 py-24 bg-black/40 border-y border-white/5 backdrop-blur-xl">
+      <section id="features" className="relative z-10 py-24 bg-white border-y border-[#f0f0f0]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">Everything you need to deliver.</h2>
-            <p className="text-slate-400 text-base">Powerful features wrapped in an elegant, minimal interface.</p>
+            <h2 className="text-3xl font-bold mb-4 text-[#0d0d0d]">Everything you need to deliver.</h2>
+            <p className="text-[#666] text-base font-medium">Powerful features wrapped in an elegant, minimal interface.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-purple-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
-                <Layers size={24} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: Layers, title: "Isolated Workspaces", desc: "Give every client their own branded portal. Keep their data, tickets, and communications completely separate and secure.", bg: "bg-indigo-50", color: "text-indigo-600" },
+              { icon: Shield, title: "Change Approvals", desc: "Enforce rigorous workflows. Require explicit sign-off from designated client stakeholders before resolving critical Changes.", bg: "bg-purple-50", color: "text-purple-600" },
+              { icon: Briefcase, title: "Project Tracker", desc: "Let clients follow progress in real-time. Share milestones, task updates, and timelines directly within their dedicated workspace.", bg: "bg-cyan-50", color: "text-cyan-600" },
+              { icon: Zap, title: "ITIL-Ready Naming", desc: "Automatically organize work streams with industry-standard tags like INC- (Incidents), REQ- (Requests), and CHG- (Changes).", bg: "bg-amber-50", color: "text-amber-600" },
+              { icon: MessageSquare, title: "Email Notifications", desc: "Stay updated with automated Resend alerts. Get notified instantly for new tickets, status changes, and client comments.", bg: "bg-emerald-50", color: "text-emerald-600" },
+              { icon: PenTool, title: "Secure Authentication", desc: "Professional security for you and your clients. Dual-option login via Google OAuth or verified email registration.", bg: "bg-rose-50", color: "text-rose-600" }
+            ].map((f, i) => (
+              <div key={i} className="p-8 rounded-[2rem] bg-white border border-[#e5e5e5] hover:border-indigo-400/50 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden">
+                <div className={`w-12 h-12 ${f.bg} rounded-2xl flex items-center justify-center ${f.color} mb-6 transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
+                  <f.icon size={22} />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-[#0d0d0d]">{f.title}</h3>
+                <p className="text-[#666] text-sm leading-relaxed font-medium">{f.desc}</p>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Isolated Workspaces</h3>
-              <p className="text-slate-400 leading-relaxed">Give every client their own branded portal. Keep their data, tickets, and communications completely separate and secure.</p>
-            </div>
-            
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-pink-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 mb-6 group-hover:scale-110 transition-transform">
-                <Shield size={24} />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Change Approvals</h3>
-              <p className="text-slate-400 leading-relaxed">Enforce rigorous workflows. Require explicit sign-off from designated client stakeholders before resolving critical Changes.</p>
-            </div>
-
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-indigo-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
-                <Briefcase size={24} />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Project Tracker</h3>
-              <p className="text-slate-400 leading-relaxed">Let clients follow progress in real-time. Share milestones, task updates, and timelines directly within their dedicated workspace.</p>
-            </div>
-
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-blue-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
-                <Zap size={24} />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">ITIL-Ready Naming</h3>
-              <p className="text-slate-400 leading-relaxed">Automatically organize work streams with industry-standard tags like INC- (Incidents), REQ- (Requests), and CHG- (Changes).</p>
-            </div>
-
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-emerald-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
-                <MessageSquare size={24} />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Email Notifications</h3>
-              <p className="text-slate-400 leading-relaxed">Stay updated with automated Resend alerts. Get notified instantly for new tickets, status changes, and client comments.</p>
-            </div>
-
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/10 hover:border-yellow-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center text-yellow-400 mb-6 group-hover:scale-110 transition-transform">
-                <PenTool size={24} />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Secure Authentication</h3>
-              <p className="text-slate-400 leading-relaxed">Professional security for you and your clients. Dual-option login via Google OAuth or verified email registration.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof / Reviews */}
-      <section className="relative z-10 py-32 w-full overflow-hidden border-t border-white/5 bg-black/20">
-        <div className="text-center mb-24 px-6 relative z-20">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6 animate-lightbulb shadow-2xl shadow-yellow-500/50">
-             <Star className="text-white" size={32} fill="currentColor" />
+      {/* Social Proof / Dynamic Reviews - RESTORED ANIMATIONS & DYNAMIC CONTENT */}
+      <section className="relative z-10 py-32 bg-[#fafafa] flex flex-col items-center overflow-hidden border-b border-[#f0f0f0]">
+        <div className="text-center mb-4 px-6 relative z-10">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-amber-100 rounded-full mb-6 border border-amber-200 shadow-lg shadow-amber-500/10">
+             <Star className="text-amber-500" size={24} fill="currentColor" />
           </div>
-          <h2 className="text-2xl md:text-4xl font-bold mb-4">Loved by Top Professionals</h2>
-          <p className="text-slate-400 text-base">Real feedback from freelancers and agencies using Batein.</p>
+          <h2 className="text-3xl md:text-5xl font-black mb-3 text-[#0d0d0d] tracking-tight">Trust of Professionals World Wide</h2>
         </div>
 
-        {/* Cloud/Lightbulb Floating Container */}
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16 pt-8 pb-16">
-          {(() => {
-            const reviews = [
-              { name: "Sarah Jenkins", role: "UI/UX Designer", rating: 5, color: "from-purple-500 to-indigo-500", text: "Batein completely eliminated email tag with my clients. They log into their workspaces and approve design changes instantly.", delayClass: "" },
-              { name: "Alex Chen", role: "DevOps Consultant", rating: 5, color: "from-blue-500 to-cyan-500", text: "The Change Approval workflow feature alone is worth $100/mo. It protects me from scope creep and undocumented client demands.", delayClass: "delay-1" },
-              { name: "Maria Rodriguez", role: "Digital Agency Owner", rating: 4, color: "from-pink-500 to-rose-500", text: "We manage 15 distinct clients across 15 workspaces. Batein is the elegant, lightweight solution Jira could never be.", delayClass: "delay-2" },
-              { name: "David Kim", role: "Freelance", rating: 5, color: "from-emerald-500 to-teal-500", text: "I tried Zendesk but it was too complex. Batein is built exactly for solo devs handling multiple retainers.", delayClass: "delay-3" },
-              { name: "Emma Wilson", role: "Marketing", rating: 5, color: "from-amber-500 to-orange-500", text: "My clients love having their own branded portal. It makes my 1-person business look like a Fortune 500 agency.", delayClass: "delay-4" },
-            ];
-            return reviews.map((review, i) => (
-              <div 
-                key={i} 
-                className={`relative p-8 md:p-10 bg-white/5 border-2 border-white/10 backdrop-blur-md transition-transform animate-cloud-morph ${review.delayClass} hover:bg-white/10 hover:border-yellow-500/50 hover:shadow-[0_0_50px_rgba(234,179,8,0.2)] flex flex-col items-center text-center`}
-              >
-                {/* Floating Lightbulb Accent */}
-                <div className="absolute top-[-20px] bg-gradient-to-br from-yellow-300 to-amber-500 w-10 h-10 rounded-full animate-lightbulb border-[3px] border-[#0A0514] flex items-center justify-center shadow-[0_0_20px_rgba(234,179,8,0.6)]">
-                   <Star size={14} className="text-[#0A0514]" fill="currentColor" />
-                </div>
-                
-                <div className="flex text-yellow-400 mb-5 gap-1 justify-center">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} size={18} fill={j < review.rating ? "currentColor" : "none"} className={j >= review.rating ? "text-slate-600" : ""} />
-                  ))}
-                </div>
-                <p className="text-slate-300 mb-8 italic text-[16px] leading-relaxed">"{review.text}"</p>
-                
-                <div className="flex items-center gap-4 mt-auto">
-                  <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${review.color} flex items-center justify-center font-bold text-white shadow-lg text-lg`}>
-                    {review.name[0]}
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-bold text-white text-base">{review.name}</h4>
-                    <p className="text-sm text-slate-400 font-medium">{review.role}</p>
-                  </div>
-                </div>
-              </div>
-            ));
-          })()}
-        </div>
+        <DynamicReviews />
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="relative z-10 py-24 bg-black/40 border-t border-white/5 backdrop-blur-xl">
+      <section id="pricing" className="relative z-10 py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-slate-400 text-base">Start for free. Upgrade when you need more power.</p>
+            <h2 className="text-3xl font-bold mb-4 text-[#0d0d0d]">Simple, Transparent Pricing</h2>
+            <p className="text-[#666] text-base font-medium">Start for free. Upgrade when you need more power.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free */}
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col">
-               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-               <div className="text-4xl font-black text-white mb-6">$0<span className="text-lg text-slate-400 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-slate-400 text-sm">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 1 Workspace</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Up to 50 Tickets</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 1 Notebook (5 Pages)</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Share with 2 Customers</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 100 MB Storage</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 5 MB Max File Size</li>
+            <div className="p-10 rounded-[2.5rem] bg-white border border-[#e5e5e5] flex flex-col hover:shadow-xl transition-all">
+               <h3 className="text-xl font-bold text-[#666] mb-1">Free</h3>
+               <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$0<span className="text-sm text-[#888] font-medium">/mo</span></div>
+               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 1 Workspace Limit</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Up to 50 Tickets</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 1 Notebook (5 Pages)</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 100 MB Storage</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Started</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-indigo-400 hover:text-indigo-600 text-[#666] font-bold transition-all text-sm">Get Started</Link>
             </div>
 
             {/* Pro */}
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-purple-900/40 to-indigo-900/20 border-2 border-purple-500 transform md:-translate-y-4 shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col">
-               <div className="inline-block px-3 py-1 bg-purple-500 text-white text-xs font-bold rounded-full mb-4 self-start">RECOMMENDED</div>
-               <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-               <div className="text-4xl font-black text-white mb-6">$2<span className="text-lg text-purple-200 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-purple-100 text-sm">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 10 Workspaces</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Tickets</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Notebooks</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> Unlimited Customer Sharing</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 1 GB Storage</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-white"/> 5 MB Max File Size</li>
+            <div className="p-10 rounded-[2.5rem] bg-white border-2 border-indigo-600 flex flex-col shadow-2xl shadow-indigo-500/10 relative transform scale-105 z-20">
+               <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black rounded-full shadow-lg">MOST POPULAR</div>
+               <h3 className="text-xl font-bold text-indigo-600 mb-1">Pro</h3>
+               <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$2<span className="text-sm text-[#888] font-medium">/mo</span></div>
+               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> 10 Workspaces</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Unlimited Tickets</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Unlimited Notebooks</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> 1 GB Storage</li>
+                  <li className="flex items-center gap-3 font-bold text-indigo-600"><CheckCircle size={16} className="text-indigo-500"/> Priority Support</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white font-bold transition-colors shadow-lg shadow-purple-500/30">Upgrade Now</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white font-bold transition-all text-sm ring-4 ring-indigo-50">Get Pro Now</Link>
             </div>
 
             {/* Max */}
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col">
-               <h3 className="text-2xl font-bold text-white mb-2">Max</h3>
-               <div className="text-4xl font-black text-white mb-6">$6<span className="text-lg text-slate-400 font-medium">/mo</span></div>
-               <ul className="space-y-3 mb-8 text-slate-400 text-sm">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Workspaces</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Tickets</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Unlimited Notebooks</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> Priority 24/7 Support</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 5 GB Storage</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-purple-400"/> 10 MB Max File Size</li>
-                  <li className="mt-4 pt-4 border-t border-white/10 text-xs text-purple-300 font-medium italic">
-                    Additional storage: $1 per 1GB
-                  </li>
+            <div className="p-10 rounded-[2.5rem] bg-white border border-[#e5e5e5] flex flex-col hover:shadow-xl transition-all">
+               <h3 className="text-xl font-bold text-[#666] mb-1">Max</h3>
+               <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$6<span className="text-sm text-[#888] font-medium">/mo</span></div>
+               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Unlimited Everything</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 5 GB Storage</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Large File Uploads</li>
+                  <li className="flex items-center gap-3 font-bold text-emerald-600"><CheckCircle size={16} className="text-emerald-500"/> 24/7 Priority Support</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold transition-colors">Get Max</Link>
+               <Link href="/register" className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-emerald-400 hover:text-emerald-600 text-[#666] font-bold transition-all text-sm">Get Max</Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer CTA */}
-      <section className="relative z-10 py-32 bg-gradient-to-b from-transparent to-purple-900/20 border-t border-white/10">
+      <section className="relative z-10 py-32 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-5xl font-black mb-8">Ready to elevate your client experience?</h2>
-          <Link href="/register" className="inline-flex items-center gap-2 px-10 py-5 bg-white text-slate-900 rounded-full font-extrabold text-xl hover:bg-slate-200 transition-colors shadow-2xl shadow-white/10 hover:scale-105 transform">
+          <h2 className="text-3xl md:text-5xl font-black mb-8 text-[#0d0d0d] tracking-tight leading-tight">Ready to elevate your <br /> <span className="text-indigo-600">client experience?</span></h2>
+          <Link href="/register" className="inline-flex items-center gap-3 px-10 py-5 bg-[#0d0d0d] text-white rounded-[2rem] font-black text-xl hover:bg-[#222] hover:shadow-2xl hover:shadow-black/20 transition-all hover:scale-105 active:scale-95 shadow-xl">
             Get Started For Free
+            <ArrowRight size={22} />
           </Link>
-          <p className="mt-6 text-slate-500">No credit card required. Upgrade anytime.</p>
+          <p className="mt-6 text-[#888] text-sm font-bold uppercase tracking-widest">No credit card required</p>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-16 border-t border-[#f0f0f0] bg-white text-center relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <Logo className="scale-100 opacity-60 grayscale hover:grayscale-0 transition-all mb-6 mx-auto cursor-pointer" />
+          <div className="flex justify-center gap-8 mb-8 text-sm font-bold text-[#888]">
+            <Link href="#features" className="hover:text-indigo-600 transition-colors">Features</Link>
+            <Link href="#pricing" className="hover:text-indigo-600 transition-colors">Pricing</Link>
+            <Link href="/login" className="hover:text-indigo-600 transition-colors">Login</Link>
+          </div>
+          <p className="text-xs text-[#aaa] font-medium tracking-wide prose max-w-none">© 2026 Batein Software Architecture. Built for modern freelancers worldwide.</p>
+        </div>
+        
+        {/* Subtle Footer Blob */}
+        <div className="absolute bottom-[-50%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-500/5 rounded-[100%] blur-[100px] pointer-events-none"></div>
+      </footer>
     </div>
   );
 }

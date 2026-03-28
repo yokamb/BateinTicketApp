@@ -11,7 +11,6 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
   const router = useRouter();
 
   const handleApprove = async (plan: "PRO" | "MAX", data: any, actions: any) => {
-    // For subscriptions, onApprove receives data.subscriptionID.
     const res = await fetch("/api/user/upgrade", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,7 +34,6 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
       if (planId === "PRO") return { disabled: true, buttonText: "Current Plan" };
       if (planId === "MAX") return { disabled: false, buttonText: "Upgrade to Max" };
     }
-    // userPlan === "FREE"
     if (planId === "FREE") return { disabled: true, buttonText: "Current Plan" };
     if (planId === "PRO") return { disabled: false, buttonText: "Upgrade to Pro" };
     if (planId === "MAX") return { disabled: false, buttonText: "Upgrade to Max" };
@@ -67,32 +65,33 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-20 px-4 animate-fade-in-up">
+    <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased">
       <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Choose Your Plan</h1>
-        <p className="text-xl text-slate-500">Scale your freelance business with premium features.</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
+        <p className="text-base text-[#666]">Scale your freelance business with premium features.</p>
       </div>
 
       {isSuccess ? (
-        <div className="max-w-md mx-auto p-6 bg-green-50 border border-green-200 rounded-2xl text-green-700 text-center font-medium shadow-sm">
+        <div className="max-w-md mx-auto p-8 bg-white border border-emerald-100 rounded-2xl text-[#0d0d0d] text-center font-medium shadow-xl shadow-black/[0.03]">
           <div className="text-4xl mb-4">🎉</div>
-          Payment Successful! You've been upgraded. Redirecting...
+          <p className="text-lg font-bold mb-1">Upgrade Successful!</p>
+          <p className="text-sm text-[#666]">We're redirecting you to your dashboard.</p>
         </div>
       ) : (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((pl: any) => (
-            <div key={pl.id} className={`bg-white rounded-3xl overflow-hidden shadow-lg border-2 ${selectedPlan === pl.id ? 'border-indigo-500 ring-4 ring-indigo-50 transform scale-105' : 'border-transparent'} transition-all`}>
-              <div className="p-8 text-center bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-                <h2 className="text-2xl font-bold mb-2">{pl.name}</h2>
-                <div className="text-5xl font-black mb-1">{pl.price}<span className="text-lg font-medium opacity-80">/mo</span></div>
+            <div key={pl.id} className={`bg-white rounded-2xl overflow-hidden border transition-all ${selectedPlan === pl.id ? 'border-[#0d0d0d] shadow-2xl scale-[1.02]' : 'border-[#e5e5e5] shadow-sm'}`}>
+              <div className="p-8 pb-6 text-center border-b border-[#f0f0f0]">
+                <h2 className="text-lg font-bold mb-1 text-[#666] tracking-tight">{pl.name}</h2>
+                <div className="text-4xl font-bold text-[#0d0d0d]">{pl.price}<span className="text-sm font-medium text-[#888]">/mo</span></div>
               </div>
 
               <div className="p-8">
-                <ul className="space-y-4 mb-8 min-h-[160px]">
+                <ul className="space-y-3.5 mb-8 min-h-[140px]">
                   {pl.features.map((feature: string, i: number) => (
-                    <li key={i} className="flex items-center gap-3 text-slate-700">
-                      <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                        <Check size={12} />
+                    <li key={i} className="flex items-center gap-3 text-[#444]">
+                      <div className="w-5 h-5 rounded-full bg-[#f3f3f3] text-[#0d0d0d] flex items-center justify-center shrink-0">
+                        <Check size={12} strokeWidth={3} />
                       </div>
                       <span className="text-sm font-medium">{feature}</span>
                     </li>
@@ -102,20 +101,20 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                 {!pl.disabled && selectedPlan !== pl.id && (
                   <button 
                     onClick={() => setSelectedPlan(pl.id)}
-                    className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition-colors"
+                    className="w-full py-2.5 bg-[#0d0d0d] hover:bg-[#333] text-white font-bold rounded-xl transition-all shadow-md text-sm"
                   >
                     Select {pl.name}
                   </button>
                 )}
 
                 {pl.disabled && (
-                  <button disabled className="w-full py-3 bg-slate-50 text-slate-400 font-bold rounded-xl border border-slate-200 cursor-not-allowed">
+                  <button disabled className="w-full py-2.5 bg-white text-[#bbb] font-bold rounded-xl border border-[#e5e5e5] cursor-not-allowed text-sm">
                     {pl.buttonText}
                   </button>
                 )}
 
                 {selectedPlan === pl.id && (
-                  <div className="mt-4 animate-fade-in-up">
+                  <div className="mt-4">
                     <PayPalScriptProvider options={{ 
                       "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
                       "intent": "subscription",
@@ -124,14 +123,14 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                       "enable-funding": "card",
                     }}>
                       <PayPalButtons
-                        style={{ layout: "vertical", shape: "rect", color: "blue", height: 40 }}
+                        style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
                         createSubscription={(data, actions) => {
                           const planId = pl.id === "PRO" 
                             ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
                             : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
                             
                           if (!planId) {
-                            alert("PayPal Plan ID is missing! Next.js failed to load it. I'm automatically restarting your server to pull in the fresh .env variables.");
+                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
                             return Promise.reject("Missing PayPal Plan ID");
                           }
 
@@ -144,7 +143,7 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                     </PayPalScriptProvider>
                     <button 
                       onClick={() => setSelectedPlan(null)}
-                      className="w-full py-2 mt-2 text-sm text-slate-500 hover:text-slate-700"
+                      className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
                     >
                       Cancel
                     </button>

@@ -2,7 +2,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0d0d0d;
+  --sidebar-bg: #f9f9f9;
+  --sidebar-border: #e5e5e5;
+  --hover-bg: #efefef;
+  --text-muted: #888888;
+  --text-secondary: #444444;
 }
 
 @theme inline {
@@ -12,19 +17,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
   max-width: 100vw;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 @keyframes cloud-morph {
@@ -47,10 +46,22 @@ body {
   animation: cloud-morph 10s ease-in-out infinite, float-random 8s ease-in-out infinite;
 }
 
-.animate-cloud-morph.delay-1 { animation-delay: -3s, -2s; }
-.animate-cloud-morph.delay-2 { animation-delay: -5s, -7s; }
-.animate-cloud-morph.delay-3 { animation-delay: -8s, -4s; }
-.animate-cloud-morph.delay-4 { animation-delay: -2s, -9s; }
+.amoeba-border {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+@keyframes cloud-morph {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1) rotate(0deg); }
+  25% { border-radius: 45% 55% 50% 50% / 55% 45% 60% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: scale(1.05) rotate(3deg); }
+  75% { border-radius: 55% 45% 40% 60% / 45% 55% 50% 50%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1) rotate(0deg); }
+}
+
+.animate-cloud-morph.delay-1 { animation-delay: -3.2s, -1.5s; }
+.animate-cloud-morph.delay-2 { animation-delay: -5.7s, -6.8s; }
+.animate-cloud-morph.delay-3 { animation-delay: -8.1s, -4.3s; }
+.animate-cloud-morph.delay-4 { animation-delay: -2.4s, -8.9s; }
 
 .animate-lightbulb {
   animation: lightbulb-glow 4s ease-in-out infinite;

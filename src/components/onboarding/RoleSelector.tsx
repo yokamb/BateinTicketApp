@@ -10,9 +10,8 @@ import {
   Badge, 
   Box,
   rem,
-  Card,
-  Tooltip,
-  ActionIcon
+  ActionIcon,
+  Tooltip
 } from "@mantine/core";
 import { Search, ChevronRight, Info, Check } from "lucide-react";
 
@@ -58,54 +57,59 @@ export function RoleSelector({ onSelect, selectedRoleName }: RoleSelectorProps) 
   );
 
   return (
-    <Box className="space-y-4">
+    <Box className="space-y-3">
       <TextInput
         placeholder="Search for your profession..."
         value={search}
         onChange={(e) => setSearch(e.currentTarget.value)}
-        leftSection={<Search size={16} />}
+        leftSection={<Search size={14} className="text-[#888]" />}
         size="md"
-        radius="xl"
+        radius="lg"
         styles={{
           input: {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'white',
+            backgroundColor: '#fff',
+            border: '1px solid #e5e5e5',
+            color: '#0d0d0d',
+            fontSize: rem(13),
+            paddingLeft: rem(38),
             '&:focus': {
-              borderColor: '#6366f1',
+              borderColor: '#0d0d0d',
             }
           }
         }}
+        className="px-4 pt-4"
       />
 
-      <ScrollArea h={400} type="hover" offsetScrollbars>
-        <div className="grid grid-cols-1 gap-3 pr-2">
+      <ScrollArea h={380} type="hover" offsetScrollbars className="px-4">
+        <div className="grid grid-cols-1 gap-2 pb-4">
           {filteredRoles.map((role) => (
             <UnstyledButton
               key={role.id}
               onClick={() => onSelect(role)}
-              className={`p-4 rounded-2xl border transition-all duration-200 group ${
+              className={`p-3.5 rounded-xl border transition-all duration-200 group ${
                 selectedRoleName === role.roleName
-                  ? "bg-indigo-500/20 border-indigo-500 shadow-lg shadow-indigo-500/20"
-                  : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                  ? "bg-[#0d0d0d] border-[#0d0d0d] text-white shadow-md shadow-black/10"
+                  : "bg-white border-[#f0f0f0] hover:bg-[#fafafa] hover:border-[#ddd] text-[#0d0d0d]"
               }`}
             >
               <Group justify="apart" wrap="nowrap">
-                <Group wrap="nowrap">
+                <Group wrap="nowrap" gap="md">
                   <Box 
-                    className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 flex items-center justify-center text-xl group-hover:scale-110 transition-transform"
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-transform ${
+                      selectedRoleName === role.roleName ? "bg-white/10" : "bg-[#f3f3f3]"
+                    }`}
                   >
                     {role.issueIcon}
                   </Box>
                   <Box>
-                    <Text fw={700} size="sm" className="text-white group-hover:text-indigo-300 transition-colors">
+                    <Text fw={700} size="sm" className={selectedRoleName === role.roleName ? "text-white" : "text-[#0d0d0d]"}>
                       {role.roleName}
                     </Text>
-                    <Group gap={6} mt={4}>
-                      <Badge variant="dot" size="xs" color="blue" className="text-[9px] uppercase tracking-tighter">
+                    <Group gap={4} mt={3}>
+                      <Badge variant="dot" size="10px" color={selectedRoleName === role.roleName ? "white" : "gray"} className={`text-[8px] uppercase tracking-tighter font-bold ${selectedRoleName === role.roleName ? "text-white opacity-80" : "text-[#888]"}`}>
                         {role.issueLabel}
                       </Badge>
-                      <Badge variant="dot" size="xs" color="teal" className="text-[9px] uppercase tracking-tighter">
+                      <Badge variant="dot" size="10px" color={selectedRoleName === role.roleName ? "white" : "gray"} className={`text-[8px] uppercase tracking-tighter font-bold ${selectedRoleName === role.roleName ? "text-white opacity-80" : "text-[#888]"}`}>
                         {role.requestLabel}
                       </Badge>
                     </Group>
@@ -127,14 +131,14 @@ export function RoleSelector({ onSelect, selectedRoleName }: RoleSelectorProps) 
                     multiline
                     w={200}
                   >
-                    <ActionIcon variant="subtle" color="slate" size="sm">
-                       <Info size={14} />
+                    <ActionIcon variant="subtle" color={selectedRoleName === role.roleName ? "gray.0" : "gray.6"} size="sm">
+                       <Info size={14} className={selectedRoleName === role.roleName ? "text-white opacity-50" : ""} />
                     </ActionIcon>
                   </Tooltip>
                   {selectedRoleName === role.roleName ? (
-                    <Check size={20} className="text-indigo-400" />
+                    <Check size={18} className="text-white" strokeWidth={3} />
                   ) : (
-                    <ChevronRight size={18} className="text-slate-500 group-hover:text-white transition-colors" />
+                    <ChevronRight size={16} className="text-[#ccc] group-hover:text-[#888] transition-colors" />
                   )}
                 </Group>
               </Group>

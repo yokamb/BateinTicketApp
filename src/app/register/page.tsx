@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
+import Logo from "@/components/Logo";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -38,89 +39,97 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f9f9f9] p-6 text-[#0d0d0d] font-sans antialiased relative overflow-hidden">
+      {/* Background blobs for vibrancy */}
+      <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="relative z-10 w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl">
+      <div className="mb-10 relative z-10">
+        <Logo className="scale-125" />
+      </div>
+
+      <div className="w-full max-w-md p-10 bg-white rounded-[2.5rem] border border-[#e5e5e5] shadow-2xl shadow-black/5 relative z-10">
 
         {/* Success state — email sent */}
         {registered ? (
-          <div className="text-center space-y-4 py-4">
-            <div className="text-6xl">📬</div>
-            <h2 className="text-xl font-bold text-white">Check your inbox!</h2>
-            <p className="text-indigo-200 text-sm leading-relaxed">
+          <div className="text-center space-y-6 py-6 transition-all animate-in fade-in zoom-in duration-500">
+            <div className="text-6xl animate-bounce">📬</div>
+            <h2 className="text-3xl font-black text-[#0d0d0d] tracking-tight">Check your inbox!</h2>
+            <p className="text-[#666] text-base leading-relaxed font-medium">
               We sent a verification link to{" "}
-              <span className="font-semibold text-white">{email}</span>.<br />
-              Click it to activate your account, then log in.
+              <span className="font-black text-indigo-600">{email}</span>.<br />
+              Click it to activate your account.
             </p>
-            <Link href="/login" className="inline-block mt-4 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold transition-colors text-sm">
+            <Link href="/login" className="inline-block mt-8 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white rounded-2xl font-black transition-all text-base shadow-xl shadow-indigo-500/20 active:scale-95">
               Go to Login
             </Link>
           </div>
         ) : (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-extrabold text-white tracking-tight mb-2">Create Account</h1>
-              <p className="text-indigo-200 text-sm">Start managing tickets and clients seamlessly.</p>
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-black tracking-tight mb-2">Create Account</h1>
+              <p className="text-[#666] text-base font-medium">Join the <span className="text-indigo-600 font-black">Batein</span> community</p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-200 text-sm text-center">
+              <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm text-center font-bold">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleRegister} className="space-y-5">
               {/* Account Type */}
-              <div className="grid grid-cols-2 gap-4 mb-2">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <button type="button" onClick={() => setUserType("freelancer")}
-                  className={`p-4 rounded-xl border ${userType === "freelancer" ? "bg-indigo-500/20 border-indigo-400 text-white" : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"} flex flex-col items-center justify-center gap-2 transition-all`}>
+                  className={`py-4 px-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all outline-none ${userType === "freelancer" ? "bg-indigo-50 border-indigo-500 text-indigo-700 shadow-lg shadow-indigo-500/10" : "bg-[#fcfcfc] border-[#eee] text-[#888] hover:border-indigo-200"}`}>
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  <span className="font-semibold text-sm">Freelancer</span>
+                  <span className="font-black text-xs uppercase tracking-widest">Freelancer</span>
                 </button>
                 <button type="button" onClick={() => setUserType("company")}
-                  className={`p-4 rounded-xl border ${userType === "company" ? "bg-cyan-500/20 border-cyan-400 text-white" : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"} flex flex-col items-center justify-center gap-2 transition-all`}>
+                  className={`py-4 px-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all outline-none ${userType === "company" ? "bg-purple-50 border-purple-500 text-purple-700 shadow-lg shadow-purple-500/10" : "bg-[#fcfcfc] border-[#eee] text-[#888] hover:border-purple-200"}`}>
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                  <span className="font-semibold text-sm">Company</span>
+                  <span className="font-black text-xs uppercase tracking-widest">Company</span>
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-indigo-100 mb-2">Full Name</label>
+                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Full Name</label>
                 <input type="text" required value={name} onChange={e => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-white placeholder-white/30 transition-all outline-none"
+                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
                   placeholder="John Doe" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-indigo-100 mb-2">Email Address</label>
+                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Email Address</label>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-white placeholder-white/30 transition-all outline-none"
+                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
                   placeholder="you@example.com" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-indigo-100 mb-2">Password</label>
+                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Password</label>
                 <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-white placeholder-white/30 transition-all outline-none"
-                  placeholder="Min. 8 chars, letters & numbers" />
-                <PasswordStrengthIndicator password={password} dark={true} />
+                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
+                  placeholder="Min. 8 chars" />
+                <PasswordStrengthIndicator password={password} dark={false} />
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-cyan-600 hover:from-indigo-600 hover:to-cyan-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 transform transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
+                className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white rounded-2xl font-black transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-base shadow-xl shadow-indigo-500/20 mt-4"
+              >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-indigo-200">
+            <div className="mt-10 text-center text-xs text-[#666] font-medium">
               Already have an account?{" "}
-              <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Sign In</Link>
+              <Link href="/login" className="text-indigo-600 hover:underline font-black transition-all">Sign In</Link>
             </div>
           </>
         )}
       </div>
+
+      <p className="mt-12 text-[10px] text-[#bbb] font-black tracking-[0.2em] uppercase relative z-10">© 2026 Batein Software. All rights reserved.</p>
     </div>
   );
 }
