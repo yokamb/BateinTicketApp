@@ -30,15 +30,13 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
   }
 
   // Security check
-  let hasAccess = false;
-  if (user.role === "ADMIN") {
-      hasAccess = ticket.workspace.adminId === user.id;
-  } else {
-      const access = await prisma.instanceAccess.findUnique({
-          where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
-      });
-      hasAccess = !!access;
-  }
+  // Security check: must be owner or invited customer
+  const isOwner = ticket.workspace.adminId === user.id;
+  const access = await prisma.instanceAccess.findUnique({
+    where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
+  });
+  
+  const hasAccess = isOwner || !!access;
 
   if (!hasAccess) {
     redirect("/dashboard/tickets");

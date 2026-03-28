@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const user = session?.user as any;
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { title, description, priority, type, workspaceId, approverId } = await req.json();
+    const { title, description, priority, type, category, workspaceId, approverId } = await req.json();
 
     // Verification check
     let hasAccess = false;
@@ -38,14 +38,16 @@ export async function POST(req: Request) {
     }
 
     const tType = type || "INCIDENT";
-    const prefix = tType === "CHANGE" ? "CHG" : tType === "REQUEST" ? "REQ" : "INC";
+    const tCategory = category || (tType.toUpperCase() === "CHANGE" ? "CHANGE" : tType.toUpperCase() === "REQUEST" ? "REQUEST" : "ISSUE");
+    
+    const prefix = tCategory === "CHANGE" ? "CHG" : tCategory === "REQUEST" ? "REQ" : "INC";
     const ticketCount = await (prisma as any).ticket.count();
     const seqNum = 1000 + ticketCount;
     const shortId = `${prefix}${String(seqNum).padStart(7, '0')}`;
 
     // Optional: check if workspace requires change approval
     let initialStatus = "OPEN";
-    if (tType === "CHANGE" && ws?.requiresChangeApproval) {
+    if (tCategory === "CHANGE") {
         initialStatus = "PENDING";
     }
 
@@ -55,9 +57,10 @@ export async function POST(req: Request) {
         description: description || "",
         priority: priority || "MEDIUM",
         type: tType,
+        typeCategory: tCategory,
         shortId,
         status: initialStatus,
-        approverId: (tType === "CHANGE" && ws?.requiresChangeApproval && approverId) ? approverId : null,
+        approverId: (tCategory === "CHANGE" && approverId) ? approverId : null,
         workspaceId,
         creatorId: user.id,
       },

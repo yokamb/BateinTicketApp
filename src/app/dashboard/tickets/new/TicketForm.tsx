@@ -7,13 +7,19 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("MEDIUM");
+  
+  // State for ticket types and selection
   const [type, setType] = useState("INCIDENT");
+  const [selectedCategory, setSelectedCategory] = useState("ISSUE");
+  const [ticketTypes, setTicketTypes] = useState<any[]>([]);
+  const [typesLoading, setTypesLoading] = useState(false);
+
+  // Workspace and Submission state
   const [workspaceId, setWorkspaceId] = useState(defaultWorkspaceId || workspaces[0]?.id || "");
   const [approverId, setApproverId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [ticketTypes, setTicketTypes] = useState<any[]>([]);
-  const [typesLoading, setTypesLoading] = useState(false);
+  
   const [userRoleConfig, setUserRoleConfig] = useState<any>(null);
   const router = useRouter();
 
@@ -25,12 +31,32 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
       if (res.ok) {
         const data = await res.json();
         setTicketTypes(data);
-        if (data.length > 0) setType(data[0].label);
+        if (data.length > 0) {
+          setType(data[0].label);
+          setSelectedCategory(data[0].category);
+        }
       }
     } catch (e) {
       console.error("Failed to fetch ticket types", e);
     } finally {
       setTypesLoading(false);
+    }
+  };
+
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const label = e.target.value;
+    setType(label);
+    
+    // Find category for the selected label
+    const selected = ticketTypes.find(t => t.label === label);
+    if (selected) {
+      setSelectedCategory(selected.category);
+    } else {
+      // Fallback for defaults if any
+      const upper = label.toUpperCase();
+      if (upper === "CHANGE") setSelectedCategory("CHANGE");
+      else if (upper === "REQUEST") setSelectedCategory("REQUEST");
+      else setSelectedCategory("ISSUE");
     }
   };
 
@@ -67,7 +93,15 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
       const res = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, priority, type, workspaceId, approverId }),
+        body: JSON.stringify({ 
+          title, 
+          description, 
+          priority, 
+          type, 
+          category: selectedCategory, // Pass category for backend logic
+          workspaceId, 
+          approverId 
+        }),
       });
       if (res.ok) {
         router.push(`/dashboard/tickets`);
@@ -130,7 +164,7 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
             <select
               value={type}
               disabled={typesLoading}
-              onChange={(e) => setType(e.target.value)}
+              onChange={handleTypeChange}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white disabled:opacity-50"
             >
               {typesLoading ? (
@@ -177,7 +211,8 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
 
         {(() => {
             const ws = workspaces.find((w: any) => w.id === workspaceId);
-            if (type === "CHANGE" && ws?.requiresChangeApproval) {
+            // Dynamic check based on category
+            if (selectedCategory === "CHANGE" && ws?.requiresChangeApproval) {
                 return (
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1">Select Approver *</label>

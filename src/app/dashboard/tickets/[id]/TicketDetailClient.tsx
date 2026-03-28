@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, AlertCircle, Clock, CheckCircle, MessageSquare, Send } from "lucide-react";
+import { Trash2, AlertCircle, Clock, CheckCircle, MessageSquare, Send, XCircle, RotateCcw, Sparkles } from "lucide-react";
 import { TicketTypeBadge } from "@/components/TicketTypeBadge";
+import { Modal, Textarea, Button, Group, Stack, Text, Title } from "@mantine/core";
 
 export default function TicketDetailClient({ ticket, currentUser }: { ticket: any, currentUser: any }) {
   const [status, setStatus] = useState(ticket.status);
@@ -19,9 +20,51 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
   const [editTitle, setEditTitle] = useState(ticket.title);
   const [editDesc, setEditDesc] = useState(ticket.description || "");
 
+  // Approval state
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectionFeedback, setRejectionFeedback] = useState("");
+  const [isDeciding, setIsDeciding] = useState(false);
+
   const router = useRouter();
 
-  const isAdmin = currentUser.role === "ADMIN";
+  // Check roles (Guest or Owner)
+  const isGuest = ticket.workspace?.customers?.find((c: any) => c.userId === currentUser.id)?.role === "GUEST";
+  const isOwner = ticket.workspace?.adminId === currentUser.id || ticket.creatorId === currentUser.id;
+
+  const handleDecision = async (decision: "APPROVED" | "REJECTED") => {
+    setIsDeciding(true);
+    try {
+      const res = await fetch(`/api/tickets/${ticket.id}/decide`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, feedback: rejectionFeedback }),
+      });
+      if (res.ok) {
+        setRejectModalOpen(false);
+        setRejectionFeedback("");
+        router.refresh();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsDeciding(false);
+    }
+  };
+
+  const handleResubmit = async () => {
+    setIsUpdating(true);
+    try {
+      const res = await fetch(`/api/tickets/${ticket.id}/resubmit`, { method: "POST" });
+      if (res.ok) {
+        router.refresh();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
 
   const handleUpdate = async (field: string, value: string) => {
     setIsUpdating(true);
@@ -193,13 +236,13 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
                <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-indigo-700 font-black uppercase tracking-tighter shadow-sm text-[10px]">
                  {ticket.shortId}
                </span>
-               <TicketTypeBadge type={ticket.type} professionalRole={currentUser.professionalRole} size="sm" />
+               <TicketTypeBadge type={ticket.type} category={ticket.typeCategory} professionalRole={currentUser.professionalRole} size="sm" />
                <span>In <strong className="text-slate-700">{ticket.workspace?.name}</strong></span>
                <span>Created {new Date(ticket.createdAt).toLocaleDateString()}</span>
                <span>By <strong className="text-slate-700">{ticket.creator?.name}</strong></span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-1.5 shrink-0">
+            <div className="flex flex-wrap gap-1.5 shrink-0">
             {isEditing ? (
               <>
                 <button onClick={() => { setIsEditing(false); setEditTitle(ticket.title); setEditDesc(ticket.description || ""); }} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Cancel</button>
@@ -208,27 +251,129 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
             ) : (
               <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Edit</button>
             )}
-            {isAdmin && (
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
-                title="Delete Ticket"
-              >
-                <Trash2 size={14} /> 
-              </button>
-            )}
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+              title="Delete Ticket"
+            >
+              <Trash2 size={14} /> 
+            </button>
           </div>
         </div>
 
         {/* Approval Controls */}
-        {ticket.type === "CHANGE" && ticket.workspace?.requiresChangeApproval && ticket.approvalStatus !== "PENDING" && (
-           <div className="mb-4 p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-3">
-              <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">Approval:</span>
-              <span className={`px-2 py-0.5 text-[10px] font-black rounded uppercase ${ticket.approvalStatus === "APPROVED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                 {ticket.approvalStatus}
-              </span>
+        {ticket.typeCategory === "CHANGE" && (
+           <div className="mb-6">
+              <div className={`p-4 rounded-[1.5rem] border ${
+                ticket.approvalStatus === "APPROVED" ? "bg-emerald-50 border-emerald-100" : 
+                ticket.approvalStatus === "REJECTED" ? "bg-rose-50 border-rose-100" : 
+                "bg-amber-50 border-amber-100"
+              } shadow-sm transition-all`}>
+                <Group justify="apart">
+                   <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        ticket.approvalStatus === "APPROVED" ? "bg-emerald-500 text-white" : 
+                        ticket.approvalStatus === "REJECTED" ? "bg-rose-500 text-white" : 
+                        "bg-amber-500 text-white"
+                      }`}>
+                         {ticket.approvalStatus === "APPROVED" ? <CheckCircle size={20} /> : 
+                          ticket.approvalStatus === "REJECTED" ? <XCircle size={20} /> : 
+                          <Clock size={20} />}
+                      </div>
+                      <div>
+                        <Text size="xs" fw={800} color="dimmed" className="uppercase tracking-widest opacity-60">Approval Status</Text>
+                        <Title order={4} className={`text-sm font-black uppercase tracking-tighter ${
+                          ticket.approvalStatus === "APPROVED" ? "text-emerald-700" : 
+                          ticket.approvalStatus === "REJECTED" ? "text-rose-700" : 
+                          "text-amber-700"
+                        }`}>
+                          {ticket.approvalStatus}
+                        </Title>
+                      </div>
+                   </div>
+
+                   {/* Actions for Guest */}
+                   {isGuest && ticket.approvalStatus === "PENDING" && (
+                      <Group gap="sm">
+                         <Button 
+                            variant="light" 
+                            color="red" 
+                            radius="xl" 
+                            size="xs" 
+                            leftSection={<XCircle size={14} />}
+                            onClick={() => setRejectModalOpen(true)}
+                            loading={isDeciding}
+                         >
+                            Reject
+                         </Button>
+                         <Button 
+                            color="dark" 
+                            radius="xl" 
+                            size="xs" 
+                            leftSection={<CheckCircle size={14} />}
+                            onClick={() => handleDecision("APPROVED")}
+                            loading={isDeciding}
+                         >
+                            Approve
+                         </Button>
+                      </Group>
+                   )}
+
+                   {/* Action for Owner: Resubmit */}
+                   {isOwner && ticket.approvalStatus === "REJECTED" && (
+                      <Button 
+                        variant="filled" 
+                        color="dark" 
+                        radius="xl" 
+                        size="xs" 
+                        leftSection={<RotateCcw size={14} />}
+                        onClick={handleResubmit}
+                        loading={isUpdating}
+                      >
+                        Resubmit for Approval
+                      </Button>
+                   )}
+                </Group>
+
+                {ticket.rejectionFeedback && ticket.approvalStatus === "REJECTED" && (
+                  <div className="mt-3 p-3 bg-white/50 rounded-xl border border-rose-100 text-xs text-rose-800 font-medium italic">
+                    <strong>Guest Feedback:</strong> "{ticket.rejectionFeedback}"
+                  </div>
+                )}
+              </div>
            </div>
         )}
+
+        {/* Rejection Modal */}
+        <Modal 
+          opened={rejectModalOpen} 
+          onClose={() => setRejectModalOpen(false)} 
+          title={<Text fw={900} className="uppercase tracking-tighter">Reject this Change</Text>}
+          radius="2rem"
+          padding="xl"
+          centered
+        >
+          <Stack gap="md">
+            <Text size="xs" color="dimmed" fw={600}>Please provide feedback to the team so they can address your concerns.</Text>
+            <Textarea 
+              placeholder="e.g. Please update the logo size before we proceed..." 
+              value={rejectionFeedback}
+              onChange={(e) => setRejectionFeedback(e.currentTarget.value)}
+              minRows={4}
+              radius="lg"
+            />
+            <Button 
+              fullWidth 
+              color="red" 
+              radius="xl" 
+              onClick={() => handleDecision("REJECTED")}
+              disabled={!rejectionFeedback.trim() || isDeciding}
+              loading={isDeciding}
+            >
+              Confirm Rejection
+            </Button>
+          </Stack>
+        </Modal>
 
         {/* Status and Priority Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 bg-slate-50 p-3 rounded-xl border border-slate-100">

@@ -10,7 +10,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const session = await getServerSession(authOptions);
     const user = session?.user as any;
 
-    if (!session || user?.role !== "ADMIN") {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,13 +21,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Verify workspace ownership
+    // Verify workspace access (either owner or member)
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
+      include: { customers: true }
     });
 
-    if (!workspace || workspace.adminId !== user.id) {
+    if (!workspace) {
       return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    }
+
+    const isOwner = workspace.adminId === user.id;
+    const isMember = workspace.customers.some((c: any) => c.userId === user.id);
+
+    if (!isOwner && !isMember) {
+      return NextResponse.json({ error: "Forbidden: You do not have access to this workspace." }, { status: 403 });
     }
 
     // Check plan limits for customer sharing
@@ -62,7 +70,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           email,
           name: name || "Customer",
           passwordHash,
-          role: "CUSTOMER", // explicit customer role
+          role: "ADMIN", // set every user to ADMIN as requested
         },
       });
       // In a real app we would send the email here with their temp password

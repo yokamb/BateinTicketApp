@@ -12,31 +12,40 @@ export default async function DashboardPage() {
   let activeTicketsCount = 0;
   let recentTickets: any[] = [];
 
-  if (user.role === "ADMIN") {
-    workspaceCount = await (prisma as any).workspace.count({ where: { adminId: user.id } });
-    activeTicketsCount = await (prisma as any).ticket.count({ 
-      where: { workspace: { adminId: user.id }, status: { not: "CLOSED" } }
-    });
-    
-    recentTickets = await (prisma as any).ticket.findMany({
-      where: { workspace: { adminId: user.id }, status: { not: "CLOSED" } },
-      orderBy: { updatedAt: "desc" },
-      take: 10,
-      include: { workspace: true }
-    });
-  } else {
-    // Customer
-    activeTicketsCount = await prisma.ticket.count({
-      where: { creatorId: user.id, status: { not: "CLOSED" } }
-    });
-    
-    recentTickets = await prisma.ticket.findMany({
-      where: { creatorId: user.id, status: { not: "CLOSED" } },
-      orderBy: { updatedAt: "desc" },
-      take: 10,
-      include: { workspace: true }
-    });
-  }
+  // Fetch stats for all workspaces user is part of (admin or customer)
+  const ownedWorkspaces = await (prisma as any).workspace.findMany({ where: { adminId: user.id } });
+  const joinedWorkspaces = await (prisma as any).instanceAccess.findMany({ where: { userId: user.id }, include: { workspace: true } });
+  
+  const allWorkspaceIds = [
+    ...ownedWorkspaces.map((w: any) => w.id),
+    ...joinedWorkspaces.map((j: any) => j.workspaceId)
+  ];
+
+  workspaceCount = allWorkspaceIds.length;
+  activeTicketsCount = await (prisma as any).ticket.count({ 
+    where: { 
+      workspaceId: { in: allWorkspaceIds },
+      OR: [
+        { creatorId: user.id },
+        { workspace: { adminId: user.id } }
+      ],
+      status: { not: "CLOSED" } 
+    }
+  });
+  
+  recentTickets = await (prisma as any).ticket.findMany({
+    where: { 
+      workspaceId: { in: allWorkspaceIds },
+      OR: [
+        { creatorId: user.id },
+        { workspace: { adminId: user.id } }
+      ],
+      status: { not: "CLOSED" }
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 10,
+    include: { workspace: true }
+  });
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto w-full">
@@ -49,12 +58,10 @@ export default async function DashboardPage() {
         
         {/* Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {user.role === "ADMIN" && (
-            <div className="bg-white p-4 rounded-xl border border-[#e5e5e5] hover:border-[#ccc] transition-colors">
-              <p className="text-[10px] font-semibold text-[#888] uppercase tracking-widest mb-2">Active Workspaces</p>
-              <p className="text-3xl font-bold text-[#0d0d0d]">{workspaceCount}</p>
-            </div>
-          )}
+          <div className="bg-white p-4 rounded-xl border border-[#e5e5e5] hover:border-[#ccc] transition-colors">
+            <p className="text-[10px] font-semibold text-[#888] uppercase tracking-widest mb-2">Active Workspaces</p>
+            <p className="text-3xl font-bold text-[#0d0d0d]">{workspaceCount}</p>
+          </div>
           
           <div className="bg-white p-4 rounded-xl border border-[#e5e5e5] hover:border-[#ccc] transition-colors">
             <p className="text-[10px] font-semibold text-[#888] uppercase tracking-widest mb-2">Open Tickets</p>
@@ -78,7 +85,7 @@ export default async function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#f0f0f0] text-[#666] rounded font-mono">{ticket.shortId}</span>
-                          <TicketTypeBadge type={ticket.type} professionalRole={user.professionalRole} />
+                          <TicketTypeBadge type={ticket.type} category={ticket.typeCategory} professionalRole={user.professionalRole} />
                           <span className="text-[10px] text-[#aaa]">in {ticket.workspace.name}</span>
                         </div>
                         <h3 className="font-medium text-[#0d0d0d] group-hover:text-[#555] transition-colors text-sm truncate leading-tight">

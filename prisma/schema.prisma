@@ -38,7 +38,7 @@ model User {
   emailVerified DateTime?
   image         String?
   passwordHash  String?
-  role          String    @default("CUSTOMER")
+  role          String    @default("ADMIN")
   plan          String    @default("FREE")
   paypalSubscriptionId String?
   additionalStorageGB   Int       @default(0)
@@ -53,7 +53,6 @@ model User {
   workspaces      InstanceAccess[]
   ticketsCreated  Ticket[]       @relation("TicketCreator")
   comments        Comment[]
-  approverRoles   WorkspaceApprover[]
   notePagesCreated NotePage[]
   
   profile       UserProfile?
@@ -106,9 +105,9 @@ model Workspace {
   requiresChangeApproval Boolean @default(false)
   
   customers   InstanceAccess[]
-  approvers   WorkspaceApprover[]
   tickets     Ticket[]
   ticketTypes TicketType[]
+  invites     WorkspaceInvite[]
   noteSections NoteSection[]
 
   createdAt   DateTime @default(now())
@@ -118,6 +117,7 @@ model Workspace {
 model InstanceAccess {
   workspaceId String
   userId      String
+  role        String   @default("MEMBER") // ADMIN, MEMBER, GUEST
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -125,15 +125,20 @@ model InstanceAccess {
   @@id([workspaceId, userId])
 }
 
-model WorkspaceApprover {
+model WorkspaceInvite {
   id          String   @id @default(cuid())
+  email       String
   workspaceId String
-  userId      String
+  role        String   @default("GUEST")
+  token       String   @unique
+  expiresAt   DateTime
   
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([workspaceId, userId])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([workspaceId, email])
 }
 
 model Ticket {
@@ -142,11 +147,13 @@ model Ticket {
   title       String
   description String
   type        String         @default("INCIDENT")
+  typeCategory String        @default("ISSUE")
   status      String         @default("OPEN")
   priority    String         @default("MEDIUM")
   
   approverId  String?
   approvalStatus String      @default("PENDING")
+  rejectionFeedback String?
 
   workspaceId String
   workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

@@ -4,6 +4,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLE_TICKET_MAPPINGS } from "@/lib/constants/roles";
 
+async function hasWorkspaceAccess(userId: string, workspaceId: string) {
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    include: { customers: true }
+  });
+
+  if (!workspace) return false;
+  if (workspace.adminId === userId) return true;
+  return workspace.customers.some((c: any) => c.userId === userId);
+}
+
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,6 +25,11 @@ export async function GET(req: Request) {
 
     if (!workspaceId) return NextResponse.json({ error: "Workspace ID required" }, { status: 400 });
 
+    const userId = (session.user as any).id;
+    if (!(await hasWorkspaceAccess(userId, workspaceId))) {
+      return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+    }
+
     // Fetch custom ticket types from DB
     let ticketTypes = await (prisma as any).ticketType.findMany({
       where: { workspaceId },
@@ -23,8 +39,8 @@ export async function GET(req: Request) {
     // If no custom types, use defaults based on user role
     if (ticketTypes.length === 0) {
       const user = await (prisma as any).user.findUnique({
-        where: { id: (session.user as any).id } as any,
-        select: { professionalRole: true } as any,
+        where: { id: userId },
+        select: { professionalRole: true },
       });
 
       const roleMapping = ROLE_TICKET_MAPPINGS.find(m => m.role === user?.professionalRole) || ROLE_TICKET_MAPPINGS[0];
@@ -33,7 +49,7 @@ export async function GET(req: Request) {
         { id: "default-issue", label: roleMapping.issue, category: "ISSUE", workspaceId },
         { id: "default-request", label: roleMapping.request, category: "REQUEST", workspaceId },
         { id: "default-change", label: roleMapping.change, category: "CHANGE", workspaceId },
-      ] as any;
+      ];
     }
 
     return NextResponse.json(ticketTypes);
@@ -52,11 +68,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const userId = (session.user as any).id;
+    if (!(await hasWorkspaceAccess(userId, workspaceId))) {
+      return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+    }
+
     const ticketType = await (prisma as any).ticketType.create({
       data: { workspaceId, label, category },
     });
 
     return NextResponse.json(ticketType);
+  } catch (e) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id, label, category } = await req.json();
+    if (!id || (!label && !category)) {
+      return NextResponse.json({ error: "ID and at least one field to update are required" }, { status: 400 });
+    }
+
+    const tt = await (prisma as any).ticketType.findUnique({ where: { id } });
+    if (!tt) return NextResponse.json({ error: "Ticket type not found" }, { status: 404 });
+
+    const userId = (session.user as any).id;
+    if (!(await hasWorkspaceAccess(userId, tt.workspaceId))) {
+      return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+    }
+
+    const updated = await (prisma as any).ticketType.update({
+      where: { id },
+      data: { label, category },
+    });
+
+    return NextResponse.json(updated);
   } catch (e) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
@@ -71,6 +121,18 @@ export async function DELETE(req: Request) {
       const id = searchParams.get("id");
   
       if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+      const tt = await (prisma as any).ticketType.findUnique({ where: { id } });
+      if (!tt) return NextResponse.json({ error: "Ticket type not found" }, { status: 404 });
+
+      if (tt.category === "CHANGE" || tt.label.toUpperCase() === "CHANGE") {
+        return NextResponse.json({ error: "Cannot delete CHANGE types as they are reserved for the approval process." }, { status: 400 });
+      }
+
+      const userId = (session.user as any).id;
+      if (!(await hasWorkspaceAccess(userId, tt.workspaceId))) {
+        return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+      }
   
       await (prisma as any).ticketType.delete({ where: { id } });
   

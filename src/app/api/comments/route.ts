@@ -19,15 +19,13 @@ export async function POST(req: Request) {
 
     if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    let hasAccess = false;
-    if (user.role === "ADMIN") {
-        hasAccess = ticket.workspace.adminId === user.id;
-    } else {
-        const access = await prisma.instanceAccess.findUnique({
-            where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
-        });
-        hasAccess = !!access;
-    }
+    // Security check: must be owner or invited customer
+    const isOwner = ticket.workspace.adminId === user.id;
+    const access = await prisma.instanceAccess.findUnique({
+        where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
+    });
+    
+    const hasAccess = isOwner || !!access;
     if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const comment = await prisma.comment.create({

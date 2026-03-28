@@ -11,27 +11,45 @@ export default async function TicketsPage() {
   let tickets: any[] = [];
   let userWorkspaces: any[] = [];
   
-  if (user.role === "ADMIN") {
-    tickets = await (prisma as any).ticket.findMany({
-      where: { workspace: { adminId: user.id } },
-      include: { creator: true, workspace: true },
-      orderBy: { createdAt: "desc" }
-    });
-  } else {
-    // customers see tickets in their granted workspaces
-    tickets = await (prisma as any).ticket.findMany({
-      where: { workspace: { customers: { some: { userId: user.id } } } },
-      include: { creator: true, workspace: true },
-      orderBy: { createdAt: "desc" }
-    });
+  // Fetch tickets user has access to
+  const ownedWorkspaces = await (prisma as any).workspace.findMany({ where: { adminId: user.id } });
+  const joinedWorkspaces = await (prisma as any).instanceAccess.findMany({ 
+    where: { userId: user.id }, 
+    include: { workspace: true } 
+  });
+  
+  const guestWorkspaceIds = joinedWorkspaces
+    .filter((j: any) => j.role === 'GUEST')
+    .map((j: any) => j.workspaceId);
     
-    // fetch the customer's workspaces to know where they can create tickets
-    const accesses = await (prisma as any).instanceAccess.findMany({
-      where: { userId: user.id },
-      include: { workspace: true }
-    });
-    userWorkspaces = accesses.map((a: any) => a.workspace);
-  }
+  const fullAccessWorkspaceIds = [
+    ...ownedWorkspaces.map((w: any) => w.id),
+    ...joinedWorkspaces.filter((j: any) => j.role !== 'GUEST').map((j: any) => j.workspaceId)
+  ];
+
+  tickets = await (prisma as any).ticket.findMany({
+    where: { 
+      OR: [
+        // Full access workspaces: see all tickets
+        { workspaceId: { in: fullAccessWorkspaceIds } },
+        // Guest workspaces: see ONLY Change tickets OR tickets they created they might have created themselves
+        { 
+          workspaceId: { in: guestWorkspaceIds },
+          OR: [
+            { typeCategory: "CHANGE" },
+            { creatorId: user.id }
+          ]
+        }
+      ]
+    },
+    include: { creator: true, workspace: true },
+    orderBy: { createdAt: "desc" }
+  });
+
+  userWorkspaces = [
+    ...ownedWorkspaces,
+    ...joinedWorkspaces.map((j: any) => j.workspace)
+  ];
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto w-full">

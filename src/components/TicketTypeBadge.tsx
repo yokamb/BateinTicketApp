@@ -16,11 +16,12 @@ interface RoleConfig {
 
 interface TicketTypeBadgeProps {
   type: string;
+  category?: string; // New prop for custom categories
   professionalRole?: string;
   size?: "xs" | "sm" | "md";
 }
 
-export function TicketTypeBadge({ type, professionalRole, size = "xs" }: TicketTypeBadgeProps) {
+export function TicketTypeBadge({ type, category, professionalRole, size = "xs" }: TicketTypeBadgeProps) {
   const [roleConfig, setRoleConfig] = useState<RoleConfig | null>(null);
 
   useEffect(() => {
@@ -40,15 +41,19 @@ export function TicketTypeBadge({ type, professionalRole, size = "xs" }: TicketT
   }, [professionalRole]);
 
   const normalizedType = (type || "").toUpperCase();
+  const normalizedCategory = (category || "").toUpperCase();
+
   const matchesIssue = roleConfig
-    ? normalizedType === "INCIDENT" || type === roleConfig.issueLabel
-    : normalizedType === "INCIDENT";
+    ? normalizedType === "INCIDENT" || type === roleConfig.issueLabel || normalizedCategory === "ISSUE"
+    : normalizedType === "INCIDENT" || normalizedCategory === "ISSUE";
+    
   const matchesRequest = roleConfig
-    ? normalizedType === "REQUEST" || type === roleConfig.requestLabel
-    : normalizedType === "REQUEST";
+    ? normalizedType === "REQUEST" || type === roleConfig.requestLabel || normalizedCategory === "REQUEST"
+    : normalizedType === "REQUEST" || normalizedCategory === "REQUEST";
+    
   const matchesChange = roleConfig
-    ? normalizedType === "CHANGE" || type === roleConfig.changeLabel
-    : normalizedType === "CHANGE";
+    ? normalizedType === "CHANGE" || type === roleConfig.changeLabel || normalizedCategory === "CHANGE"
+    : normalizedType === "CHANGE" || normalizedCategory === "CHANGE";
 
   const palette = roleConfig?.colorScheme
     ? roleConfig.colorScheme.split(",").map((c) => c.trim())

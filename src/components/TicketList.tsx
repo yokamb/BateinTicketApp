@@ -125,7 +125,7 @@ export default function TicketList({ tickets, workspaceId, isAdmin, professional
                  {ticket.title}
               </h4>
               <div className="flex gap-2 shrink-0 ml-3">
-                <TicketTypeBadge type={ticket.type} professionalRole={professionalRole} />
+                <TicketTypeBadge type={ticket.type} category={ticket.typeCategory} professionalRole={professionalRole} />
                 <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)}`}>
                   {getStatusIcon(ticket.status)}
                   {ticket.status.replace("_", " ")}

@@ -3,19 +3,29 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+async function hasWorkspaceAccess(userId: string, workspaceId: string) {
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    include: { customers: true }
+  });
+
+  if (!workspace) return false;
+  if (workspace.adminId === userId) return true;
+  return workspace.customers.some((c: any) => c.userId === userId);
+}
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions);
     const user = session?.user as any;
 
-    if (!session || user.role !== "ADMIN") {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const workspace = await prisma.workspace.findUnique({ where: { id } });
-    if (!workspace || workspace.adminId !== user.id) {
-       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasWorkspaceAccess(user.id, id))) {
+       return NextResponse.json({ error: "Forbidden: You do not have access to this workspace." }, { status: 403 });
     }
 
     const { email } = await req.json();

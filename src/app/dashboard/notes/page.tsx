@@ -8,15 +8,13 @@ export default async function NotesPage() {
   const user = session?.user as any;
   
   let userWorkspaces = [];
-  if (user.role === "ADMIN") {
-    userWorkspaces = await prisma.workspace.findMany({ where: { adminId: user.id } });
-  } else {
-    const accesses = await prisma.instanceAccess.findMany({
-      where: { userId: user.id },
-      include: { workspace: true }
-    });
-    userWorkspaces = accesses.map((a: any) => a.workspace);
-  }
+  const ownedWorkspaces = await (prisma as any).workspace.findMany({ where: { adminId: user.id } });
+  const joinedWorkspaces = await (prisma as any).instanceAccess.findMany({ where: { userId: user.id }, include: { workspace: true } });
+  
+  userWorkspaces = [
+    ...ownedWorkspaces,
+    ...joinedWorkspaces.map((j: any) => j.workspace)
+  ];
 
   return (
     <div className="h-full w-full animate-fade-in flex flex-col font-sans z-20">

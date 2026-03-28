@@ -10,15 +10,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { professionalRole } = await req.json();
+    const { professionalRole, customLabels } = await req.json();
     if (!professionalRole) {
       return NextResponse.json({ error: "Professional role required" }, { status: 400 });
     }
 
     const userId = (session.user as any).id;
 
-    // Update user and their profile using type casting to bypass persistent build-time type errors
-    // related to model synchronization which are blocking the production build.
+    // 1. Update user profile
     await (prisma as any).user.update({
       where: { id: userId },
       data: { 
@@ -31,6 +30,39 @@ export async function POST(req: Request) {
         }
       }
     });
+
+    // 2. Find or create default workspace
+    let workspace = await (prisma as any).workspace.findFirst({
+        where: { adminId: userId }
+    });
+
+    if (!workspace) {
+        workspace = await (prisma as any).workspace.create({
+            data: {
+                name: "My Workspace",
+                adminId: userId
+            }
+        });
+    }
+
+    // 3. Create Ticket Types for this workspace
+    if (customLabels && Array.isArray(customLabels)) {
+        // Clear existing default types if any
+        await (prisma as any).ticketType.deleteMany({
+            where: { workspaceId: workspace.id }
+        });
+
+        // Create new ones
+        for (const labelData of customLabels) {
+            await (prisma as any).ticketType.create({
+                data: {
+                    label: labelData.label,
+                    category: labelData.category,
+                    workspaceId: workspace.id
+                }
+            });
+        }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

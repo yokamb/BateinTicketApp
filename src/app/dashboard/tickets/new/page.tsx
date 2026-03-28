@@ -13,18 +13,19 @@ export default async function NewTicketPage({
   const user = session?.user as any;
   
   let workspaces = [];
-  if (user.role === "ADMIN") {
-    workspaces = await prisma.workspace.findMany({
-      where: { adminId: user.id },
-      include: { approvers: { include: { user: true } } }
-    });
-  } else {
-    const accesses = await prisma.instanceAccess.findMany({
-      where: { userId: user.id },
-      include: { workspace: { include: { approvers: { include: { user: true } } } } }
-    });
-    workspaces = accesses.map((a: any) => a.workspace);
-  }
+  const ownedWorkspaces = await (prisma as any).workspace.findMany({ 
+    where: { adminId: user.id },
+    include: { approvers: { include: { user: true } } }
+  });
+  const joinedWorkspaces = await (prisma as any).instanceAccess.findMany({ 
+    where: { userId: user.id },
+    include: { workspace: { include: { approvers: { include: { user: true } } } } }
+  });
+  
+  workspaces = [
+    ...ownedWorkspaces,
+    ...joinedWorkspaces.map((j: any) => j.workspace)
+  ];
 
   return (
     <div className="p-6 md:p-8 w-full">

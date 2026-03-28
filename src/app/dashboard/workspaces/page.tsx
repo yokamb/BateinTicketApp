@@ -8,19 +8,29 @@ export default async function WorkspacesPage() {
   const session = await getServerSession(authOptions);
   const user = session?.user as any;
   
-  if (user?.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
-
-  const workspaces = await prisma.workspace.findMany({
+  const ownedWorkspaces = await prisma.workspace.findMany({
     where: { adminId: user.id },
     include: {
-      _count: {
-        select: { tickets: true, customers: true }
-      }
+      _count: { select: { tickets: true, customers: true } }
     },
     orderBy: { createdAt: "desc" }
   });
+
+  const joinedWorkspaces = await prisma.instanceAccess.findMany({
+    where: { userId: user.id },
+    include: {
+        workspace: {
+            include: {
+                _count: { select: { tickets: true, customers: true } }
+            }
+        }
+    }
+  });
+
+  const allWorkspaces = [
+    ...ownedWorkspaces,
+    ...joinedWorkspaces.map((j: any) => j.workspace)
+  ];
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto w-full">
@@ -32,7 +42,7 @@ export default async function WorkspacesPage() {
           </div>
         </div>
         
-        <ClientWorkspaces initialWorkspaces={workspaces} />
+        <ClientWorkspaces initialWorkspaces={allWorkspaces} />
       </div>
     </div>
   );

@@ -4,6 +4,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmailNotification } from "@/lib/email";
 
+async function hasWorkspaceAccess(userId: string, workspaceId: string) {
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    include: { customers: true }
+  });
+
+  if (!workspace) return false;
+  if (workspace.adminId === userId) return true;
+  return workspace.customers.some((c: any) => c.userId === userId);
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -18,16 +29,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    let hasAccess = false;
-    if (user.role === "ADMIN") {
-        hasAccess = ticket.workspace.adminId === user.id;
-    } else {
-        const access = await prisma.instanceAccess.findUnique({
-            where: { workspaceId_userId: { workspaceId: ticket.workspaceId, userId: user.id } }
-        });
-        hasAccess = !!access;
+    if (!(await hasWorkspaceAccess(user.id, ticket.workspaceId))) {
+      return NextResponse.json({ error: "Forbidden: You do not have access to this workspace." }, { status: 403 });
     }
-    if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
     const { status, priority, description, title, approvalStatus } = body;
@@ -46,7 +50,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     if (status) {
         // block resolving unapproved changes
-        if (ticket.type === "CHANGE" && ticket.workspace.requiresChangeApproval && ticket.approvalStatus !== "APPROVED") {
+        if (ticket.type === "CHANGE" && ticket.approvalStatus !== "APPROVED") {
             if (status === "RESOLVED" || status === "CLOSED") {
                 return NextResponse.json({ error: "Change tickets must be approved before they can be resolved or closed." }, { status: 400 });
             }
@@ -89,15 +93,17 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { id } = await params;
     const session = await getServerSession(authOptions);
     const user = session?.user as any;
-    if (!session || user.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const ticket = await prisma.ticket.findUnique({
         where: { id },
         include: { workspace: true }
     });
 
-    if (!ticket || ticket.workspace.adminId !== user.id) {
-        return NextResponse.json({ error: "Forbidden or Not Found" }, { status: 403 });
+    if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (!(await hasWorkspaceAccess(user.id, ticket.workspaceId))) {
+      return NextResponse.json({ error: "Forbidden: You do not have access to this workspace." }, { status: 403 });
     }
 
     await prisma.ticket.delete({
@@ -106,6 +112,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     return NextResponse.json({ success: true });
   } catch(e: any) {
+    console.error("Delete error:", e);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
