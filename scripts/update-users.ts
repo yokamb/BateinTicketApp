@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +13,7 @@ async function main() {
   });
 
   // Sort numerically based on "dummy<num>@"
-  users.sort((a, b) => {
+  users.sort((a: User, b: User) => {
     const numA = parseInt(a.email?.replace(/[^\d]/g, '') || '0');
     const numB = parseInt(b.email?.replace(/[^\d]/g, '') || '0');
     return numA - numB;
@@ -38,7 +38,7 @@ async function main() {
     }
   });
 
-  updatedUsers.sort((a, b) => {
+  updatedUsers.sort((a: User, b: User) => {
     const numA = parseInt(a.email?.replace(/[^\d]/g, '') || '0');
     const numB = parseInt(b.email?.replace(/[^\d]/g, '') || '0');
     return numA - numB;
