@@ -55,6 +55,8 @@ model User {
   comments        Comment[]
   approverRoles   WorkspaceApprover[]
   notePagesCreated NotePage[]
+  
+  profile       UserProfile?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -232,4 +234,30 @@ model NotePage {
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model UserProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          String?
+  subSpecialty  String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RoleConfig {
+  id           String   @id @default(cuid())
+  roleName     String   @unique
+  issueLabel   String
+  requestLabel String
+  changeLabel  String
+  issueIcon    String
+  requestIcon  String
+  changeIcon   String
+  colorScheme  String   // Comma-separated hex colors
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
