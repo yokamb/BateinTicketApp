@@ -1,12 +1,13 @@
 "use client";
 
+import { MantineProvider } from "@mantine/core";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
-      {children}
-    </SessionProvider>
+    <MantineProvider>
+      <SessionProvider>{children}</SessionProvider>
+    </MantineProvider>
   );
 }
