@@ -129,47 +129,48 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                     </button>
                   )}
 
-                  {selectedPlan === pl.id && (
-                    <div className="mt-4">
-                      <PayPalButtons
-                        style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
-                        createSubscription={(data, actions) => {
-                          const cleanId = (envVar: string | undefined) => {
-                            if (!envVar) return "";
-                            // Remove actual newlines, literal '\n' strings, and surrounding whitespace
-                            return envVar.replace(/\\n/g, "").replace(/\n/g, "").trim();
-                          };
+                  {selectedPlan === pl.id && (() => {
+                    const cleanId = (envVar: string | undefined) => {
+                      if (!envVar) return "";
+                      return envVar.replace(/\\n/g, "").replace(/\n/g, "").trim();
+                    };
 
-                          const planId = pl.id === "PRO" 
-                            ? cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO) 
-                            : cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX);
-                            
-                          if (!planId) {
-                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
-                            return Promise.reject("Missing PayPal Plan ID");
-                          }
+                    const planId = pl.id === "PRO" 
+                      ? cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO) 
+                      : cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX);
 
-                          return actions.subscription.create({
-                            plan_id: planId
-                          });
-                        }}
-                        onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
-                        onError={(err) => {
-                          console.error("PayPal Error:", err);
-                          alert("PayPal error: " + (err.message || "The payment window closed unexpectedly. This usually happens if your PayPal Client ID and Plan IDs don't match, or if you are using Sandbox IDs in Production."));
-                        }}
-                        onCancel={() => {
-                          alert("Payment cancelled.");
-                        }}
-                      />
-                      <button 
-                        onClick={() => setSelectedPlan(null)}
-                        className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
+                    return (
+                      <div className="mt-4">
+                        <PayPalButtons
+                          style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
+                          createSubscription={(data, actions) => {
+                            if (!planId) {
+                              alert("PayPal Plan ID is missing! Next.js failed to load it.");
+                              return Promise.reject("Missing PayPal Plan ID");
+                            }
+                            return actions.subscription.create({
+                              plan_id: planId
+                            });
+                          }}
+                          onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
+                          onError={(err: any) => {
+                            console.error("PayPal Error:", err);
+                            const currentClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb";
+                            alert(`PayPal error: ${err.message || "Unknown"}\n\nDiagnostic Info:\nDomain: ${window.location.hostname}\nClient ID starts with: ${currentClientId.substring(0, 10)}...\nPlan ID: ${planId}`);
+                          }}
+                          onCancel={() => {
+                            alert("Payment cancelled.");
+                          }}
+                        />
+                        <button 
+                          onClick={() => setSelectedPlan(null)}
+                          className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
