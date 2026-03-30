@@ -133,22 +133,26 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                     <div className="mt-4">
                       <PayPalButtons
                         style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
-                          createSubscription={(data, actions) => {
-                            const rawPlanId = pl.id === "PRO" 
-                              ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
-                              : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
-                              
-                            if (!rawPlanId) {
-                              alert("PayPal Plan ID is missing! Next.js failed to load it.");
-                              return Promise.reject("Missing PayPal Plan ID");
-                            }
+                        createSubscription={(data, actions) => {
+                          const cleanId = (envVar: string | undefined) => {
+                            if (!envVar) return "";
+                            // Remove actual newlines, literal '\n' strings, and surrounding whitespace
+                            return envVar.replace(/\\n/g, "").replace(/\n/g, "").trim();
+                          };
 
-                            const planId = rawPlanId.trim();
+                          const planId = pl.id === "PRO" 
+                            ? cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO) 
+                            : cleanId(process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX);
+                            
+                          if (!planId) {
+                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
+                            return Promise.reject("Missing PayPal Plan ID");
+                          }
 
-                            return actions.subscription.create({
-                              plan_id: planId
-                            });
-                          }}
+                          return actions.subscription.create({
+                            plan_id: planId
+                          });
+                        }}
                         onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
                         onError={(err) => {
                           console.error("PayPal Error:", err);
