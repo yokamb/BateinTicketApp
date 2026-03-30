@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { 
   LayoutDashboard, 
@@ -10,12 +9,10 @@ import {
   Plus, 
   LogOut, 
   Crown,
-  Settings,
-  UserPlus
+  Settings
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import StorageTracker from "@/components/StorageTracker";
-import InviteMemberModal from "@/components/InviteMemberModal";
 
 export default function Sidebar({ 
   dbUser, 
@@ -26,7 +23,6 @@ export default function Sidebar({
   allWorkspaces: any[]; 
   isGuest: boolean;
 }) {
-  const [inviteModalOpened, setInviteModalOpened] = useState(false);
   
   // Filter nav items: Guests only see Dashboard and Tickets
   const navItems = [
@@ -38,11 +34,6 @@ export default function Sidebar({
     ] : [])
   ];
 
-  // The workspace context for invites/settings should be the one they are currently in, 
-  // but for now we'll use the first one as primary.
-  const primaryWorkspace = allWorkspaces[0];
-  const primaryWorkspaceId = primaryWorkspace?.id;
-  const isOwnerOfPrimary = primaryWorkspace?.adminId === dbUser.id;
 
   return (
     <aside className="w-60 bg-[#f9f9f9] border-r border-[#e5e5e5] flex flex-col sticky top-0 h-screen z-20 shrink-0">
@@ -62,19 +53,6 @@ export default function Sidebar({
           </div>
           New Ticket
         </Link>
-
-        {/* Invite button: Only for Owners */}
-        {!isGuest && isOwnerOfPrimary && primaryWorkspaceId && (
-          <button 
-            onClick={() => setInviteModalOpened(true)}
-            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors group font-bold text-xs uppercase tracking-tighter"
-          >
-            <div className="w-6 h-6 bg-emerald-100 group-hover:bg-emerald-200 rounded-md flex items-center justify-center transition-colors shrink-0">
-              <UserPlus size={14} className="text-emerald-700" />
-            </div>
-            Invite Client
-          </button>
-        )}
       </div>
 
       {/* Navigation */}
@@ -134,13 +112,6 @@ export default function Sidebar({
         </Link>
       </div>
 
-      {!isGuest && primaryWorkspaceId && (
-        <InviteMemberModal 
-          workspaceId={primaryWorkspaceId}
-          opened={inviteModalOpened}
-          onClose={() => setInviteModalOpened(false)}
-        />
-      )}
     </aside>
   );
 }

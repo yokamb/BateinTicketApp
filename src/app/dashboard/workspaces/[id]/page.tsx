@@ -7,6 +7,7 @@ import InviteCustomerForm from "./InviteCustomerForm";
 import TicketList from "@/components/TicketList";
 import ApproverSettings from "./ApproverSettings";
 import TicketTypeSettings from "./TicketTypeSettings";
+import WorkspaceGeneralSettings from "./WorkspaceGeneralSettings";
 
 export default async function WorkspaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -48,7 +49,7 @@ export default async function WorkspaceDetailPage({ params }: { params: Promise<
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Col: Tickets */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
@@ -64,6 +65,9 @@ export default async function WorkspaceDetailPage({ params }: { params: Promise<
 
         {/* Right Col: Settings */}
         <div className="space-y-6">
+          {/* Workspace Info & Settings */}
+          <WorkspaceGeneralSettings workspace={workspace} />
+          
           {/* Ticket Type Settings */}
           <TicketTypeSettings workspaceId={workspace.id} />
 

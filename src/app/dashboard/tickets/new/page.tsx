@@ -15,18 +15,37 @@ export default async function NewTicketPage({
   let workspaces = [];
   const ownedWorkspaces = await (prisma as any).workspace.findMany({ 
     where: { adminId: user.id },
-    include: { approvers: { include: { user: true } } }
+    include: { 
+      customers: { include: { user: true } },
+      ticketTypes: true
+    }
   });
   const joinedWorkspaces = await (prisma as any).instanceAccess.findMany({ 
     where: { userId: user.id },
-    include: { workspace: { include: { approvers: { include: { user: true } } } } }
+    include: { 
+      workspace: { 
+        include: { 
+          customers: { include: { user: true } },
+          ticketTypes: true
+        } 
+      } 
+    }
   });
-  
-  workspaces = [
-    ...ownedWorkspaces,
-    ...joinedWorkspaces.map((j: any) => j.workspace)
-  ];
 
+  // Map customers to approvers for the TicketForm which expects it
+  const formattedWorkspaces = [
+    ...ownedWorkspaces.map((w: any) => ({
+      ...w,
+      approvers: w.customers.filter((c: any) => c.role === "GUEST")
+    })),
+    ...joinedWorkspaces.map((j: any) => ({
+      ...j.workspace,
+      approvers: j.workspace.customers.filter((c: any) => c.role === "GUEST")
+    }))
+  ];
+  
+  workspaces = formattedWorkspaces;
+  
   return (
     <div className="p-6 md:p-8 w-full">
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in-up">

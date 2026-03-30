@@ -33,11 +33,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
        return NextResponse.json({ error: "Only the Workspace Owner can modify settings" }, { status: 403 });
     }
 
-    const { requiresChangeApproval } = await req.json();
+    const { requiresChangeApproval, name } = await req.json();
+
+    const data: any = {};
+    if (requiresChangeApproval !== undefined) data.requiresChangeApproval = requiresChangeApproval;
+    if (name !== undefined) data.name = name;
 
     const updated = await prisma.workspace.update({
         where: { id },
-        data: { requiresChangeApproval }
+        data
     });
 
     return NextResponse.json(updated);
