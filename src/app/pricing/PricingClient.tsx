@@ -64,28 +64,37 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased">
-      <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
-        <p className="text-base text-[#666]">Scale your freelance business with premium features.</p>
-      </div>
+  const isSandbox = !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID === "sb";
+  const isProduction = typeof window !== "undefined" && !window.location.hostname.includes("localhost");
 
-      {isSuccess ? (
-        <div className="max-w-md mx-auto p-8 bg-white border border-emerald-100 rounded-2xl text-[#0d0d0d] text-center font-medium shadow-xl shadow-black/[0.03]">
-          <div className="text-4xl mb-4">🎉</div>
-          <p className="text-lg font-bold mb-1">Upgrade Successful!</p>
-          <p className="text-sm text-[#666]">We're redirecting you to your dashboard.</p>
+  return (
+    <PayPalScriptProvider options={{ 
+      "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
+      "intent": "subscription",
+      "vault": true,
+      "components": "buttons",
+      "currency": "USD"
+    }}>
+      <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased">
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
+          <p className="text-base text-[#666]">Scale your freelance business with premium features.</p>
+
+          {isSandbox && isProduction && (
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 text-xs font-semibold animate-pulse inline-block">
+              ⚠️ Warning: You are using the default Sandbox (sb) PayPal ID on a production domain. Subscriptions will not work.
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          <PayPalScriptProvider options={{ 
-            "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
-            "intent": "subscription",
-            "vault": true,
-            "components": "buttons",
-            "currency": "USD"
-          }}>
+
+        {isSuccess ? (
+          <div className="max-w-md mx-auto p-8 bg-white border border-emerald-100 rounded-2xl text-[#0d0d0d] text-center font-medium shadow-xl shadow-black/[0.03]">
+            <div className="text-4xl mb-4">🎉</div>
+            <p className="text-lg font-bold mb-1">Upgrade Successful!</p>
+            <p className="text-sm text-[#666]">We're redirecting you to your dashboard.</p>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans.map((pl: any) => (
               <div key={pl.id} className={`bg-white rounded-2xl overflow-hidden border transition-all ${selectedPlan === pl.id ? 'border-[#0d0d0d] shadow-2xl scale-[1.02]' : 'border-[#e5e5e5] shadow-sm'}`}>
                 <div className="p-8 pb-6 text-center border-b border-[#f0f0f0]">
@@ -122,24 +131,31 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
 
                   {selectedPlan === pl.id && (
                     <div className="mt-4">
-                        <PayPalButtons
-                          style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
-                          createSubscription={(data, actions) => {
-                            const planId = pl.id === "PRO" 
-                              ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
-                              : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
-                              
-                            if (!planId) {
-                                alert("PayPal Plan ID is missing! Next.js failed to load it.");
-                                return Promise.reject("Missing PayPal Plan ID");
-                            }
+                      <PayPalButtons
+                        style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
+                        createSubscription={(data, actions) => {
+                          const planId = pl.id === "PRO" 
+                            ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
+                            : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
+                            
+                          if (!planId) {
+                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
+                            return Promise.reject("Missing PayPal Plan ID");
+                          }
 
-                            return actions.subscription.create({
-                              plan_id: planId
-                            });
-                          }}
-                          onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
-                        />
+                          return actions.subscription.create({
+                            plan_id: planId
+                          });
+                        }}
+                        onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
+                        onError={(err) => {
+                          console.error("PayPal Error:", err);
+                          alert("PayPal error: " + (err.message || "The payment window closed unexpectedly. This usually happens if your PayPal Client ID and Plan IDs don't match, or if you are using Sandbox IDs in Production."));
+                        }}
+                        onCancel={() => {
+                          alert("Payment cancelled.");
+                        }}
+                      />
                       <button 
                         onClick={() => setSelectedPlan(null)}
                         className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
@@ -151,9 +167,9 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                 </div>
               </div>
             ))}
-          </PayPalScriptProvider>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </PayPalScriptProvider>
   );
 }
