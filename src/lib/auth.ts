@@ -9,8 +9,9 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID || "",
-      clientSecret: process.env.GOOGLE_SECRET || "",
+      clientId: process.env.GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true, // Allow linking Google accounts to existing email/password accounts
     }),
     CredentialsProvider({
       name: "Credentials",
