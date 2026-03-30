@@ -79,79 +79,79 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
         </div>
       ) : (
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((pl: any) => (
-            <div key={pl.id} className={`bg-white rounded-2xl overflow-hidden border transition-all ${selectedPlan === pl.id ? 'border-[#0d0d0d] shadow-2xl scale-[1.02]' : 'border-[#e5e5e5] shadow-sm'}`}>
-              <div className="p-8 pb-6 text-center border-b border-[#f0f0f0]">
-                <h2 className="text-lg font-bold mb-1 text-[#666] tracking-tight">{pl.name}</h2>
-                <div className="text-4xl font-bold text-[#0d0d0d]">{pl.price}<span className="text-sm font-medium text-[#888]">/mo</span></div>
-              </div>
+          <PayPalScriptProvider options={{ 
+            "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
+            "intent": "subscription",
+            "vault": true,
+            "components": "buttons",
+            "currency": "USD"
+          }}>
+            {plans.map((pl: any) => (
+              <div key={pl.id} className={`bg-white rounded-2xl overflow-hidden border transition-all ${selectedPlan === pl.id ? 'border-[#0d0d0d] shadow-2xl scale-[1.02]' : 'border-[#e5e5e5] shadow-sm'}`}>
+                <div className="p-8 pb-6 text-center border-b border-[#f0f0f0]">
+                  <h2 className="text-lg font-bold mb-1 text-[#666] tracking-tight">{pl.name}</h2>
+                  <div className="text-4xl font-bold text-[#0d0d0d]">{pl.price}<span className="text-sm font-medium text-[#888]">/mo</span></div>
+                </div>
 
-              <div className="p-8">
-                <ul className="space-y-3.5 mb-8 min-h-[140px]">
-                  {pl.features.map((feature: string, i: number) => (
-                    <li key={i} className="flex items-center gap-3 text-[#444]">
-                      <div className="w-5 h-5 rounded-full bg-[#f3f3f3] text-[#0d0d0d] flex items-center justify-center shrink-0">
-                        <Check size={12} strokeWidth={3} />
-                      </div>
-                      <span className="text-sm font-medium">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="p-8">
+                  <ul className="space-y-3.5 mb-8 min-h-[140px]">
+                    {pl.features.map((feature: string, i: number) => (
+                      <li key={i} className="flex items-center gap-3 text-[#444]">
+                        <div className="w-5 h-5 rounded-full bg-[#f3f3f3] text-[#0d0d0d] flex items-center justify-center shrink-0">
+                          <Check size={12} strokeWidth={3} />
+                        </div>
+                        <span className="text-sm font-medium">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-                {!pl.disabled && selectedPlan !== pl.id && (
-                  <button 
-                    onClick={() => setSelectedPlan(pl.id)}
-                    className="w-full py-2.5 bg-[#0d0d0d] hover:bg-[#333] text-white font-bold rounded-xl transition-all shadow-md text-sm"
-                  >
-                    Select {pl.name}
-                  </button>
-                )}
-
-                {pl.disabled && (
-                  <button disabled className="w-full py-2.5 bg-white text-[#bbb] font-bold rounded-xl border border-[#e5e5e5] cursor-not-allowed text-sm">
-                    {pl.buttonText}
-                  </button>
-                )}
-
-                {selectedPlan === pl.id && (
-                  <div className="mt-4">
-                    <PayPalScriptProvider options={{ 
-                      "clientId": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
-                      "intent": "subscription",
-                      "vault": true,
-                      "components": "buttons",
-                      "enable-funding": "card",
-                    }}>
-                      <PayPalButtons
-                        style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
-                        createSubscription={(data, actions) => {
-                          const planId = pl.id === "PRO" 
-                            ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
-                            : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
-                            
-                          if (!planId) {
-                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
-                            return Promise.reject("Missing PayPal Plan ID");
-                          }
-
-                          return actions.subscription.create({
-                            plan_id: planId
-                          });
-                        }}
-                        onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
-                      />
-                    </PayPalScriptProvider>
+                  {!pl.disabled && selectedPlan !== pl.id && (
                     <button 
-                      onClick={() => setSelectedPlan(null)}
-                      className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
+                      onClick={() => setSelectedPlan(pl.id)}
+                      className="w-full py-2.5 bg-[#0d0d0d] hover:bg-[#333] text-white font-bold rounded-xl transition-all shadow-md text-sm"
                     >
-                      Cancel
+                      Select {pl.name}
                     </button>
-                  </div>
-                )}
+                  )}
+
+                  {pl.disabled && (
+                    <button disabled className="w-full py-2.5 bg-white text-[#bbb] font-bold rounded-xl border border-[#e5e5e5] cursor-not-allowed text-sm">
+                      {pl.buttonText}
+                    </button>
+                  )}
+
+                  {selectedPlan === pl.id && (
+                    <div className="mt-4">
+                        <PayPalButtons
+                          style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
+                          createSubscription={(data, actions) => {
+                            const planId = pl.id === "PRO" 
+                              ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
+                              : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
+                              
+                            if (!planId) {
+                                alert("PayPal Plan ID is missing! Next.js failed to load it.");
+                                return Promise.reject("Missing PayPal Plan ID");
+                            }
+
+                            return actions.subscription.create({
+                              plan_id: planId
+                            });
+                          }}
+                          onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
+                        />
+                      <button 
+                        onClick={() => setSelectedPlan(null)}
+                        className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </PayPalScriptProvider>
         </div>
       )}
     </div>
