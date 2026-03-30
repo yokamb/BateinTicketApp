@@ -133,20 +133,22 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                     <div className="mt-4">
                       <PayPalButtons
                         style={{ layout: "vertical", shape: "rect", color: "black", height: 40 }}
-                        createSubscription={(data, actions) => {
-                          const planId = pl.id === "PRO" 
-                            ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
-                            : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
-                            
-                          if (!planId) {
-                            alert("PayPal Plan ID is missing! Next.js failed to load it.");
-                            return Promise.reject("Missing PayPal Plan ID");
-                          }
+                          createSubscription={(data, actions) => {
+                            const rawPlanId = pl.id === "PRO" 
+                              ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO 
+                              : process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_MAX;
+                              
+                            if (!rawPlanId) {
+                              alert("PayPal Plan ID is missing! Next.js failed to load it.");
+                              return Promise.reject("Missing PayPal Plan ID");
+                            }
 
-                          return actions.subscription.create({
-                            plan_id: planId
-                          });
-                        }}
+                            const planId = rawPlanId.trim();
+
+                            return actions.subscription.create({
+                              plan_id: planId
+                            });
+                          }}
                         onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
                         onError={(err) => {
                           console.error("PayPal Error:", err);
