@@ -56,16 +56,18 @@ export default function OnboardingPage() {
       });
       
       if (res.ok) {
-        await update({ professionalRole: profession });
-        router.push("/dashboard");
+        // We trigger the update but don't await it to prevent hangs on some environments.
+        // Then we do a hard redirect to ensure the middleware and session are fully synced.
+        update({ professionalRole: profession });
+        window.location.href = "/dashboard";
       } else {
         const data = await res.json();
         setError(data.error || "Failed to complete onboarding. Please try again.");
+        setSaving(false);
       }
     } catch (e: any) {
       console.error("Onboarding failed", e);
       setError(e.message || "An unexpected error occurred.");
-    } finally {
       setSaving(false);
     }
   };
