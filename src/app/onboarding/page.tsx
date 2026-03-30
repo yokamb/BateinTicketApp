@@ -20,6 +20,7 @@ export default function OnboardingPage() {
     { category: "CHANGE", label: "Change", icon: "🔄" },
   ]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -57,9 +58,13 @@ export default function OnboardingPage() {
       if (res.ok) {
         await update({ professionalRole: profession });
         router.push("/dashboard");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to complete onboarding. Please try again.");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Onboarding failed", e);
+      setError(e.message || "An unexpected error occurred.");
     } finally {
       setSaving(false);
     }
@@ -229,6 +234,12 @@ export default function OnboardingPage() {
                        </div>
                     </Stack>
                  </Paper>
+
+                 {error && (
+                   <Text color="red" size="xs" fw={700} ta="center" className="animate-pulse">
+                     Error: {error}
+                   </Text>
+                 )}
 
                  <Group justify="center" mt="xl" pt="xl">
                    <Button variant="subtle" color="gray" onClick={() => setActive(1)} size="sm">Back</Button>
