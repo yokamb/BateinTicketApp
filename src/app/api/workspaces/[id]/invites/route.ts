@@ -36,11 +36,22 @@ export async function POST(
         token,
         expiresAt,
       },
+      include: { workspace: { include: { admin: true } } }
     });
 
-    // In a real app, send an email here.
-    // We'll just return the link for the user to copy for now.
+    // Send the invitation email
     const inviteLink = `${process.env.NEXTAUTH_URL}/invite/${token}`;
+    try {
+        const { sendWorkspaceInviteEmail } = await import("@/lib/email");
+        await sendWorkspaceInviteEmail(
+            email,
+            invite.workspace.name,
+            invite.workspace.admin.name || invite.workspace.admin.email || "A Workspace Owner",
+            token
+        );
+    } catch (emailError) {
+        console.error("Failed to send invite email:", emailError);
+    }
 
     return NextResponse.json({ invite, inviteLink }, { status: 201 });
   } catch (e: any) {
