@@ -31,26 +31,10 @@ export async function GET(req: Request) {
     }
 
     // Fetch custom ticket types from DB
-    let ticketTypes = await (prisma as any).ticketType.findMany({
+    const ticketTypes = await (prisma as any).ticketType.findMany({
       where: { workspaceId },
       orderBy: { createdAt: "asc" },
     });
-
-    // If no custom types, use defaults based on user role
-    if (ticketTypes.length === 0) {
-      const user = await (prisma as any).user.findUnique({
-        where: { id: userId },
-        select: { professionalRole: true },
-      });
-
-      const roleMapping = ROLE_TICKET_MAPPINGS.find(m => m.role === user?.professionalRole) || ROLE_TICKET_MAPPINGS[0];
-      
-      ticketTypes = [
-        { id: "default-issue", label: roleMapping.issue, category: "ISSUE", workspaceId },
-        { id: "default-request", label: roleMapping.request, category: "REQUEST", workspaceId },
-        { id: "default-change", label: roleMapping.change, category: "CHANGE", workspaceId },
-      ];
-    }
 
     return NextResponse.json(ticketTypes);
   } catch (e) {

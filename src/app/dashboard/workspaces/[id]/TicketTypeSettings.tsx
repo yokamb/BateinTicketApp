@@ -126,8 +126,16 @@ export default function TicketTypeSettings({ workspaceId }: { workspaceId: strin
             <div className="h-10 bg-slate-100 rounded-xl"></div>
             <div className="h-10 bg-slate-100 rounded-xl"></div>
           </div>
+        ) : types.length === 0 ? (
+          <div className="p-8 border-2 border-dashed border-slate-100 rounded-2xl text-center bg-slate-50/50">
+              <Plus size={32} className="mx-auto text-slate-300 mb-3" />
+              <p className="text-sm font-bold text-slate-900 mb-1">Clean Slate</p>
+              <p className="text-[11px] text-slate-500 max-w-[200px] mx-auto leading-relaxed">
+                  No ticket labels defined yet. Add your first custom label below to start tracking work.
+              </p>
+          </div>
         ) : (
-          types.map((t) => (
+          types.map((t: any) => (
             <div key={t.id} className="group border border-transparent hover:border-slate-100 transition-all rounded-xl">
               {editingId === t.id ? (
                 <form onSubmit={handleUpdate} className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl animate-fade-in border border-indigo-100 ring-1 ring-indigo-50">
