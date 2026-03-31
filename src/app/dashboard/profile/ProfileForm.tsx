@@ -265,24 +265,42 @@ export default function ProfileForm({ user }: { user: any }) {
                   <span className="text-sm font-bold text-slate-900">{user.plan || "FREE"}</span>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {(user.plan === "FREE" || !user.plan) && (
-                <>
-                  <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Upgrade to Pro ($2/mo)</button>
-                  <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Get Max ($6/mo)</button>
-                </>
+
+              {user.isSubscriptionCancelled && user.subscriptionExpiresAt && (
+                <div className="text-right">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-amber-600 mb-1">Status: Expiring</p>
+                  <p className="text-xs font-bold text-slate-700 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                    {Math.ceil((new Date(user.subscriptionExpiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                  </p>
+                </div>
               )}
-              {user.plan === "PRO" && (
-                <>
-                  <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Upgrade to Max ($6/mo)</button>
+            </div>
+
+            {user.isSubscriptionCancelled && user.subscriptionExpiresAt ? (
+              <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  Your <strong>{user.plan}</strong> features will remain active until <strong>{new Date(user.subscriptionExpiresAt).toLocaleDateString()}</strong>. After this, your account will move to the Free plan.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                {(user.plan === "FREE" || !user.plan) && (
+                  <>
+                    <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Upgrade to Pro</button>
+                    <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Get Max</button>
+                  </>
+                )}
+                {user.plan === "PRO" && (
+                  <>
+                    <button type="button" onClick={() => router.push('/pricing')} disabled={loading} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-70 shadow-sm">Upgrade to Max</button>
+                    <button type="button" onClick={handleCancel} disabled={loading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors disabled:opacity-70">{loading ? "Cancelling..." : "Cancel Subscription"}</button>
+                  </>
+                )}
+                {user.plan === "MAX" && (
                   <button type="button" onClick={handleCancel} disabled={loading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors disabled:opacity-70">{loading ? "Cancelling..." : "Cancel Subscription"}</button>
-                </>
-              )}
-              {user.plan === "MAX" && (
-                <button type="button" onClick={handleCancel} disabled={loading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors disabled:opacity-70">{loading ? "Cancelling..." : "Cancel Subscription"}</button>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
