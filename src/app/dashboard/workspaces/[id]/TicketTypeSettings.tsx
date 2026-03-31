@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Settings2, Edit2, Check, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function TicketTypeSettings({ workspaceId }: { workspaceId: string }) {
   const [types, setTypes] = useState<any[]>([]);
@@ -8,6 +9,7 @@ export default function TicketTypeSettings({ workspaceId }: { workspaceId: strin
   const [newLabel, setNewLabel] = useState("");
   const [newRequiresApproval, setNewRequiresApproval] = useState(false);
   const [adding, setAdding] = useState(false);
+  const router = useRouter();
 
   // Edit states
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -52,6 +54,7 @@ export default function TicketTypeSettings({ workspaceId }: { workspaceId: strin
         setNewLabel("");
         setNewRequiresApproval(false);
         fetchTypes();
+        router.refresh();
       }
     } catch (e) {
       console.error(e);
@@ -77,6 +80,7 @@ export default function TicketTypeSettings({ workspaceId }: { workspaceId: strin
       if (res.ok) {
         setEditingId(null);
         fetchTypes();
+        router.refresh();
       }
     } catch (e) {
       console.error(e);
@@ -159,7 +163,7 @@ export default function TicketTypeSettings({ workspaceId }: { workspaceId: strin
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-bold text-slate-900">{t.label}</span>
                     {t.category === 'CHANGE' && (
-                        <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-[9px] font-black uppercase tracking-widest border border-purple-100 flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-[9px] font-black uppercase tracking-widest border border-purple-100 flex items-center gap-1 transition-all duration-300 animate-fade-in">
                            <Check size={10} /> Approval Workflow
                         </span>
                     )}

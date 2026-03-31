@@ -50,11 +50,11 @@ export default function ApproverSettings({ workspace }: { workspace: any }) {
             Approvals
         </h2>
         {isApprovalsActive ? (
-            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1 transition-all duration-500 animate-pulse-subtle">
                <Shield size={10} /> Active
             </span>
         ) : (
-            <span className="px-2 py-0.5 rounded-full bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest border border-slate-100 flex items-center gap-1">
+            <span className="px-2 py-0.5 rounded-full bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-widest border border-slate-100 flex items-center gap-1 transition-all duration-500">
                Disabled
             </span>
         )}
