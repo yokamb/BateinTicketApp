@@ -28,8 +28,11 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (status === "authenticated" && (session?.user as any)?.professionalRole) {
-      router.replace("/dashboard");
+    if (status === "authenticated") {
+      const user = session?.user as any;
+      if (user?.professionalRole || user?.role === "GUEST") {
+        router.replace("/dashboard");
+      }
     }
   }, [status, session, router]);
 

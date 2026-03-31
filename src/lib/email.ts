@@ -9,7 +9,7 @@ export async function sendVerificationEmail(email: string, token: string) {
     const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
 
     console.log(`[Email] To: ${email} | URL: ${verifyUrl}`);
-    
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "noreply@batein.com",
       to: email,

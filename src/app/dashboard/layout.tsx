@@ -45,19 +45,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
     ...joinedWorkspaces.map((j: any) => j.workspace)
   ];
 
-  // Only auto-create if they have ZERO access anywhere
-  if (allWorkspaces.length === 0) {
+  const isGuest = dbUser.role === "GUEST";
+
+  // Only auto-create if they have ZERO access anywhere and are NOT a Guest
+  if (allWorkspaces.length === 0 && !isGuest) {
     const newWs = await prisma.workspace.create({
       data: {
-        name: "My Workspace",
+        name: `${dbUser.name || "My"}'s Workspace`,
         adminId: dbUser.id
       }
     });
     allWorkspaces.push(newWs);
     ownedWorkspaces.push(newWs);
   }
-
-  const isGuest = dbUser.role === "GUEST" || (allWorkspaces.length > 0 && !ownedWorkspaces.some((w: any) => w.adminId === dbUser.id));
 
   return (
     <div className="min-h-screen bg-white text-[#0d0d0d] flex relative font-sans text-sm antialiased">
