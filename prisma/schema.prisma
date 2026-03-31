@@ -59,6 +59,8 @@ model User {
   comments        Comment[]
   notePagesCreated NotePage[]
   
+  mustChangePassword Boolean @default(false)
+  
   profile       UserProfile?
 
   createdAt     DateTime  @default(now())

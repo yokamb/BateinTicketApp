@@ -109,6 +109,7 @@ export const authOptions: NextAuthOptions = {
           token.plan = currentPlan;
           token.subscriptionExpiresAt = dbUser.subscriptionExpiresAt;
           token.isSubscriptionCancelled = dbUser.isSubscriptionCancelled;
+          token.mustChangePassword = (dbUser as any).mustChangePassword;
         }
       }
 
@@ -122,6 +123,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).plan = token.plan;
         (session.user as any).subscriptionExpiresAt = token.subscriptionExpiresAt;
         (session.user as any).isSubscriptionCancelled = token.isSubscriptionCancelled;
+        (session.user as any).mustChangePassword = token.mustChangePassword;
       }
       return session;
     }

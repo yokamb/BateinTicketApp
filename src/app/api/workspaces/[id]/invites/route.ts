@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 export async function POST(
   req: Request,
@@ -25,6 +26,46 @@ export async function POST(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    // Check if user already exists
+    let userRecord = await prisma.user.findUnique({ where: { email } });
+    let temporaryPassword = "";
+
+    if (!userRecord) {
+      // Create a random temporary password
+      temporaryPassword = crypto.randomBytes(6).toString("hex"); // 12 chars
+      const hashedPassword = await (bcrypt as any).hash(temporaryPassword, 10);
+      
+      userRecord = await prisma.user.create({
+        data: {
+          email,
+          name: email.split("@")[0],
+          passwordHash: hashedPassword,
+          role: "ADMIN", // Default role, user is GUEST within workspace
+          emailVerified: new Date(), // Auto-verify since we send password to this email
+          mustChangePassword: true,
+        }
+      }) as any;
+
+      // Create profile
+      await (prisma as any).userProfile.create({
+        data: {
+          userId: userRecord?.id,
+          subSpecialty: "Client"
+        }
+      });
+    }
+
+    // Add user to workspace immediately (Revokeable anytime)
+    await (prisma as any).instanceAccess.upsert({
+      where: { workspaceId_userId: { workspaceId, userId: userRecord?.id as string } },
+      update: { role: role || "GUEST" },
+      create: {
+        workspaceId,
+        userId: userRecord?.id as string,
+        role: role || "GUEST"
+      }
+    });
+
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
@@ -39,7 +80,7 @@ export async function POST(
       include: { workspace: { include: { admin: true } } }
     });
 
-    // Send the invitation email
+    // Send the invitation email with credentials if newly created
     const inviteLink = `${process.env.NEXTAUTH_URL}/invite/${token}`;
     try {
         const { sendWorkspaceInviteEmail } = await import("@/lib/email");
@@ -47,7 +88,8 @@ export async function POST(
             email,
             invite.workspace.name,
             invite.workspace.admin.name || invite.workspace.admin.email || "A Workspace Owner",
-            token
+            token,
+            temporaryPassword // Pass temporary password to the email template
         );
     } catch (emailError) {
         console.error("Failed to send invite email:", emailError);

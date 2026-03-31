@@ -77,7 +77,7 @@ export async function sendEmailNotification(to: string, subject: string, text: s
   }
 }
 
-export async function sendWorkspaceInviteEmail(email: string, workspaceName: string, inviterName: string, token: string) {
+export async function sendWorkspaceInviteEmail(email: string, workspaceName: string, inviterName: string, token: string, temporaryPassword?: string) {
   try {
     const rawUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     const baseUrl = rawUrl.trim().replace(/\/$/, "");
@@ -98,6 +98,14 @@ export async function sendWorkspaceInviteEmail(email: string, workspaceName: str
             <p style="color: #444444; font-size: 15px; margin: 0 0 24px; line-height: 1.6;">
               <strong>${inviterName}</strong> has invited you to join their workspace on <strong>Batein</strong>.
             </p>
+
+            ${temporaryPassword ? `
+            <div style="background-color: #ffffff; border: 1px solid #eeeeee; padding: 20px; border-radius: 12px; margin-bottom: 24px; text-align: left;">
+              <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: 700; color: #888888; text-transform: uppercase;">Your Login Credentials</p>
+              <p style="margin: 0 0 4px 0; font-size: 14px; color: #1a1a1a;"><strong>Login ID:</strong> ${email}</p>
+              <p style="margin: 0; font-size: 14px; color: #1a1a1a;"><strong>Temporary Password:</strong> <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px;">${temporaryPassword}</code></p>
+            </div>
+            ` : ''}
             
             <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
               <tr>

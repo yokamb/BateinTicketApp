@@ -16,6 +16,7 @@ import {
   Settings
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
+import ForcePasswordReset from "@/components/ForcePasswordReset";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -56,17 +57,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     ownedWorkspaces.push(newWs);
   }
 
-  const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Tickets", href: "/dashboard/tickets", icon: Ticket },
-    { name: "Notes", href: "/dashboard/notes", icon: NotebookIcon },
-    { name: "Workspaces", href: "/dashboard/workspaces", icon: Briefcase },
-  ];
-
   const isGuest = dbUser.role === "GUEST" || (allWorkspaces.length > 0 && !ownedWorkspaces.some((w: any) => w.adminId === dbUser.id));
 
   return (
     <div className="min-h-screen bg-white text-[#0d0d0d] flex relative font-sans text-sm antialiased">
+        {/* Force password change guard */}
+        <ForcePasswordReset />
+
         {/* Sidebar - ChatGPT Style */}
         <Sidebar 
           dbUser={dbUser} 
