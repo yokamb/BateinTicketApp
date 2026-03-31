@@ -39,7 +39,9 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
         window.location.href = "/dashboard";
       }, 3000);
     } else {
-      alert("Subscription created but local account upgrade failed. Contact support.");
+      const data = await res.json();
+      console.error("Upgrade error response:", data);
+      alert("Subscription created but local account upgrade failed: " + (data.details || "Check console for details"));
     }
     setIsLoading(false);
   };
