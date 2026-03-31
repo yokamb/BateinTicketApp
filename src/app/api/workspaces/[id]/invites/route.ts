@@ -69,6 +69,11 @@ export async function POST(
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
+    // Delete any existing invite for this email in this workspace first
+    await (prisma as any).workspaceInvite.deleteMany({
+      where: { workspaceId, email }
+    });
+
     const invite = await (prisma as any).workspaceInvite.create({
       data: {
         email,
