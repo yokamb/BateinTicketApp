@@ -59,12 +59,14 @@ export default async function TicketsPage() {
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Support Tickets</h1>
             <p className="text-xs text-slate-500 mt-0.5">Manage and track customer requests.</p>
           </div>
-          <Link 
-            href="/dashboard/tickets/new" 
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-2"
-          >
-            Create Ticket
-          </Link>
+          {!joinedWorkspaces.some((j: any) => j.userId === user.id && j.role === 'GUEST') && (
+            <Link 
+              href="/dashboard/tickets/new" 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-2"
+            >
+              Create Ticket
+            </Link>
+          )}
         </div>
         <div className="bg-white rounded-xl p-0 sm:p-4 border-0 sm:border border-slate-200 shadow-none sm:shadow-sm">
            {/* the workspaceId="" prevents the list from showing 'New Ticket' if we don't have a specific workspace context here. We added a global button instead above. */}

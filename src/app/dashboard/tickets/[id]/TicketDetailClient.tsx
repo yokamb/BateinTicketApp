@@ -243,21 +243,25 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
             </div>
           </div>
             <div className="flex flex-wrap gap-1.5 shrink-0">
-            {isEditing ? (
+            {!isGuest && (
               <>
-                <button onClick={() => { setIsEditing(false); setEditTitle(ticket.title); setEditDesc(ticket.description || ""); }} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Cancel</button>
-                <button onClick={handleSaveDetails} disabled={isUpdating} className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-bold transition-colors shadow-sm">{isUpdating ? "Saving..." : "Save"}</button>
+                {isEditing ? (
+                  <>
+                    <button onClick={() => { setIsEditing(false); setEditTitle(ticket.title); setEditDesc(ticket.description || ""); }} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Cancel</button>
+                    <button onClick={handleSaveDetails} disabled={isUpdating} className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-bold transition-colors shadow-sm">{isUpdating ? "Saving..." : "Save"}</button>
+                  </>
+                ) : (
+                  <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Edit</button>
+                )}
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+                  title="Delete Ticket"
+                >
+                  <Trash2 size={14} /> 
+                </button>
               </>
-            ) : (
-              <button onClick={() => setIsEditing(true)} className="flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-colors">Edit</button>
             )}
-            <button
-              onClick={handleDelete}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
-              title="Delete Ticket"
-            >
-              <Trash2 size={14} /> 
-            </button>
           </div>
         </div>
 

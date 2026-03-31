@@ -43,17 +43,19 @@ export default function Sidebar({
       </div>
 
       {/* New Ticket Button & Invite Link */}
-      <div className="px-3 py-2 space-y-1">
-        <Link 
-          href="/dashboard/tickets/new" 
-          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[#0d0d0d] hover:bg-[#efefef] transition-colors group font-bold text-xs uppercase tracking-tighter"
-        >
-          <div className="w-6 h-6 bg-[#efefef] group-hover:bg-[#e0e0e0] rounded-md flex items-center justify-center transition-colors shrink-0">
-            <Plus size={15} className="text-[#555]" />
-          </div>
-          New Ticket
-        </Link>
-      </div>
+      {!isGuest && (
+        <div className="px-3 py-2 space-y-1">
+          <Link 
+            href="/dashboard/tickets/new" 
+            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[#0d0d0d] hover:bg-[#efefef] transition-colors group font-bold text-xs uppercase tracking-tighter"
+          >
+            <div className="w-6 h-6 bg-[#efefef] group-hover:bg-[#e0e0e0] rounded-md flex items-center justify-center transition-colors shrink-0">
+              <Plus size={15} className="text-[#555]" />
+            </div>
+            New Ticket
+          </Link>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">

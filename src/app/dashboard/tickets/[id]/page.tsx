@@ -14,7 +14,9 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
     where: { id },
     include: {
       creator: true,
-      workspace: true,
+      workspace: {
+        include: { customers: true }
+      },
       comments: {
         include: { user: true },
         orderBy: { createdAt: "asc" }
