@@ -297,7 +297,10 @@ export default function ProfileForm({ user }: { user: any }) {
                   </>
                 )}
                 {user.plan === "MAX" && (
-                  <button type="button" onClick={handleCancel} disabled={loading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors disabled:opacity-70">{loading ? "Cancelling..." : "Cancel Subscription"}</button>
+                  <>
+                    <button type="button" onClick={() => router.push('/pricing')} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors shadow-sm">Get More Storage</button>
+                    <button type="button" onClick={handleCancel} disabled={loading} className="px-5 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors disabled:opacity-70">{loading ? "Cancelling..." : "Cancel Subscription"}</button>
+                  </>
                 )}
               </div>
             )}

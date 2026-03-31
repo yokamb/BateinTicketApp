@@ -70,11 +70,11 @@ export default function Sidebar({
         ))}
 
         {/* Upgrade Link: Only for Owners/Admins */}
-        {!isGuest && dbUser.plan !== "MAX" && (
+        {!isGuest && (
           <div className="pt-3 mt-2 border-t border-[#e5e5e5]">
             <Link href="/pricing" className="flex items-center gap-2.5 px-3 py-2 text-[#444] hover:bg-[#efefef] hover:text-[#0d0d0d] rounded-lg font-medium transition-colors text-sm">
-              <Crown size={17} className="text-amber-500 shrink-0" />
-              Upgrade Plan
+              <Crown size={17} className={`${dbUser.plan === "MAX" ? "text-indigo-500" : "text-amber-500"} shrink-0`} />
+              {dbUser.plan === "MAX" ? "Manage Plan & Storage" : "Upgrade Plan"}
             </Link>
           </div>
         )}
