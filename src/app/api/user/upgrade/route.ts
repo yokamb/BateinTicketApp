@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { plan, subscriptionId } = await req.json();
+    const { plan, subscriptionId, razorpayPaymentId, isRazorpay } = await req.json();
     if (!["FREE", "PRO", "MAX"].includes(plan)) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
@@ -21,7 +21,9 @@ export async function POST(req: Request) {
       where: { id: user.id },
       data: {
         plan,
-        paypalSubscriptionId: subscriptionId ?? null,
+        paypalSubscriptionId: !isRazorpay ? subscriptionId : undefined,
+        razorpaySubscriptionId: isRazorpay ? subscriptionId : undefined,
+        razorpayPaymentId: isRazorpay ? razorpayPaymentId : undefined,
       },
     });
 

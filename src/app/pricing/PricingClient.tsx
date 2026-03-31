@@ -1,20 +1,36 @@
 "use client";
 
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
+import Script from "next/script";
 
 export default function PricingClient({ userPlan }: { userPlan: string }) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<"PRO" | "MAX" | null>(null);
+  const [isIndian, setIsIndian] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleApprove = async (plan: "PRO" | "MAX", data: any, actions: any) => {
+  useEffect(() => {
+    // Basic auto-detection for India based on TimeZone
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz === "Asia/Calcutta" || tz === "Asia/Kolkata") {
+      setIsIndian(true);
+    }
+  }, []);
+
+  const handleApprove = async (plan: "PRO" | "MAX", data: any, isRazorpay: boolean = false) => {
     const res = await fetch("/api/user/upgrade", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan, subscriptionId: data.subscriptionID }),
+      body: JSON.stringify({ 
+        plan, 
+        subscriptionId: isRazorpay ? data.razorpay_subscription_id : data.subscriptionID,
+        razorpayPaymentId: isRazorpay ? data.razorpay_payment_id : undefined,
+        isRazorpay 
+      }),
     });
 
     if (res.ok) {
@@ -24,6 +40,58 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
       }, 3000);
     } else {
       alert("Subscription created but local account upgrade failed. Contact support.");
+    }
+    setIsLoading(false);
+  };
+
+  const handleRazorpaySubscription = async (plan: "PRO" | "MAX") => {
+    setIsLoading(true);
+    try {
+      const planId = plan === "PRO" 
+        ? process.env.NEXT_PUBLIC_RAZORPAY_PLAN_ID_PRO 
+        : process.env.NEXT_PUBLIC_RAZORPAY_PLAN_ID_MAX;
+
+      if (!planId) {
+        alert("Razorpay Plan ID is missing!");
+        setIsLoading(false);
+        return;
+      }
+
+      const res = await fetch("/api/razorpay/create-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId }),
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      const options = {
+        key: data.keyId,
+        subscription_id: data.subscriptionId,
+        name: "Batein SaaS",
+        description: `${plan} Plan Subscription`,
+        handler: (response: any) => {
+          handleApprove(plan, response, true);
+        },
+        prefill: {
+          name: "", // Can be prefilled if user info available
+          email: "",
+        },
+        theme: {
+          color: "#0d0d0d",
+        },
+        modal: {
+          ondismiss: () => setIsLoading(false)
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error("Razorpay Error:", error);
+      alert("Failed to initiate Razorpay: " + error.message);
+      setIsLoading(false);
     }
   };
 
@@ -45,21 +113,21 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
     {
       name: "Free",
       id: "FREE",
-      price: "$0",
+      price: isIndian ? "₹0" : "$0",
       features: ["2 Workspaces", "2 Notebooks", "50 Tickets", "100 MB Storage"],
       ...getPlanButtonProps("FREE")
     },
     {
       name: "Pro",
       id: "PRO",
-      price: "$2",
+      price: isIndian ? "₹169" : "$2",
       features: ["Up to 10 Workspaces", "File Attachments", "Priority Email Support"],
       ...getPlanButtonProps("PRO")
     },
     {
       name: "Max",
       id: "MAX",
-      price: "$6",
+      price: isIndian ? "₹499" : "$6",
       features: ["Unlimited Workspaces", "Change Approvals", "Custom Domains", "24/7 Support"],
       ...getPlanButtonProps("MAX")
     }
@@ -73,6 +141,7 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
       "components": "buttons",
       "currency": "USD"
     }}>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased">
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
@@ -122,6 +191,34 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                   )}
 
                   {selectedPlan === pl.id && (() => {
+                    if (isIndian) {
+                      return (
+                        <div className="mt-4">
+                          <button 
+                            disabled={isLoading}
+                            onClick={() => handleRazorpaySubscription(pl.id)}
+                            className="w-full py-2.5 bg-[#0d0d0d] hover:bg-[#333] text-white font-bold rounded-xl transition-all shadow-md text-sm flex items-center justify-center gap-2"
+                          >
+                            {isLoading ? (
+                              <>
+                                <Loader2 size={16} className="animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              `Pay ${pl.price} / month`
+                            )}
+                          </button>
+                          <button 
+                            disabled={isLoading}
+                            onClick={() => setSelectedPlan(null)}
+                            className="w-full py-2 mt-2 text-xs text-[#888] hover:text-[#0d0d0d] font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      );
+                    }
+
                     const cleanId = (envVar: string | undefined) => {
                       if (!envVar) return "";
                       return envVar.replace(/\\n/g, "").replace(/\n/g, "").trim();
@@ -146,7 +243,7 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                               plan_id: planId
                             });
                           }}
-                          onApprove={(data, actions) => handleApprove(pl.id, data, actions)}
+                          onApprove={(data, actions) => handleApprove(pl.id, data)}
                           onError={(err: any) => {
                             console.error("PayPal Error:", err);
                             alert("PayPal error: " + (err.message || "Something went wrong during checkout. Please try again."));

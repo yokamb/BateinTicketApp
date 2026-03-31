@@ -41,6 +41,8 @@ model User {
   role          String    @default("ADMIN")
   plan          String    @default("FREE")
   paypalSubscriptionId String?
+  razorpaySubscriptionId String?
+  razorpayPaymentId     String?
   additionalStorageGB   Int       @default(0)
   
   accounts      Account[]
