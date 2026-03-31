@@ -4,7 +4,7 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Loader2, X } from "lucide-react";
+import { Check, Loader2, X, Database } from "lucide-react";
 import Script from "next/script";
 
 export default function PricingClient({ 
@@ -102,6 +102,63 @@ export default function PricingClient({
     } catch (error: any) {
       console.error("Razorpay Error:", error);
       alert("Failed to initiate Razorpay: " + error.message);
+      setIsLoading(false);
+    }
+  };
+
+  const handleExpandStorage = async (provider: "razorpay" | "paypal", amountGB: number, data?: any) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/expand-storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          orderId: provider === "razorpay" ? data.razorpay_order_id : data.orderID,
+          amountGB,
+          provider
+        }),
+      });
+      if (res.ok) {
+        alert("Storage expanded successfully! Your limit has been updated.");
+        router.refresh();
+      } else {
+        const error = await res.json();
+        alert("Expansion failed: " + (error.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Storage Expand Error:", err);
+      alert("An error occurred during expansion.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const expandRazorpayStorage = async (amountGB: number, priceINR: number) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: priceINR }),
+      });
+      const order = await res.json();
+
+      const options = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: "INR",
+        name: "Batein Storage Power-Up",
+        description: `+${amountGB}GB Lifetime Storage Expansion`,
+        order_id: order.orderId,
+        handler: (response: any) => handleExpandStorage("razorpay", amountGB, response),
+        theme: { color: "#0d0d0d" },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error("Razorpay Power-up Error:", error);
+      alert("Failed to initiate Razorpay Expansion: " + error.message);
       setIsLoading(false);
     }
   };
@@ -327,6 +384,65 @@ export default function PricingClient({
             ))}
           </div>
         )}
+
+        {/* --- Storage Power-Ups --- */}
+        <div className="max-w-4xl mx-auto mt-24 mb-12 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full mb-4">
+            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Add-ons</span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight mb-2 text-[#0d0d0d]">Storage Power-Ups</h2>
+          <p className="text-sm text-[#666]">Expand your file attachment limit forever with a one-time purchase.</p>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+          {[
+            { id: "2GB", name: "+2GB Storage", price: isIndian ? "₹199" : "$3", amount: 2, priceVal: 199, usdPrice: "3.00" },
+            { id: "5GB", name: "+5GB Storage", price: isIndian ? "₹399" : "$6", amount: 5, priceVal: 399, usdPrice: "6.00" }
+          ].map((addon) => (
+            <div key={addon.id} className="bg-white border border-[#e5e5e5] rounded-2xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <Database size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#0d0d0d]">{addon.name}</h3>
+                  <p className="text-xs text-[#888]">One-time lifetime expansion</p>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="text-xl font-bold text-[#0d0d0d] mb-2">{addon.price}</div>
+                {isIndian ? (
+                  <button 
+                    onClick={() => expandRazorpayStorage(addon.amount, addon.priceVal)}
+                    disabled={isLoading}
+                    className="px-4 py-1.5 bg-[#0d0d0d] hover:bg-[#333] text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {isLoading ? "..." : "Buy Now"}
+                  </button>
+                ) : (
+                  <div className="w-32">
+                    <PayPalButtons 
+                      style={{ layout: 'horizontal', color: 'black', shape: 'rect', label: 'pay', height: 32, tagline: false }}
+                      createOrder={(data, actions) => {
+                        return actions.order.create({
+                          purchase_units: [{
+                            description: `${addon.name} Lifetime Expansion`,
+                            amount: { currency_code: "USD", value: addon.usdPrice }
+                          }],
+                          intent: "CAPTURE"
+                        });
+                      }}
+                      onApprove={async (data, actions) => {
+                        await handleExpandStorage("paypal", addon.amount, data);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </PayPalScriptProvider>
   );
