@@ -30,7 +30,7 @@ export default function OnboardingPage() {
 
     if (status === "authenticated") {
       const user = session?.user as any;
-      if (user?.professionalRole || user?.role === "GUEST") {
+      if (user?.professionalRole || user?.role === "CUSTOMER") {
         router.replace("/dashboard");
       }
     }

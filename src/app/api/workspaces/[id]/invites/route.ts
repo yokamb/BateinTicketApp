@@ -40,8 +40,8 @@ export async function POST(
           email,
           name: email.split("@")[0],
           passwordHash: hashedPassword,
-          role: "ADMIN", // Default role, user is GUEST within workspace
-          emailVerified: new Date(), // Auto-verify since we send password to this email
+          role: "CUSTOMER", // Set as CUSTOMER to distinguish from freelancers (ADMINS)
+          emailVerified: new Date(), 
           mustChangePassword: true,
         }
       }) as any;
