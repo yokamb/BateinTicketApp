@@ -247,7 +247,7 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
 
       {(() => {
         const ws = workspaces.find((w: any) => w.id === workspaceId);
-        const isApproverRequired = selectedCategory === "CHANGE" && ws?.requiresChangeApproval;
+        const isApproverRequired = selectedCategory === "CHANGE";
         const hasNoApprovers = (ws?.approvers?.length || 0) === 0;
 
         if (isApproverRequired && hasNoApprovers) {

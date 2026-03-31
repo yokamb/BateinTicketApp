@@ -35,13 +35,13 @@ export async function POST(req: Request) {
     const tType = type || "INCIDENT";
     const tCategory = category || (tType.toUpperCase() === "CHANGE" ? "CHANGE" : tType.toUpperCase() === "REQUEST" ? "REQUEST" : "ISSUE");
 
-    if (ws.requiresChangeApproval && tCategory === "CHANGE") {
+    if (tCategory === "CHANGE") {
         const guestCount = await (prisma as any).instanceAccess.count({
             where: { workspaceId: workspaceId, role: "GUEST" }
         });
         if (guestCount === 0) {
             return NextResponse.json({ 
-                error: "This workspace requires Change Approvals, but no approvers (clients) have been added. Please invite an approver first." 
+                error: "This ticket type requires Client Approval, but no approvers (clients) have been added. Please invite an approver first." 
             }, { status: 400 });
         }
     }
