@@ -3,7 +3,8 @@
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Check, Loader2, X } from "lucide-react";
 import Script from "next/script";
 
 export default function PricingClient({ 
@@ -175,7 +176,14 @@ export default function PricingClient({
       "currency": "USD"
     }}>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
-      <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased">
+      <div className="min-h-screen bg-[#f9f9f9] py-20 px-4 font-sans text-[#0d0d0d] antialiased relative">
+        <Link 
+          href="/dashboard"
+          className="absolute top-8 left-8 p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-black border border-gray-200 bg-white"
+          title="Back to Dashboard"
+        >
+          <X size={18} />
+        </Link>
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
           <p className="text-base text-[#666]">Scale your freelance business with premium features.</p>
