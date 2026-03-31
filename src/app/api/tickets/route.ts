@@ -14,9 +14,13 @@ export async function POST(req: Request) {
 
     // Verification check
     let hasAccess = false;
-    const ws = await (prisma as any).workspace.findUnique({ where: { id: workspaceId } });
+    const ws = await (prisma as any).workspace.findUnique({ 
+        where: { id: workspaceId } 
+    });
     
-    if (ws?.adminId === user.id) {
+    if (!ws) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+
+    if (ws.adminId === user.id) {
         hasAccess = true;
     } else {
         const access = await (prisma as any).instanceAccess.findUnique({
@@ -26,6 +30,21 @@ export async function POST(req: Request) {
     }
 
     if (!hasAccess) return NextResponse.json({ error: "Forbidden access to workspace" }, { status: 403 });
+
+    // --- Enforce Approver Presence ---
+    const tType = type || "INCIDENT";
+    const tCategory = category || (tType.toUpperCase() === "CHANGE" ? "CHANGE" : tType.toUpperCase() === "REQUEST" ? "REQUEST" : "ISSUE");
+
+    if (ws.requiresChangeApproval && tCategory === "CHANGE") {
+        const guestCount = await (prisma as any).instanceAccess.count({
+            where: { workspaceId: workspaceId, role: "GUEST" }
+        });
+        if (guestCount === 0) {
+            return NextResponse.json({ 
+                error: "This workspace requires Change Approvals, but no approvers (clients) have been added. Please invite an approver first." 
+            }, { status: 400 });
+        }
+    }
     
     // Check plan limits
     const dbUser = await (prisma as any).user.findUnique({ where: { id: user.id } });
@@ -37,9 +56,6 @@ export async function POST(req: Request) {
         }
     }
 
-    const tType = type || "INCIDENT";
-    const tCategory = category || (tType.toUpperCase() === "CHANGE" ? "CHANGE" : tType.toUpperCase() === "REQUEST" ? "REQUEST" : "ISSUE");
-    
     const prefix = tCategory === "CHANGE" ? "CHG" : tCategory === "REQUEST" ? "REQ" : "INC";
     const ticketCount = await (prisma as any).ticket.count();
     const seqNum = 1000 + ticketCount;

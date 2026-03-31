@@ -245,6 +245,28 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
         </div>
       </div>
 
+      {(() => {
+        const ws = workspaces.find((w: any) => w.id === workspaceId);
+        const isApproverRequired = selectedCategory === "CHANGE" && ws?.requiresChangeApproval;
+        const hasNoApprovers = (ws?.approvers?.length || 0) === 0;
+
+        if (isApproverRequired && hasNoApprovers) {
+          return (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 animate-pulse">
+                <span className="text-xl">⚠️</span>
+                <div>
+                  <p className="text-xs font-bold text-amber-800 uppercase tracking-tighter mb-1">Approval Blocked</p>
+                  <p className="text-[11px] text-amber-700 leading-normal">
+                    This workspace requires <strong>Change Approvals</strong>, but no approvers (Clients) have been invited yet. 
+                    Please add an approver in <strong>Workspace Settings</strong> before creating this ticket.
+                  </p>
+                </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
         <button
           type="button"
@@ -255,8 +277,11 @@ export default function TicketForm({ workspaces, defaultWorkspaceId }: any) {
         </button>
         <button
           type="submit"
-          disabled={loading}
-          className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-70 shadow-sm"
+          disabled={loading || (() => {
+            const ws = workspaces.find((w: any) => w.id === workspaceId);
+            return (selectedCategory === "CHANGE" && ws?.requiresChangeApproval && (ws?.approvers?.length || 0) === 0);
+          })()}
+          className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           <Save size={18} />
           {loading ? "Creating..." : "Create Ticket"}
