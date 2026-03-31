@@ -6,7 +6,15 @@ import { useRouter } from "next/navigation";
 import { Check, Loader2 } from "lucide-react";
 import Script from "next/script";
 
-export default function PricingClient({ userPlan }: { userPlan: string }) {
+export default function PricingClient({ 
+  userPlan,
+  isSubscriptionCancelled = false,
+  subscriptionExpiresAt = null
+}: { 
+  userPlan: string,
+  isSubscriptionCancelled?: boolean,
+  subscriptionExpiresAt?: Date | null
+}) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<"PRO" | "MAX" | null>(null);
   const [isIndian, setIsIndian] = useState(false);
@@ -97,6 +105,29 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
     }
   };
 
+  const handleCancel = async () => {
+    if (!confirm("Are you sure you want to cancel your subscription? You will keep your benefits until the end of the billing period.")) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/cancel-subscription", { method: "POST" });
+      if (res.ok) {
+        alert("Subscription cancelled successfully. Your plan will remain active until the end of the period.");
+        window.location.reload();
+      } else {
+        const data = await res.json();
+        alert("Cancellation failed: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Cancel error:", err);
+      alert("An error occurred during cancellation.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getPlanButtonProps = (planId: string) => {
     if (userPlan === "MAX") return { disabled: true, buttonText: planId === "MAX" ? "Current Plan" : "Included in Max" };
     if (userPlan === "PRO") {
@@ -148,6 +179,15 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h1 className="text-3xl font-bold tracking-tight mb-3">Choose Your Plan</h1>
           <p className="text-base text-[#666]">Scale your freelance business with premium features.</p>
+
+          {isSubscriptionCancelled && subscriptionExpiresAt && (
+            <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 max-w-2xl mx-auto flex items-center justify-center gap-3 shadow-sm">
+              <span className="text-lg">⏳</span>
+              <p className="text-sm font-medium">
+                Your <strong>{userPlan}</strong> plan is cancelled and will expire in <strong>{Math.ceil((new Date(subscriptionExpiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days</strong> ({new Date(subscriptionExpiresAt).toLocaleDateString()}).
+              </p>
+            </div>
+          )}
         </div>
 
         {isSuccess ? (
@@ -187,9 +227,20 @@ export default function PricingClient({ userPlan }: { userPlan: string }) {
                   )}
 
                   {pl.disabled && (
-                    <button disabled className="w-full py-2.5 bg-white text-[#bbb] font-bold rounded-xl border border-[#e5e5e5] cursor-not-allowed text-sm">
-                      {pl.buttonText}
-                    </button>
+                    <div className="space-y-2">
+                      <button disabled className="w-full py-2.5 bg-white text-[#bbb] font-bold rounded-xl border border-[#e5e5e5] cursor-not-allowed text-sm">
+                        {pl.buttonText}
+                      </button>
+                      {pl.id === userPlan && !isSubscriptionCancelled && userPlan !== "FREE" && (
+                        <button 
+                          onClick={handleCancel}
+                          disabled={isLoading}
+                          className="w-full py-2 text-xs text-rose-600 hover:text-rose-800 font-medium transition-colors"
+                        >
+                          Cancel Subscription
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {selectedPlan === pl.id && (() => {

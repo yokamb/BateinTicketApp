@@ -72,15 +72,43 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      if ((!token.role || !token.professionalRole) && token.id) {
+      if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, professionalRole: true },
+          select: { 
+            role: true, 
+            professionalRole: true,
+            plan: true,
+            subscriptionExpiresAt: true,
+            isSubscriptionCancelled: true
+          },
         });
 
         if (dbUser) {
+          let currentPlan = dbUser.plan;
+          
+          // Check for expiry
+          if (dbUser.plan !== "FREE" && dbUser.subscriptionExpiresAt && new Date() > dbUser.subscriptionExpiresAt) {
+            // Plan has expired, downgrade to FREE
+            await prisma.user.update({
+              where: { id: token.id as string },
+              data: {
+                plan: "FREE",
+                isSubscriptionCancelled: false,
+                subscriptionExpiresAt: null,
+                paypalSubscriptionId: null,
+                razorpaySubscriptionId: null,
+                razorpayPaymentId: null,
+              }
+            });
+            currentPlan = "FREE";
+          }
+
           token.role = dbUser.role;
           token.professionalRole = dbUser.professionalRole;
+          token.plan = currentPlan;
+          token.subscriptionExpiresAt = dbUser.subscriptionExpiresAt;
+          token.isSubscriptionCancelled = dbUser.isSubscriptionCancelled;
         }
       }
 
@@ -91,6 +119,9 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
         (session.user as any).professionalRole = token.professionalRole;
+        (session.user as any).plan = token.plan;
+        (session.user as any).subscriptionExpiresAt = token.subscriptionExpiresAt;
+        (session.user as any).isSubscriptionCancelled = token.isSubscriptionCancelled;
       }
       return session;
     }

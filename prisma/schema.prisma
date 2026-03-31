@@ -43,6 +43,8 @@ model User {
   paypalSubscriptionId String?
   razorpaySubscriptionId String?
   razorpayPaymentId     String?
+  subscriptionExpiresAt DateTime?
+  isSubscriptionCancelled Boolean @default(false)
   additionalStorageGB   Int       @default(0)
   
   accounts      Account[]
