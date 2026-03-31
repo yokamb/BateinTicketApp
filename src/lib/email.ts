@@ -81,22 +81,22 @@ export async function sendWorkspaceInviteEmail(email: string, workspaceName: str
   try {
     const rawUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     const baseUrl = rawUrl.trim().replace(/\/$/, "");
-    const inviteUrl = `${baseUrl}/invite/${token}`;
+    const loginUrl = `${baseUrl}/login`;
 
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "noreply@batein.com",
       to: email,
-      subject: `Invitation to join ${workspaceName} on Batein`,
+      subject: `You've been added to ${workspaceName} on Batein`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; color: #1a1a1a;">
           <div style="text-align: center; margin-bottom: 32px;">
-            <p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 800; color: #6366f1; margin-bottom: 8px;">Workspace Invitation</p>
-            <h1 style="font-size: 24px; font-weight: 800; color: #0d0d0d; margin: 0; letter-spacing: -0.02em;">Join ${workspaceName}</h1>
+            <p style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 800; color: #6366f1; margin-bottom: 8px;">Workspace Access Active</p>
+            <h1 style="font-size: 24px; font-weight: 800; color: #0d0d0d; margin: 0; letter-spacing: -0.02em;">Welcome to ${workspaceName}</h1>
           </div>
           
           <div style="background-color: #f9f9f9; border-radius: 16px; padding: 32px; border: 1px solid #eeeeee; text-align: center;">
             <p style="color: #444444; font-size: 15px; margin: 0 0 24px; line-height: 1.6;">
-              <strong>${inviterName}</strong> has invited you to join their workspace on <strong>Batein</strong>.
+              <strong>${inviterName}</strong> has added you to their workspace on <strong>Batein</strong>. Your account is ready for use.
             </p>
 
             ${temporaryPassword ? `
@@ -110,14 +110,14 @@ export async function sendWorkspaceInviteEmail(email: string, workspaceName: str
             <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
               <tr>
                 <td align="center" bgcolor="#0d0d0d" style="border-radius: 12px;">
-                  <a href="${inviteUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; border: 1px solid #0d0d0d; border-radius: 12px;">
-                    Accept Invitation & Join
+                  <a href="${loginUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; border: 1px solid #0d0d0d; border-radius: 12px;">
+                    Sign in to Workspace
                   </a>
                 </td>
               </tr>
             </table>
 
-            <p style="color: #888888; font-size: 11px; margin-top: 24px;">This invitation will expire in 7 days.</p>
+            <p style="color: #888888; font-size: 11px; margin-top: 24px;">Please login and update your password immediately.</p>
           </div>
 
           <div style="margin-top: 32px; text-align: center;">

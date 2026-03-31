@@ -80,36 +80,33 @@ export default function InvitePage() {
             </Box>
 
             <div>
-              <Text size="xs" fw={800} color="dimmed" className="uppercase tracking-widest mb-1 opacity-60">Invitation to JOIN</Text>
+              <Text size="xs" fw={800} color="dimmed" className="uppercase tracking-widest mb-1 opacity-60">Access Active</Text>
               <Title order={2} className="text-3x font-black tracking-tighter uppercase leading-none">
                 {invite.workspace.name}
               </Title>
               <Text size="sm" color="dimmed" fw={500} className="mt-4 px-4">
-                <strong>{invite.workspace.admin.name || "A workspace owner"}</strong> invited you to join their team as a <strong>{invite.role}</strong>.
+                You have been successfully added to <strong>{invite.workspace.name}</strong> by <strong>{invite.workspace.admin.name || "the owner"}</strong>.
               </Text>
             </div>
 
-            {invite.role === "GUEST" && (
-                <Box className="bg-amber-50 border border-amber-100 p-3 rounded-2xl w-full">
-                    <Text size="xs" color="amber" fw={700} className="flex items-center justify-center gap-1.5 uppercase tracking-tighter">
-                        <Crown size={14} /> Client / Guest Access
-                    </Text>
-                    <Text fz={11} color="amber" fw={500} className="mt-1 opacity-80">
-                        You'll have access to review and approve tickets in this workspace.
-                    </Text>
-                </Box>
-            )}
+            <Box className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl w-full">
+                <Text size="xs" color="emerald" fw={800} className="flex items-center justify-center gap-1.5 uppercase tracking-tighter mb-1">
+                    <CheckCircle size={14} /> Ready to Sign In
+                </Text>
+                <Text fz={11} color="emerald" fw={500} className="opacity-80">
+                    Your account and workspace access are already active. Use the credentials sent to your email to log in.
+                </Text>
+            </Box>
 
             <Button 
                 fullWidth 
                 size="lg" 
                 radius="xl" 
                 color="dark" 
-                loading={accepting}
-                onClick={handleAccept}
+                onClick={() => router.push("/login")}
                 className="hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-xl"
             >
-              Accept Invitation & Join
+              Sign in to Dashboard
             </Button>
 
             <Text fz={10} color="dimmed" fw={600} className="uppercase tracking-widest opacity-40 italic">
