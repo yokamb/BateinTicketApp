@@ -205,21 +205,50 @@ export default function PricingClient({
       name: "Free",
       id: "FREE",
       price: isIndian ? "₹0" : "$0",
-      features: ["2 Workspaces", "2 Notebooks", "50 Tickets", "100 MB Storage"],
+      features: [
+        "1 Active Workspace",
+        "50 Lifecycle Tickets",
+        "Universal Time Tracker",
+        "Base SLA Monitoring",
+        "100 MB Cloud Storage",
+        "Personal Notebook"
+      ],
       ...getPlanButtonProps("FREE")
     },
     {
       name: "Pro",
       id: "PRO",
       price: isIndian ? "₹169" : "$2",
-      features: ["Up to 10 Workspaces", "File Attachments", "Priority Email Support"],
+      features: [
+        "10 Active Workspaces",
+        "Unlimited Support Tickets",
+        "Enhanced Analytics (30d)",
+        "Custom Ticket Types & Labels",
+        "File & Media Attachments",
+        "Team Collaboration Nodes",
+        "Priority Pulse Email Support",
+        "1 GB High-Speed Storage",
+        "Unlimited Notebooks"
+      ],
       ...getPlanButtonProps("PRO")
     },
     {
       name: "Max",
       id: "MAX",
       price: isIndian ? "₹499" : "$6",
-      features: ["Unlimited Workspaces", "Change Approvals", "Custom Domains", "24/7 Support"],
+      features: [
+        "Unlimited Everything",
+        "Full Analytics Intelligence",
+        "SLA Resolution Heatmaps",
+        "Change Request Approvals",
+        "Workflow Triggers & Automation",
+        "Multi-Organization Control",
+        "Role-Based Access (RBAC)",
+        "White-Label Portal Config",
+        "Bulk Data Export (CSV/PDF)",
+        "24/7 Elite Support Channel",
+        "5 GB Global Cloud Storage"
+      ],
       ...getPlanButtonProps("MAX")
     }
   ];

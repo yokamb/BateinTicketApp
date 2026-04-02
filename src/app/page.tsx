@@ -119,16 +119,19 @@ export default async function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free */}
-            <div className="p-10 rounded-[2.5rem] bg-white border border-[#e5e5e5] flex flex-col hover:shadow-xl transition-all">
+            <div className="p-10 rounded-[2.5rem] bg-white border border-[#e5e5e5] flex flex-col hover:shadow-xl transition-all group">
                <h3 className="text-xl font-bold text-[#666] mb-1">Free</h3>
                <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$0<span className="text-sm text-[#888] font-medium">/mo</span></div>
-               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 1 Workspace Limit</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Up to 50 Tickets</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 1 Notebook (5 Pages)</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 100 MB Storage</li>
+               <ul className="space-y-4 mb-10 text-[#555] text-[13px] font-medium">
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 1 Active Workspace</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 50 Lifecycle Tickets</li>
+                  <li className="flex items-center gap-3 text-indigo-600 font-bold"><CheckCircle size={16} className="text-indigo-500"/> Universal Time Tracker</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Base SLA Monitoring</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 100 MB Cloud Storage</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-indigo-400 hover:text-indigo-600 text-[#666] font-bold transition-all text-sm">Get Started</Link>
+               <Link href={session ? "/dashboard" : "/register"} className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-indigo-400 hover:text-indigo-600 text-[#666] font-bold transition-all text-sm">
+                 {session ? "Dashboard" : "Get Started"}
+               </Link>
             </div>
 
             {/* Pro */}
@@ -136,27 +139,38 @@ export default async function LandingPage() {
                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black rounded-full shadow-lg">MOST POPULAR</div>
                <h3 className="text-xl font-bold text-indigo-600 mb-1">Pro</h3>
                <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$2<span className="text-sm text-[#888] font-medium">/mo</span></div>
-               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> 10 Workspaces</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Unlimited Tickets</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Unlimited Notebooks</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> 1 GB Storage</li>
-                  <li className="flex items-center gap-3 font-bold text-indigo-600"><CheckCircle size={16} className="text-indigo-500"/> Priority Support</li>
+               <ul className="space-y-3.5 mb-10 text-[#555] text-[12px] font-medium">
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> 10 Active Workspaces</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Unlimited Support Tickets</li>
+                  <li className="flex items-center gap-3 text-indigo-600 font-bold"><CheckCircle size={16} className="text-indigo-500"/> Enhanced Analytics (30d)</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Custom Ticket Types & Labels</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> File & Media Attachments</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Team Collaboration Nodes</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-indigo-500"/> Priority Pulse Email Support</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white font-bold transition-all text-sm ring-4 ring-indigo-50">Get Pro Now</Link>
+               <Link href={session ? "/dashboard" : "/register"} className="mt-auto block w-full text-center py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white font-bold transition-all text-sm ring-4 ring-indigo-50">
+                 {session ? "Upgrade Now" : "Get Pro Now"}
+               </Link>
             </div>
 
             {/* Max */}
             <div className="p-10 rounded-[2.5rem] bg-white border border-[#e5e5e5] flex flex-col hover:shadow-xl transition-all">
                <h3 className="text-xl font-bold text-[#666] mb-1">Max</h3>
                <div className="text-4xl font-black text-[#0d0d0d] mb-8 font-mono tracking-tighter">$6<span className="text-sm text-[#888] font-medium">/mo</span></div>
-               <ul className="space-y-4 mb-10 text-[#555] text-sm font-medium">
+               <ul className="space-y-3 mb-10 text-[#555] text-[11px] font-medium">
                   <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Unlimited Everything</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 5 GB Storage</li>
-                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Large File Uploads</li>
-                  <li className="flex items-center gap-3 font-bold text-emerald-600"><CheckCircle size={16} className="text-emerald-500"/> 24/7 Priority Support</li>
+                  <li className="flex items-center gap-3 text-indigo-600 font-bold"><CheckCircle size={16} className="text-indigo-500"/> Full Analytics Intelligence</li>
+                  <li className="flex items-center gap-3 text-indigo-600 font-bold"><CheckCircle size={16} className="text-indigo-500"/> SLA Resolution Heatmaps</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Change Request Approvals</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Workflow Triggers & Automation</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> Role-Based Access (RBAC)</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> White-Label Portal Config</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 24/7 Elite Support Channel</li>
+                  <li className="flex items-center gap-3"><CheckCircle size={16} className="text-emerald-500"/> 5 GB Global Cloud Storage</li>
                </ul>
-               <Link href="/register" className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-emerald-400 hover:text-emerald-600 text-[#666] font-bold transition-all text-sm">Get Max</Link>
+               <Link href={session ? "/dashboard" : "/register"} className="mt-auto block w-full text-center py-3.5 rounded-2xl border-2 border-[#eee] hover:border-emerald-400 hover:text-emerald-600 text-[#666] font-bold transition-all text-sm">
+                 {session ? "Upgrade to Max" : "Get Max"}
+               </Link>
             </div>
           </div>
         </div>
