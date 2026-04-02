@@ -41,7 +41,7 @@ export default async function AnalyticsPage() {
       select: { createdAt: true }
     });
     const map: Record<string, number> = {};
-    rawTrends.forEach(t => {
+    rawTrends.forEach((t: any) => {
       const d = t.createdAt.toLocaleDateString(undefined, { weekday: 'short' });
       map[d] = (map[d] || 0) + 1;
     });
@@ -66,8 +66,8 @@ export default async function AnalyticsPage() {
         stats={{
           totalTickets: stats._count.id,
           totalTimeWorked: stats._sum.totalTimeSpent || 0,
-          statusBreakdown: statusCounts.map(c => ({ status: c.status, count: c._count.id })),
-          priorityBreakdown: priorityCounts.map(c => ({ priority: c.priority, count: c._count.id })),
+          statusBreakdown: statusCounts.map((c: any) => ({ status: c.status, count: c._count.id })),
+          priorityBreakdown: priorityCounts.map((c: any) => ({ priority: c.priority, count: c._count.id })),
           trends: initialTrends
         }}
       />
