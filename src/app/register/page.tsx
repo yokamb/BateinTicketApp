@@ -39,97 +39,89 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f9f9f9] p-6 text-[#0d0d0d] font-sans antialiased relative overflow-hidden">
-      {/* Background blobs for vibrancy */}
-      <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-[-20%] right-[-20%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fafafa] p-6 text-[#0d0d0d] font-sans antialiased relative overflow-hidden bg-dot-grid">
+      {/* Abstract organic background elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-50/50 organic-blob animate-cloud-morph pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-50/50 organic-blob animate-cloud-morph delay-3 pointer-events-none"></div>
 
-      <div className="mb-10 relative z-10">
-        <Logo className="scale-125" />
+      <div className="mb-12 relative z-10 hover:scale-105 transition-transform duration-500 cursor-pointer">
+        <Logo className="scale-150" />
       </div>
 
-      <div className="w-full max-w-md p-10 bg-white rounded-[2.5rem] border border-[#e5e5e5] shadow-2xl shadow-black/5 relative z-10">
+      <div className="w-full max-w-[440px] p-10 bg-white sketch-border shadow-sketch relative z-10 transition-all">
 
         {/* Success state — email sent */}
         {registered ? (
-          <div className="text-center space-y-6 py-6 transition-all animate-in fade-in zoom-in duration-500">
-            <div className="text-6xl animate-bounce">📬</div>
-            <h2 className="text-3xl font-black text-[#0d0d0d] tracking-tight">Check your inbox!</h2>
-            <p className="text-[#666] text-base leading-relaxed font-medium">
-              We sent a verification link to{" "}
-              <span className="font-black text-indigo-600">{email}</span>.<br />
-              Click it to activate your account.
-            </p>
-            <Link href="/login" className="inline-block mt-8 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white rounded-2xl font-black transition-all text-base shadow-xl shadow-indigo-500/20 active:scale-95">
-              Go to Login
+          <div className="text-center space-y-8 py-6 transition-all animate-fade-in">
+            <div className="text-7xl animate-bounce">📬</div>
+            <div>
+              <h2 className="text-4xl font-black text-[#0d0d0d] tracking-tighter italic mb-3">Check your inbox!</h2>
+              <p className="text-[#666] text-sm leading-relaxed font-medium">
+                We sent a verification link to<br />
+                <span className="font-black text-indigo-600 underline underline-offset-4 decoration-indigo-100 decoration-4">{email}</span>.
+              </p>
+            </div>
+            <Link href="/login" className="inline-block w-full py-4 bg-[#111] hover:bg-indigo-600 text-white rounded-xl font-black transition-all text-base shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:scale-95">
+              Back to Login
             </Link>
           </div>
         ) : (
           <>
             <div className="text-center mb-10">
-              <h1 className="text-3xl font-black tracking-tight mb-2">Create Account</h1>
-              <p className="text-[#666] text-base font-medium">Join the <span className="text-indigo-600 font-black">Batein</span> community</p>
+              <h1 className="text-4xl font-black tracking-tighter mb-3 italic">Create Account</h1>
+              <p className="text-[#666] text-sm font-medium tracking-tight">Join the <span className="text-indigo-600 font-bold underline decoration-indigo-100 decoration-4 underline-offset-4 tracking-normal">Batein</span> community</p>
             </div>
 
             {error && (
-              <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm text-center font-bold">
+              <div className="mb-8 p-4 bg-red-50 border-2 border-red-500/20 text-red-600 text-xs text-center font-black uppercase tracking-widest rounded-xl">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleRegister} className="space-y-5">
-              {/* Account Type */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <button type="button" onClick={() => setUserType("freelancer")}
-                  className={`py-4 px-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all outline-none ${userType === "freelancer" ? "bg-indigo-50 border-indigo-500 text-indigo-700 shadow-lg shadow-indigo-500/10" : "bg-[#fcfcfc] border-[#eee] text-[#888] hover:border-indigo-200"}`}>
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  <span className="font-black text-xs uppercase tracking-widest">Freelancer</span>
-                </button>
-                <button type="button" onClick={() => setUserType("company")}
-                  className={`py-4 px-3 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all outline-none ${userType === "company" ? "bg-purple-50 border-purple-500 text-purple-700 shadow-lg shadow-purple-500/10" : "bg-[#fcfcfc] border-[#eee] text-[#888] hover:border-purple-200"}`}>
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                  <span className="font-black text-xs uppercase tracking-widest">Company</span>
-                </button>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Full Name</label>
+              <div className="group">
+                <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Full Name</label>
                 <input type="text" required value={name} onChange={e => setName(e.target.value)}
-                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
+                  className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
                   placeholder="John Doe" />
               </div>
 
-              <div>
-                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Email Address</label>
+              <div className="group">
+                <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Email Address</label>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
+                  className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
                   placeholder="you@example.com" />
               </div>
 
-              <div>
-                <label className="block text-xs font-black text-[#888] mb-2 uppercase tracking-widest">Password</label>
+              <div className="group">
+                <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Password</label>
                 <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full px-5 py-3.5 bg-[#fcfcfc] border border-[#e5e5e5] rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 text-[#0d0d0d] placeholder-[#bbb] transition-all outline-none text-sm font-medium"
-                  placeholder="Min. 8 chars" />
-                <PasswordStrengthIndicator password={password} dark={false} />
+                  className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
+                  placeholder="Min. 8 characters" />
+                <div className="pt-2">
+                  <PasswordStrengthIndicator password={password} dark={false} />
+                </div>
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white rounded-2xl font-black transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-base shadow-xl shadow-indigo-500/20 mt-4"
+                className="w-full py-4 px-6 bg-[#111] hover:bg-indigo-600 text-white rounded-xl font-black transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed text-base shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_0px_0px_rgba(79,70,229,0.3)] mt-4"
               >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
             </form>
 
-            <div className="mt-10 text-center text-xs text-[#666] font-medium">
-              Already have an account?{" "}
-              <Link href="/login" className="text-indigo-600 hover:underline font-black transition-all">Sign In</Link>
+            <div className="mt-12 text-center">
+               <p className="text-[11px] text-[#888] font-bold tracking-tight mb-2 uppercase">Already registered?</p>
+              <Link href="/login" className="inline-block py-2 px-6 border-2 border-[#eee] rounded-full text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-black transition-all text-xs uppercase tracking-widest">Sign In</Link>
             </div>
           </>
         )}
       </div>
 
-      <p className="mt-12 text-[10px] text-[#bbb] font-black tracking-[0.2em] uppercase relative z-10">© 2026 Batein Software. All rights reserved.</p>
+      <div className="mt-16 flex flex-col items-center gap-4 relative z-10">
+        <div className="w-8 h-1 bg-purple-500 rounded-full opacity-20"></div>
+        <p className="text-[10px] text-[#aaa] font-black tracking-[0.4em] uppercase">© 2026 Batein Software</p>
+      </div>
     </div>
   );
 }
