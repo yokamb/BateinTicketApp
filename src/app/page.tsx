@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { ArrowRight, CheckCircle, Shield, Zap, Layers, MessageSquare, Briefcase, Star, PenTool } from "lucide-react";
 import Logo from "@/components/Logo";
 import { DynamicReviews } from "@/components/landing/DynamicReviews";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await getServerSession(authOptions);
+
   return (
     <div className="min-h-screen bg-white text-[#0d0d0d] selection:bg-indigo-100 overflow-hidden font-sans antialiased relative">
       {/* Background blobs - RESTORED BUT SUBTLE */}
@@ -17,12 +21,25 @@ export default function LandingPage() {
             <Logo className="scale-110 origin-left" />
           </div>
           <div className="flex items-center gap-4 text-sm">
-            <Link href="/login" className="font-medium text-[#666] hover:text-[#0d0d0d] transition-colors">
-              Log in
-            </Link>
-            <Link href="/register" className="font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-500/20 transition-all active:scale-95 shadow-md">
-              Get Started
-            </Link>
+            {!session ? (
+              <>
+                <Link href="/login" className="font-medium text-[#666] hover:text-[#0d0d0d] transition-colors">
+                  Log in
+                </Link>
+                <Link href="/register" className="font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-500/20 transition-all active:scale-95 shadow-md">
+                  Get Started
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/dashboard" className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                  Dashboard
+                </Link>
+                <Link href="/api/auth/signout" className="font-medium text-slate-500 hover:text-rose-600 transition-colors">
+                  Sign out
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -41,8 +58,8 @@ export default function LandingPage() {
           Create isolated workspaces, handle Incidents with ITIL naming, track Change approvals, and manage projects. Stop using chaotic emails for client support.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl text-white font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/40 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98]">
-            Start Free Trial
+          <Link href={session ? "/dashboard" : "/register"} className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl text-white font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/40 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98]">
+            {session ? "Enter Workspace" : "Start Free Trial"}
             <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
           </Link>
           <Link href="#features" className="w-full sm:w-auto px-8 py-4 bg-white border border-[#e5e5e5] hover:border-indigo-200 hover:bg-indigo-50/20 rounded-2xl text-[#0d0d0d] font-bold text-lg transition-all shadow-sm">
