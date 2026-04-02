@@ -39,7 +39,7 @@ export default function Sidebar({
     <aside className="w-60 bg-[#f9f9f9] border-r border-[#e5e5e5] flex flex-col sticky top-0 h-screen z-20 shrink-0">
       {/* Logo */}
       <div className="p-4 pb-2">
-        <Logo className="scale-90 origin-left" />
+        <Logo className="scale-110 origin-left" />
       </div>
 
       {/* New Ticket Button & Invite Link */}

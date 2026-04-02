@@ -7,7 +7,7 @@ export default function Logo({ className = "" }: { className?: string }) {
       <img 
         src="/logo.png" 
         alt="Batein Logo" 
-        className="h-10 md:h-12 w-auto object-contain"
+        className="h-11 md:h-14 w-auto object-contain"
       />
     </Link>
   );

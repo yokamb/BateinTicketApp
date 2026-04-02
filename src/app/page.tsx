@@ -14,7 +14,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full z-50 border-b border-[#f0f0f0] bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Logo className="scale-90 origin-left" />
+            <Logo className="scale-110 origin-left" />
           </div>
           <div className="flex items-center gap-4 text-sm">
             <Link href="/login" className="font-medium text-[#666] hover:text-[#0d0d0d] transition-colors">
