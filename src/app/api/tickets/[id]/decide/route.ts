@@ -35,6 +35,7 @@ export async function POST(
       where: { id: ticketId },
       data: {
         approvalStatus: decision,
+        status: decision === "APPROVED" ? "OPEN" : "PENDING",
         rejectionFeedback: decision === "REJECTED" ? feedback : null,
       }
     });

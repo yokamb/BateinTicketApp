@@ -30,6 +30,7 @@ export async function POST(
     const updatedTicket = await (prisma as any).ticket.update({
       where: { id: ticketId },
       data: {
+        status: "PENDING",
         approvalStatus: "PENDING",
         rejectionFeedback: null,
       }

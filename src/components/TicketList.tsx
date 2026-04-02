@@ -11,6 +11,7 @@ const getStatusColor = (status: string) => {
     case "IN_PROGRESS": return "bg-orange-50 text-orange-700 border-orange-200";
     case "RESOLVED": return "bg-green-50 text-green-700 border-green-200";
     case "CLOSED": return "bg-slate-100 text-slate-700 border-slate-200";
+    case "PENDING": return "bg-amber-50 text-amber-700 border-amber-200";
     default: return "bg-slate-50 text-slate-700 border-slate-200";
   }
 };
@@ -21,6 +22,7 @@ const getStatusIcon = (status: string) => {
     case "IN_PROGRESS": return <Clock size={14} className="mr-1" />;
     case "RESOLVED": return <CheckCircle size={14} className="mr-1" />;
     case "CLOSED": return <CheckCircle size={14} className="mr-1 opacity-50" />;
+    case "PENDING": return <Clock size={14} className="mr-1" />;
     default: return null;
   }
 };
@@ -30,6 +32,7 @@ export default function TicketList({ tickets, workspaceId, isAdmin, professional
 
   const tabs = [
     { id: "ALL", label: "All Tickets" },
+    { id: "PENDING", label: "Pending" },
     { id: "OPEN", label: "Open" },
     { id: "IN_PROGRESS", label: "InProgress" },
     { id: "RESOLVED", label: "Resolved" },
