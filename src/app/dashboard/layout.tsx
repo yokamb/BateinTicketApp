@@ -64,15 +64,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {/* Force password change guard */}
         <ForcePasswordReset />
 
-        {/* Sidebar - ChatGPT Style */}
-        <Sidebar 
-          dbUser={dbUser} 
-          allWorkspaces={allWorkspaces} 
+        {/* Sidebar */}
+        <Sidebar
+          dbUser={dbUser}
+          allWorkspaces={allWorkspaces}
           isGuest={isGuest}
         />
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-white text-[#0d0d0d]">
+      {/* Main Content — pt-14 on mobile accounts for the fixed top bar */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden bg-white text-[#0d0d0d] pt-14 md:pt-0 min-w-0">
         {children}
       </main>
     </div>

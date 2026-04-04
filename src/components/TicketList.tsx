@@ -122,13 +122,13 @@ export default function TicketList({ tickets, workspaceId, isAdmin, professional
             href={`/dashboard/tickets/${ticket.id}`}
             className="block w-full text-left bg-white border border-slate-200 hover:border-indigo-300 hover:shadow shadow-sm transition-all rounded-lg p-3 group"
           >
-            <div className="flex justify-between items-start mb-0.5">
-              <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition-colors line-clamp-1">
-                 <span className="text-indigo-500 font-mono text-[11px] mr-1.5">{ticket.shortId}</span> 
+            <div className="flex items-start justify-between gap-2 mb-0.5 flex-wrap">
+              <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition-colors line-clamp-2 min-w-0 flex-1">
+                 <span className="text-indigo-500 font-mono text-[11px] mr-1.5">{ticket.shortId}</span>
                  {ticket.title}
               </h4>
-              <div className="flex gap-2 shrink-0 ml-3">
-                <TicketTypeBadge type={ticket.type} category={ticket.typeCategory} professionalRole={professionalRole} />
+              <div className="flex gap-1.5 shrink-0 flex-wrap">
+                <span className="hidden sm:inline-flex"><TicketTypeBadge type={ticket.type} category={ticket.typeCategory} professionalRole={professionalRole} /></span>
                 <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusColor(ticket.status)}`}>
                   {getStatusIcon(ticket.status)}
                   {ticket.status.replace("_", " ")}
@@ -138,7 +138,7 @@ export default function TicketList({ tickets, workspaceId, isAdmin, professional
             <p className="text-xs text-slate-500 line-clamp-1 mb-2 leading-relaxed opacity-80">
               {ticket.description}
             </p>
-            <div className="flex justify-between items-center text-[10px] text-slate-400 pt-2 border-t border-slate-50">
+            <div className="flex justify-between items-center text-[10px] text-slate-400 pt-2 border-t border-slate-50 flex-wrap gap-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[8px]">
                   {ticket.creator?.name?.[0] || 'U'}
