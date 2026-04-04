@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
       timeHour: timeHour ?? 9,
       timeMinute: timeMinute ?? 0,
       nextRunAt
-    }
+    },
+    include: { workspace: { select: { id: true, name: true } } }
   });
 
   return NextResponse.json({ template }, { status: 201 });

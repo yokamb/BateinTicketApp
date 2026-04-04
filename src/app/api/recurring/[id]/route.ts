@@ -49,20 +49,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const body = await req.json();
 
+  const updateData = {
+    ...body,
+    nextRunAt: body.frequency
+      ? computeNextRunAt(
+          body.frequency ?? template.frequency,
+          body.timeHour ?? template.timeHour,
+          body.timeMinute ?? template.timeMinute,
+          body.dayOfWeek ?? template.dayOfWeek,
+          body.dayOfMonth ?? template.dayOfMonth
+        )
+      : undefined
+  };
+
   const updated = await prisma.recurringTemplate.update({
     where: { id },
-    data: {
-      ...body,
-      nextRunAt: body.frequency
-        ? computeNextRunAt(
-            body.frequency ?? template.frequency,
-            body.timeHour ?? template.timeHour,
-            body.timeMinute ?? template.timeMinute,
-            body.dayOfWeek ?? template.dayOfWeek,
-            body.dayOfMonth ?? template.dayOfMonth
-          )
-        : undefined
-    }
+    data: updateData,
+    include: { workspace: { select: { id: true, name: true } } }
   });
 
   return NextResponse.json({ template: updated });

@@ -138,14 +138,14 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
         body: JSON.stringify(form)
       });
       if (res.ok) {
-        setShowModal(false);
-        router.refresh();
         const data = await res.json();
         if (editingId) {
           setTemplates(prev => prev.map(t => t.id === editingId ? data.template : t));
         } else {
           setTemplates(prev => [data.template, ...prev]);
         }
+        setShowModal(false);
+        router.refresh();
       }
     } catch (e) {
       console.error(e);
@@ -319,8 +319,8 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex justify-center items-start overflow-y-auto bg-black/40 backdrop-blur-sm p-4 sm:p-10 transition-all animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative animate-in slide-in-from-bottom-5 duration-300">
             <div className="px-6 py-5 border-b border-slate-100">
               <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">
                 {editingId ? "Edit Template" : "New Recurring Template"}
