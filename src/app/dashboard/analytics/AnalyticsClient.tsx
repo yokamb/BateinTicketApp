@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend
+  ResponsiveContainer
 } from "recharts";
 import {
-  TrendingUp, Clock, BarChart2, PieChart as PieIcon,
-  SlidersHorizontal, RefreshCw, Zap, Repeat, AlertTriangle
+  TrendingUp, Clock, BarChart2,
+  SlidersHorizontal, RefreshCw, Zap, Repeat, AlertTriangle, ArrowLeft
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "#6366f1",
@@ -99,6 +100,7 @@ export default function AnalyticsClient({ initialStats }: { initialStats: Stats 
   const [trendChartType, setTrendChartType] = useState("Line");
   const [timeChartType, setTimeChartType] = useState("Area");
   const [typeChartType, setTypeChartType] = useState("Bar");
+  const router = useRouter();
 
   const applyFilters = useCallback(async () => {
     setIsLoading(true);
@@ -161,6 +163,12 @@ export default function AnalyticsClient({ initialStats }: { initialStats: Stats 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors group mb-2"
+          >
+            <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" /> Back
+          </button>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <BarChart2 size={20} className="text-indigo-600" />
             Analytics

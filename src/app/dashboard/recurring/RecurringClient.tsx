@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Repeat, Plus, Play, Pause, Trash2, Clock, RefreshCw,
-  Calendar, ChevronRight, Settings2, Zap
+  Calendar, ChevronRight, Settings2, Zap, ArrowLeft
 } from "lucide-react";
+
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const FREQUENCIES = [
@@ -174,6 +175,12 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors group mb-2"
+          >
+            <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" /> Back
+          </button>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <Repeat size={20} className="text-violet-600" />
             Recurring Tickets

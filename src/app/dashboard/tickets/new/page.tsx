@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import TicketForm from "./TicketForm";
 import { prisma } from "@/lib/prisma";
+import BackButton from "@/components/BackButton";
 
 export default async function NewTicketPage({
   searchParams,
@@ -49,6 +50,7 @@ export default async function NewTicketPage({
   return (
     <div className="p-6 md:p-8 w-full">
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+        <BackButton />
         <div className="text-slate-900">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Create New Ticket</h1>
           <p className="text-xs text-slate-500 mt-1">Provide details to track this issue or task.</p>

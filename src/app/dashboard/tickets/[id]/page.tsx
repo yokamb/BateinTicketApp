@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import TicketDetailClient from "./TicketDetailClient";
+import BackButton from "@/components/BackButton";
+
 
 export default async function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,6 +49,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="p-6 md:p-8 w-full">
       <div className="max-w-4xl mx-auto animate-fade-in">
+          <BackButton label="All Tickets" />
           <TicketDetailClient 
               ticket={ticket} 
               currentUser={user} 

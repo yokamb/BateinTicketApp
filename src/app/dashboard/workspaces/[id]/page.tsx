@@ -8,6 +8,7 @@ import TicketList from "@/components/TicketList";
 import ApproverSettings from "./ApproverSettings";
 import TicketTypeSettings from "./TicketTypeSettings";
 import WorkspaceGeneralSettings from "./WorkspaceGeneralSettings";
+import BackButton from "@/components/BackButton";
 
 export default async function WorkspaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -44,6 +45,7 @@ export default async function WorkspaceDetailPage({ params }: { params: Promise<
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-slate-200 pb-6 px-6">
         <div>
+          <BackButton label="All Workspaces" />
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{workspace.name}</h1>
           <p className="text-slate-500 mt-1">Manage this workspace's team and approval workflows.</p>
         </div>
