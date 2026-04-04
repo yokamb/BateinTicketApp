@@ -84,7 +84,22 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
   const availableTypes = ticketTypes.filter(t => t.workspaceId === form.workspaceId);
 
   const handleFormChange = (field: string, value: any) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm(prev => {
+      const next = { ...prev, [field]: value };
+      
+      // If workspace changes, reset ticket type to first available in new workspace
+      if (field === "workspaceId") {
+        const nextTypes = ticketTypes.filter(t => t.workspaceId === value);
+        if (nextTypes.length > 0) {
+          next.type = nextTypes[0].label;
+          next.typeCategory = nextTypes[0].category;
+        } else {
+          next.type = "";
+          next.typeCategory = "ISSUE";
+        }
+      }
+      return next;
+    });
   };
 
   const openCreate = () => {
@@ -353,30 +368,27 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-black uppercase text-slate-400 mb-1 tracking-widest">Ticket Type *</label>
-                  {availableTypes.length > 0 ? (
-                    <select
-                      value={form.type}
-                      onChange={e => {
-                        const found = availableTypes.find(t => t.label === e.target.value);
-                        handleFormChange("type", e.target.value);
-                        if (found) handleFormChange("typeCategory", found.category);
-                      }}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400"
-                    >
-                      <option value="">— Select —</option>
-                      {availableTypes.map(t => (
-                        <option key={t.id} value={t.label}>{t.label}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={form.type}
-                      onChange={e => handleFormChange("type", e.target.value)}
-                      placeholder="e.g. Incident"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400"
-                    />
-                  )}
+                  <select
+                    value={form.type}
+                    onChange={e => {
+                      const found = availableTypes.find(t => t.label === e.target.value);
+                      handleFormChange("type", e.target.value);
+                      if (found) handleFormChange("typeCategory", found.category);
+                    }}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-1 focus:ring-indigo-400 disabled:opacity-50"
+                    disabled={availableTypes.length === 0}
+                  >
+                    {availableTypes.length > 0 ? (
+                      <>
+                        <option value="" disabled>— Select Type —</option>
+                        {availableTypes.map(t => (
+                          <option key={t.id} value={t.label}>{t.label}</option>
+                        ))}
+                      </>
+                    ) : (
+                      <option value="">No types found</option>
+                    )}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-[10px] font-black uppercase text-slate-400 mb-1 tracking-widest">Priority</label>
