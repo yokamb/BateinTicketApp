@@ -53,11 +53,13 @@ model User {
   // SaaS Relations
   professionalRole String?
   
-  workspacesOwned Workspace[]    @relation("WorkspaceAdmin")
-  workspaces      InstanceAccess[]
-  ticketsCreated  Ticket[]       @relation("TicketCreator")
-  comments        Comment[]
-  notePagesCreated NotePage[]
+  workspacesOwned    Workspace[]         @relation("WorkspaceAdmin")
+  workspaces         InstanceAccess[]
+  ticketsCreated     Ticket[]            @relation("TicketCreator")
+  comments           Comment[]
+  notePagesCreated   NotePage[]
+  recurringTemplates RecurringTemplate[]
+  timeLogs           TimeLog[]
   
   mustChangePassword Boolean @default(false)
   
@@ -110,11 +112,12 @@ model Workspace {
   admin       User     @relation("WorkspaceAdmin", fields: [adminId], references: [id], onDelete: Cascade)
   requiresChangeApproval Boolean @default(false)
   
-  customers   InstanceAccess[]
-  tickets     Ticket[]
-  ticketTypes TicketType[]
-  invites     WorkspaceInvite[]
-  noteSections NoteSection[]
+  customers          InstanceAccess[]
+  tickets            Ticket[]
+  ticketTypes        TicketType[]
+  invites            WorkspaceInvite[]
+  noteSections       NoteSection[]
+  recurringTemplates RecurringTemplate[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -160,6 +163,14 @@ model Ticket {
   approverId  String?
   approvalStatus String      @default("PENDING")
   rejectionFeedback String?
+
+  // Time tracking
+  totalTimeSpent Int         @default(0) // seconds
+  timeLogs       TimeLog[]
+
+  // Recurring
+  recurringTemplateId String?
+  recurringTemplate   RecurringTemplate? @relation(fields: [recurringTemplateId], references: [id], onDelete: SetNull)
 
   workspaceId String
   workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -273,4 +284,47 @@ model RoleConfig {
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model RecurringTemplate {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creatorId    String
+  creator      User      @relation(fields: [creatorId], references: [id])
+
+  title        String
+  description  String    @default("")
+  type         String    // ticket type label
+  typeCategory String    @default("ISSUE")
+  priority     String    @default("MEDIUM")
+
+  frequency    String    // DAILY | WEEKLY | BIWEEKLY | MONTHLY
+  dayOfWeek    Int?      // 0-6 for WEEKLY / BIWEEKLY
+  dayOfMonth   Int?      // 1-31 for MONTHLY
+  timeHour     Int       @default(9)
+  timeMinute   Int       @default(0)
+
+  isActive     Boolean   @default(true)
+  nextRunAt    DateTime
+  lastRunAt    DateTime?
+
+  spawnedTickets Ticket[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model TimeLog {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  seconds   Int      // duration in seconds
+  note      String?  // optional note for manual entries
+  isManual  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
 }

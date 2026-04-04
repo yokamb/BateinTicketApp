@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Trash2, AlertCircle, Clock, CheckCircle, MessageSquare, Send, XCircle, RotateCcw, Sparkles } from "lucide-react";
 import { TicketTypeBadge } from "@/components/TicketTypeBadge";
 import { Modal, Textarea, Button, Group, Stack, Text, Title } from "@mantine/core";
+import TimeTracker from "@/components/TimeTracker";
 
 export default function TicketDetailClient({ ticket, currentUser }: { ticket: any, currentUser: any }) {
   const [status, setStatus] = useState(ticket.status);
@@ -546,6 +547,10 @@ export default function TicketDetailClient({ ticket, currentUser }: { ticket: an
           </div>
         </div>
       </div>
+
+      {/* Time Tracker */}
+      <TimeTracker ticketId={ticket.id} totalTimeSpent={ticket.totalTimeSpent || 0} />
+
     </div>
 
   );

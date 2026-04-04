@@ -9,7 +9,9 @@ import {
   Plus, 
   LogOut, 
   Crown,
-  Settings
+  Settings,
+  Repeat,
+  BarChart2
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import StorageTracker from "@/components/StorageTracker";
@@ -29,6 +31,8 @@ export default function Sidebar({
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Tickets", href: "/dashboard/tickets", icon: Ticket },
     ...(!isGuest ? [
+      { name: "Recurring", href: "/dashboard/recurring", icon: Repeat },
+      { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
       { name: "Notes", href: "/dashboard/notes", icon: NotebookIcon },
       { name: "Workspaces", href: "/dashboard/workspaces", icon: Briefcase },
     ] : [])

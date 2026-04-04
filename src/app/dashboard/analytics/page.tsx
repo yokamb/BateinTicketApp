@@ -12,63 +12,80 @@ export default async function AnalyticsPage() {
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
   if (!dbUser) redirect("/onboarding");
 
-  // Fetch initial stats
-  const stats = await prisma.ticket.aggregate({
-    where: { workspace: { adminId: dbUser.id } },
-    _count: { id: true },
-    _sum: { totalTimeSpent: true }
+  const workspaces = await prisma.workspace.findMany({
+    where: { adminId: dbUser.id },
+    select: { id: true, name: true }
   });
 
-  const statusCounts = await prisma.ticket.groupBy({
-    by: ['status'],
-    where: { workspace: { adminId: dbUser.id } },
-    _count: { id: true }
-  });
+  const ticketFilter = { workspace: { adminId: dbUser.id } };
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const priorityCounts = await prisma.ticket.groupBy({
-    by: ['priority'],
-    where: { workspace: { adminId: dbUser.id } },
-    _count: { id: true }
-  });
+  const [stats, statusCounts, priorityCounts, typeCounts, categoryCounts, resolvedTickets, recurringCount, timeLogs, rawTrends] =
+    await Promise.all([
+      prisma.ticket.aggregate({ where: ticketFilter, _count: { id: true }, _sum: { totalTimeSpent: true } }),
+      prisma.ticket.groupBy({ by: ["status"], where: ticketFilter, _count: { id: true } }),
+      prisma.ticket.groupBy({ by: ["priority"], where: ticketFilter, _count: { id: true } }),
+      prisma.ticket.groupBy({ by: ["type"], where: ticketFilter, _count: { id: true } }),
+      prisma.ticket.groupBy({ by: ["typeCategory"], where: ticketFilter, _count: { id: true } }),
+      prisma.ticket.findMany({
+        where: { ...ticketFilter, status: { in: ["RESOLVED", "CLOSED"] } },
+        select: { createdAt: true, updatedAt: true, totalTimeSpent: true }
+      }),
+      prisma.ticket.count({ where: { ...ticketFilter, recurringTemplateId: { not: null } } }),
+      prisma.timeLog.findMany({
+        where: { ticket: ticketFilter, createdAt: { gte: thirtyDaysAgo } },
+        select: { seconds: true, createdAt: true }
+      }),
+      prisma.ticket.findMany({
+        where: { ...ticketFilter, createdAt: { gte: thirtyDaysAgo } },
+        select: { createdAt: true }
+      })
+    ]);
 
-  // Basic trend for Pro/Max (last 7 days by default for initial load)
-  let initialTrends: any[] = [];
-  if (dbUser.plan !== "FREE") {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const rawTrends = await prisma.ticket.findMany({
-      where: { workspace: { adminId: dbUser.id }, createdAt: { gte: sevenDaysAgo } },
-      select: { createdAt: true }
-    });
-    const map: Record<string, number> = {};
-    rawTrends.forEach((t: any) => {
-      const d = t.createdAt.toLocaleDateString(undefined, { weekday: 'short' });
-      map[d] = (map[d] || 0) + 1;
-    });
-    initialTrends = Object.entries(map).map(([label, value]) => ({ label, value }));
+  // Process trend data
+  const dayMap: Record<string, number> = {};
+  rawTrends.forEach((t: any) => {
+    const d = t.createdAt.toISOString().split("T")[0];
+    dayMap[d] = (dayMap[d] || 0) + 1;
+  });
+  const trends = Object.entries(dayMap).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
+
+  // Process time log trend
+  const timePerDay: Record<string, number> = {};
+  timeLogs.forEach((tl: any) => {
+    const d = tl.createdAt.toISOString().split("T")[0];
+    timePerDay[d] = (timePerDay[d] || 0) + tl.seconds;
+  });
+  const timeLogTrend = Object.entries(timePerDay).map(([date, seconds]) => ({ date, minutes: Math.round(seconds / 60) })).sort((a, b) => a.date.localeCompare(b.date));
+
+  // Avg resolution
+  let avgResolutionSeconds = 0;
+  let avgTimeSpent = 0;
+  if (resolvedTickets.length > 0) {
+    const totalResolution = resolvedTickets.reduce((acc: number, t: any) =>
+      acc + (new Date(t.updatedAt).getTime() - new Date(t.createdAt).getTime()) / 1000, 0);
+    avgResolutionSeconds = totalResolution / resolvedTickets.length;
+    const totalTimeSpent = resolvedTickets.reduce((acc: number, t: any) => acc + (t.totalTimeSpent || 0), 0);
+    avgTimeSpent = totalTimeSpent / resolvedTickets.length;
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-black text-[#111] tracking-tighter mb-2">Workspace Flux</h1>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Real-time analytical transmission</p>
-        </div>
-        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border-2 border-slate-50 shadow-sm">
-          <div className={`w-3 h-3 rounded-full animate-pulse ${dbUser.plan === "FREE" ? "bg-slate-300" : "bg-indigo-500"}`}></div>
-          <span className="text-xs font-black uppercase tracking-widest text-slate-800">{dbUser.plan || "FREE"} SUBSCRIBER</span>
-        </div>
-      </div>
-
+    <div className="p-6 md:p-8 max-w-6xl mx-auto w-full">
       <AnalyticsClient
-        plan={dbUser.plan || "FREE"}
-        stats={{
+        initialStats={{
+          plan: dbUser.plan || "FREE",
           totalTickets: stats._count.id,
           totalTimeWorked: stats._sum.totalTimeSpent || 0,
+          recurringTicketCount: recurringCount,
           statusBreakdown: statusCounts.map((c: any) => ({ status: c.status, count: c._count.id })),
           priorityBreakdown: priorityCounts.map((c: any) => ({ priority: c.priority, count: c._count.id })),
-          trends: initialTrends
+          typeBreakdown: typeCounts.map((c: any) => ({ type: c.type, count: c._count.id })),
+          categoryBreakdown: categoryCounts.map((c: any) => ({ category: c.typeCategory, count: c._count.id })),
+          trends,
+          timeLogTrend,
+          performance: { avgResolutionSeconds, avgTimeSpent },
+          workspaces
         }}
       />
     </div>
