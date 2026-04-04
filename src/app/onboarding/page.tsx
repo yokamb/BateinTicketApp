@@ -85,7 +85,7 @@ export default function OnboardingPage() {
       if (res.ok) {
         // We trigger the update but don't await it to prevent hangs on some environments.
         // Then we do a hard redirect to ensure the middleware and session are fully synced.
-        update({ professionalRole: profession });
+        update({ professionalRole: profession, timezone: timezone });
         window.location.href = "/dashboard";
       } else {
         const data = await res.json();
