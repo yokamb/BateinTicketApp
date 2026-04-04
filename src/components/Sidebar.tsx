@@ -15,7 +15,8 @@ import {
   Repeat,
   BarChart2,
   Menu,
-  X
+  X,
+  FileBarChart
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import StorageTracker from "@/components/StorageTracker";
@@ -53,6 +54,7 @@ export default function Sidebar({
     ...(!isGuest ? [
       { name: "Recurring", href: "/dashboard/recurring", icon: Repeat },
       { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
+      { name: "Reports", href: "/dashboard/reports", icon: FileBarChart },
       { name: "Notes", href: "/dashboard/notes", icon: NotebookIcon },
       { name: "Workspaces", href: "/dashboard/workspaces", icon: Briefcase },
     ] : [])
