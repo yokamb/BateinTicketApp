@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { professionalRole, customLabels } = await req.json();
+    const { professionalRole, customLabels, timezone } = await req.json();
     if (!professionalRole) {
       return NextResponse.json({ error: "Professional role required" }, { status: 400 });
     }
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       where: { id: userId },
       data: { 
         professionalRole,
+        timezone: timezone || "UTC",
         profile: {
           upsert: {
             create: { role: professionalRole },

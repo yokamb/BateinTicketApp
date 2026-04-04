@@ -9,6 +9,12 @@ export default async function RecurringPage() {
   const user = session?.user as any;
   if (!user) redirect("/login");
 
+  // Fetch full user for timezone
+  const fullUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { timezone: true }
+  });
+
   const templates = await prisma.recurringTemplate.findMany({
     where: { workspace: { adminId: user.id } },
     include: { workspace: { select: { id: true, name: true } } },
@@ -32,6 +38,7 @@ export default async function RecurringPage() {
         workspaces={workspaces}
         ticketTypes={ticketTypes}
         currentUserId={user.id}
+        userTimezone={fullUser?.timezone || "UTC"}
       />
     </div>
   );

@@ -4,13 +4,35 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Save, Lock, Eye, EyeOff, Edit2 } from "lucide-react";
 import PasswordStrengthIndicator, { validatePassword } from "@/components/PasswordStrengthIndicator";
-import { Modal, Button, Group, Text, Box, Title } from "@mantine/core";
+import { Modal, Button, Group, Text, Box, Title, Select } from "@mantine/core";
 import { RoleSelector } from "@/components/onboarding/RoleSelector";
+import { Globe } from "lucide-react";
 
 export default function ProfileForm({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");
   const [professionalRole, setProfessionalRole] = useState(user.professionalRole || "");
+  const [timezone, setTimezone] = useState(user.timezone || "UTC");
+  const [timezones] = useState(() => {
+    try {
+      const now = new Date();
+      return (Intl as any).supportedValuesOf('timeZone').map((tz: string) => {
+        try {
+          const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: tz,
+            timeZoneName: "shortOffset",
+          });
+          const parts = formatter.formatToParts(now);
+          const offset = parts.find(p => p.type === "timeZoneName")?.value || "";
+          return { value: tz, label: `${offset} ${tz.replace(/_/g, ' ')}` };
+        } catch (e) {
+          return { value: tz, label: tz.replace(/_/g, ' ') };
+        }
+      }).sort((a: any, b: any) => a.label.localeCompare(b.label));
+    } catch (e) {
+      return [{ value: "UTC", label: "UTC" }];
+    }
+  });
   const [roleConfig, setRoleConfig] = useState<any>(null);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,7 +76,7 @@ export default function ProfileForm({ user }: { user: any }) {
       const res = await fetch("/api/user/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, professionalRole }),
+        body: JSON.stringify({ name, email, professionalRole, timezone }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -162,6 +184,29 @@ export default function ProfileForm({ user }: { user: any }) {
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+            <Globe size={14} className="text-slate-400" /> Timezone
+          </label>
+          <Select
+            data={timezones}
+            searchable
+            value={timezone}
+            onChange={val => setTimezone(val || "UTC")}
+            placeholder="Search timezone..."
+            className="w-full"
+            radius="xl"
+            size="md"
+            styles={{
+              input: {
+                border: '1px solid #cbd5e1',
+                padding: '0.75rem 1rem',
+                height: 'auto'
+              }
+            }}
+          />
+          <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Controls when your recurring tasks trigger</p>
         </div>
         <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
           <label className="block text-sm font-bold text-slate-800 mb-4">Professional Role & Ticket Labels</label>

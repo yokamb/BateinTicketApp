@@ -2,39 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-function computeNextRunAt(
-  frequency: string,
-  timeHour: number,
-  timeMinute: number,
-  dayOfWeek?: number | null,
-  dayOfMonth?: number | null
-): Date {
-  const now = new Date();
-  const next = new Date();
-  next.setSeconds(0, 0);
-  next.setHours(timeHour, timeMinute);
-
-  if (frequency === "DAILY") {
-    if (next <= now) next.setDate(next.getDate() + 1);
-    return next;
-  }
-  if (frequency === "WEEKLY" || frequency === "BIWEEKLY") {
-    const targetDay = dayOfWeek ?? 1;
-    let daysUntil = (targetDay - now.getDay() + 7) % 7;
-    if (daysUntil === 0 && next <= now) daysUntil = 7;
-    next.setDate(now.getDate() + daysUntil);
-    if (frequency === "BIWEEKLY" && next <= now) next.setDate(next.getDate() + 14);
-    return next;
-  }
-  if (frequency === "MONTHLY") {
-    const targetDay = dayOfMonth ?? 1;
-    next.setDate(targetDay);
-    if (next <= now) { next.setMonth(next.getMonth() + 1); next.setDate(targetDay); }
-    return next;
-  }
-  return next;
-}
+import { computeNextRunAt } from "@/lib/utils/recurring";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -49,15 +17,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const body = await req.json();
 
+  const creator = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { timezone: true }
+  });
+
   const updateData = {
     ...body,
-    nextRunAt: body.frequency
+    nextRunAt: body.frequency || body.timeHour !== undefined || body.timeMinute !== undefined || body.dayOfWeek !== undefined || body.dayOfMonth !== undefined
       ? computeNextRunAt(
           body.frequency ?? template.frequency,
           body.timeHour ?? template.timeHour,
           body.timeMinute ?? template.timeMinute,
           body.dayOfWeek ?? template.dayOfWeek,
-          body.dayOfMonth ?? template.dayOfMonth
+          body.dayOfMonth ?? template.dayOfMonth,
+          creator?.timezone || "UTC"
         )
       : undefined
   };

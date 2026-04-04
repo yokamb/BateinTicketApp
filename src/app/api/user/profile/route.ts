@@ -25,6 +25,7 @@ export async function GET() {
       name: user.name,
       email: user.email,
       professionalRole: user.professionalRole,
+      timezone: user.timezone,
       profile: user.profile,
     });
   } catch (error) {
@@ -37,7 +38,7 @@ export async function PUT(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
-    const { name, email, professionalRole } = await req.json();
+    const { name, email, professionalRole, timezone } = await req.json();
     if (!name || !email) return NextResponse.json({ error: "Name and email required" }, { status: 400 });
 
     const user = session.user as any;
@@ -50,7 +51,7 @@ export async function PUT(req: Request) {
 
     const updated = await prisma.user.update({
         where: { id: user.id },
-        data: { name, email, professionalRole }
+        data: { name, email, professionalRole, timezone }
     });
 
     return NextResponse.json({ message: "Profile updated successfully", user: updated }, { status: 200 });

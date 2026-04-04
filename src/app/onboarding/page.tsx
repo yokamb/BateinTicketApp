@@ -4,14 +4,37 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { LabelCustomizer } from "@/components/onboarding/LabelCustomizer";
-import { Button, Stepper, Group, Text, Title, Box, Paper, Stack, ThemeIcon, TextInput, rem } from "@mantine/core";
-import { Briefcase, ArrowRight, CheckCircle, Settings, Laptop, Apple, Sparkles } from "lucide-react";
+import { Select, Button, Stepper, Group, Text, Title, Box, Paper, Stack, ThemeIcon, TextInput, rem } from "@mantine/core";
+import { Briefcase, ArrowRight, CheckCircle, Settings, Laptop, Apple, Sparkles, Globe } from "lucide-react";
 
 export default function OnboardingPage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const [active, setActive] = useState(0);
   
+  // Timezone state
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
+  const [timezones] = useState(() => {
+    try {
+      const now = new Date();
+      return (Intl as any).supportedValuesOf('timeZone').map((tz: string) => {
+        try {
+          const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: tz,
+            timeZoneName: "shortOffset",
+          });
+          const parts = formatter.formatToParts(now);
+          const offset = parts.find(p => p.type === "timeZoneName")?.value || "";
+          return { value: tz, label: `${offset} ${tz.replace(/_/g, ' ')}` };
+        } catch (e) {
+          return { value: tz, label: tz.replace(/_/g, ' ') };
+        }
+      }).sort((a: any, b: any) => a.label.localeCompare(b.label));
+    } catch (e) {
+      return [{ value: "UTC", label: "UTC" }];
+    }
+  });
+
   // Custom profession state
   const [profession, setProfession] = useState("");
   const [customLabels, setCustomLabels] = useState<any[]>([
@@ -54,7 +77,8 @@ export default function OnboardingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           professionalRole: profession,
-          customLabels: customLabels
+          customLabels: customLabels,
+          timezone: timezone
         }),
       });
       
@@ -94,7 +118,57 @@ export default function OnboardingPage() {
               separator: { backgroundColor: '#eee' }
             }}
           >
-            {/* Step 1: Profession */}
+            {/* Step 1: Timezone */}
+            <Stepper.Step 
+              label="Timezone" 
+              description="Your scheduling zone" 
+              icon={<Globe size={16} />}
+            >
+              <div className="py-12 flex flex-col items-center justify-center text-center space-y-10">
+                <div className="space-y-3">
+                  <Title order={1} className="text-3xl font-bold text-[#0d0d0d] tracking-tight">Select your timezone</Title>
+                  <Text className="text-[#888] max-w-sm mx-auto text-sm font-medium">
+                    We've detected your timezone automatically. Please confirm it's correct for your scheduled tasks.
+                  </Text>
+                </div>
+
+                <div className="w-full max-w-md">
+                   <Select
+                      data={timezones}
+                      searchable
+                      value={timezone}
+                      onChange={(val) => setTimezone(val || "UTC")}
+                      size="xl"
+                      radius="xl"
+                      placeholder="Search timezone..."
+                      nothingFoundMessage="No timezones found"
+                      className="w-full shadow-sm"
+                      styles={{
+                        input: {
+                          textAlign: 'center',
+                          fontSize: rem(16),
+                          fontWeight: 600,
+                          border: '2px solid #eee',
+                          '&:focus': { borderColor: '#0d0d0d' },
+                          height: rem(64)
+                        }
+                      }}
+                   />
+                </div>
+
+                <Button 
+                  onClick={() => setActive(1)} 
+                  size="lg" 
+                  radius="xl"
+                  className="bg-[#0d0d0d] hover:bg-[#333] px-12 h-14 shadow-lg transition-transform hover:scale-[1.02]"
+                  rightSection={<ArrowRight size={20} />}
+                >
+                  Confirm Timezone
+                </Button>
+              </div>
+            </Stepper.Step>
+
+            {/* Step 2: Profession */}
             <Stepper.Step 
               label="Profession" 
               description="Tell us your role" 
@@ -156,7 +230,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <Button 
-                  onClick={() => setActive(1)} 
+                  onClick={() => setActive(2)} 
                   disabled={!profession}
                   size="lg" 
                   radius="xl"
@@ -183,7 +257,7 @@ export default function OnboardingPage() {
                 <Group justify="center" mt="xl" pt="xl">
                   <Button variant="subtle" color="gray" onClick={() => setActive(0)} size="sm">Back</Button>
                   <Button 
-                    onClick={() => setActive(2)} 
+                    onClick={() => setActive(3)} 
                     size="md" 
                     radius="lg"
                     className="bg-[#0d0d0d] hover:bg-[#333] px-10 h-11 shadow-md"
@@ -247,7 +321,7 @@ export default function OnboardingPage() {
                  )}
 
                  <Group justify="center" mt="xl" pt="xl">
-                   <Button variant="subtle" color="gray" onClick={() => setActive(1)} size="sm">Back</Button>
+                   <Button variant="subtle" color="gray" onClick={() => setActive(2)} size="sm">Back</Button>
                    <Button 
                      onClick={handleComplete} 
                      disabled={saving}
