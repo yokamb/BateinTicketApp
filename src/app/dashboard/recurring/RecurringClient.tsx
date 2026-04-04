@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Repeat, Plus, Play, Pause, Trash2, Clock, RefreshCw,
-  Calendar, ChevronRight, Settings2, Zap, ArrowLeft, Globe, X
+  Calendar, ChevronRight, Settings2, Zap, ArrowLeft, Globe, X, Sparkles
 } from "lucide-react";
 import { format, toZonedTime } from "date-fns-tz";
 
@@ -331,241 +331,271 @@ export default function RecurringClient({ initialTemplates, workspaces, ticketTy
         )}
       </div>
 
-      {/* Drawer Overlay - Using Portal-like fixed positioning at root */}
+      {/* Centered Modal Overlay */}
       {showModal && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-300" 
-          onClick={() => setShowModal(false)}
-        />
-      )}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-8 pointer-events-none"
+        >
+          {/* Backdrop (clickable) */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-md pointer-events-auto transition-opacity animate-in fade-in duration-500"
+            onClick={() => setShowModal(false)}
+          />
 
-      {/* Side Drawer - Absolute positioning fix */}
-      <div 
-        className={`fixed inset-y-0 right-0 z-[110] w-full max-w-md bg-white shadow-2xl transition-transform duration-300 ease-in-out transform ${
-          showModal ? "translate-x-0" : "translate-x-full"
-        }`}
-        style={{ visibility: showModal ? "visible" : "hidden" }}
-      >
-        <div className="h-full flex flex-col">
-          {/* Drawer Header */}
-          <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div>
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                {editingId ? "Edit Template" : "New Recurring Template"}
-              </h2>
-              <div className="flex items-center gap-1.5 mt-1">
-                 <Globe size={10} className="text-slate-400" />
-                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Timezone: {userTimezone}</span>
-              </div>
-            </div>
-            <button 
-              onClick={() => setShowModal(false)}
-              className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Drawer Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div className="space-y-5">
-              {/* Workspace */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <label className="block text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Select Workspace</label>
-                <select
-                  value={form.workspaceId}
-                  onChange={e => handleFormChange("workspaceId", e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm"
+          {/* Modal Content */}
+          <div 
+            className={`relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] overflow-hidden pointer-events-auto transform transition-all duration-300 ${
+              showModal ? "scale-100 opacity-100" : "scale-95 opacity-0 invisible"
+            }`}
+          >
+            <div className="h-full max-h-[90vh] flex flex-col">
+              {/* Modal Header */}
+              <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <Repeat size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">
+                      {editingId ? "Edit Recurring Template" : "Create New Template"}
+                    </h2>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                       <Globe size={11} className="text-slate-400" />
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Timezone: {userTimezone}</span>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="p-3 hover:bg-slate-200 rounded-full transition-all text-slate-400 hover:text-slate-600 active:scale-90"
                 >
-                  {workspaces.map(w => (
-                    <option key={w.id} value={w.id}>{w.name}</option>
-                  ))}
-                </select>
+                  <X size={24} />
+                </button>
               </div>
 
-              {/* Basic Info Group */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Template Title *</label>
-                  <input
-                    type="text"
-                    value={form.title}
-                    onChange={e => handleFormChange("title", e.target.value)}
-                    placeholder="e.g. Weekly Security Scan"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                  />
-                </div>
+              {/* Modal Content */}
+              <div className="flex-1 overflow-y-auto p-8 lg:p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                  {/* Left Column: Core Info (Full width on mobile, 7/12 on large) */}
+                  <div className="lg:col-span-7 space-y-8">
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-[11px] font-black uppercase text-slate-400 mb-2 tracking-widest flex items-center gap-2">
+                           <Settings2 size={13} className="text-indigo-500" /> Title & Details
+                        </label>
+                        <div className="space-y-4">
+                          <input
+                            type="text"
+                            value={form.title}
+                            onChange={e => handleFormChange("title", e.target.value)}
+                            placeholder="e.g. Weekly Security Audit Report"
+                            className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm"
+                          />
+                          <textarea
+                            value={form.description}
+                            onChange={e => handleFormChange("description", e.target.value)}
+                            rows={4}
+                            placeholder="Provide details about this task. This will be included in every generated ticket."
+                            className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-medium text-slate-700 outline-none focus:border-indigo-500 focus:bg-white resize-none transition-all"
+                          />
+                        </div>
+                      </div>
 
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Description</label>
-                  <textarea
-                    value={form.description}
-                    onChange={e => handleFormChange("description", e.target.value)}
-                    rows={3}
-                    placeholder="What should this ticket be about?"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 resize-none transition-all"
-                  />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-50 p-5 rounded-2.5xl border border-slate-100 shadow-sm">
+                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-2.5 tracking-widest">Target Workspace</label>
+                          <select
+                            value={form.workspaceId}
+                            onChange={e => handleFormChange("workspaceId", e.target.value)}
+                            className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-1.5xl text-xs font-bold text-slate-700 outline-none focus:border-indigo-400 transition-all cursor-pointer"
+                          >
+                            {workspaces.map(w => (
+                              <option key={w.id} value={w.id}>{w.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 shadow-sm">
+                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-2.5 tracking-widest text-[#666]">Priority Style</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {PRIORITIES.map(p => (
+                              <button
+                                key={p}
+                                type="button"
+                                onClick={() => handleFormChange("priority", p)}
+                                className={`py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border-2 ${
+                                  form.priority === p
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-slate-500 border-slate-100 hover:border-slate-200"
+                                }`}
+                              >
+                                {p}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#f8faff] p-6 rounded-[2rem] border border-indigo-100 shadow-inner">
+                        <label className="block text-[10px] font-black uppercase text-indigo-400 mb-3 tracking-widest">Primary Ticket Type</label>
+                        <div className="flex flex-wrap gap-2">
+                          {availableTypes.length > 0 ? (
+                            availableTypes.map(t => (
+                              <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => {
+                                  handleFormChange("type", t.label);
+                                  handleFormChange("typeCategory", t.category);
+                                }}
+                                className={`px-4 py-2.5 rounded-1.5xl text-[11px] font-black uppercase tracking-wider transition-all border-2 ${
+                                  form.type === t.label
+                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                                    : "bg-white text-slate-600 border-slate-100 hover:border-slate-300"
+                                }`}
+                              >
+                                {t.label}
+                              </button>
+                            ))
+                          ) : (
+                            <span className="text-slate-400 italic text-xs px-2">No types available in this workspace</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Execution Rules (5/12) */}
+                  <div className="lg:col-span-5 bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100 space-y-8">
+                    <div>
+                      <label className="block text-[11px] font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center gap-2">
+                         <Calendar size={13} className="text-violet-500" /> Execution Rules
+                      </label>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <span className="block text-[10px] font-bold text-slate-500 mb-3 px-1 uppercase tracking-wider">How often?</span>
+                          <div className="grid grid-cols-2 gap-3">
+                            {FREQUENCIES.map(f => (
+                              <button
+                                key={f.value}
+                                type="button"
+                                onClick={() => handleFormChange("frequency", f.value)}
+                                className={`flex flex-col items-center justify-center p-3 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
+                                  form.frequency === f.value
+                                    ? "bg-white text-indigo-600 border-indigo-600 shadow-lg scale-[1.03]"
+                                    : "bg-white/50 text-slate-500 border-transparent hover:border-slate-200"
+                                }`}
+                              >
+                                {f.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Frequency Modifiers */}
+                        {(form.frequency === "WEEKLY" || form.frequency === "BIWEEKLY") && (
+                          <div className="animate-in slide-in-from-top-2 duration-300">
+                             <span className="block text-[10px] font-bold text-slate-500 mb-3 px-1 uppercase tracking-wider">On which day?</span>
+                             <div className="grid grid-cols-4 gap-2">
+                               {DAYS_OF_WEEK.map((day, idx) => (
+                                 <button
+                                   key={idx}
+                                   type="button"
+                                   onClick={() => handleFormChange("dayOfWeek", idx)}
+                                   className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all border-2 ${
+                                     form.dayOfWeek === idx
+                                       ? "bg-violet-600 text-white border-violet-600 shadow-md"
+                                       : "bg-white text-slate-500 border-slate-100 hover:border-slate-200"
+                                   }`}
+                                 >
+                                   {day.slice(0, 3)}
+                                 </button>
+                               ))}
+                             </div>
+                          </div>
+                        )}
+
+                        {form.frequency === "MONTHLY" && (
+                          <div className="animate-in slide-in-from-top-2 duration-300">
+                             <span className="block text-[10px] font-bold text-slate-500 mb-3 px-1 uppercase tracking-wider">Which day of month?</span>
+                             <div className="flex items-center gap-3">
+                               <input
+                                 type="number"
+                                 min={1}
+                                 max={28}
+                                 value={form.dayOfMonth}
+                                 onChange={e => handleFormChange("dayOfMonth", parseInt(e.target.value))}
+                                 className="w-1/2 px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl text-sm font-black text-slate-800 focus:border-indigo-400 outline-none"
+                               />
+                               <span className="text-xs font-bold text-slate-400">of the month</span>
+                             </div>
+                          </div>
+                        )}
+
+                        {/* Precise Time Row */}
+                        <div className="pt-4 border-t border-slate-200/60">
+                           <span className="block text-[10px] font-bold text-slate-500 mb-4 px-1 uppercase tracking-wider">Trigger Time (24h)</span>
+                           <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black text-slate-300 uppercase pl-1 tracking-widest">Hour</span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={23}
+                                  value={form.timeHour}
+                                  onChange={e => handleFormChange("timeHour", parseInt(e.target.value))}
+                                  className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-2xl text-base font-black text-slate-700 outline-none focus:border-indigo-400 text-center shadow-inner"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black text-slate-300 uppercase pl-1 tracking-widest">Minute</span>
+                                <select
+                                  value={form.timeMinute}
+                                  onChange={e => handleFormChange("timeMinute", parseInt(e.target.value))}
+                                  className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-2xl text-base font-black text-slate-700 shadow-inner outline-none focus:border-indigo-400 cursor-pointer"
+                                >
+                                  {[0, 15, 30, 45].map(m => (
+                                    <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                  ))}
+                                </select>
+                              </div>
+                           </div>
+                           <p className="mt-4 text-[10px] text-slate-400 font-bold bg-white px-4 py-2 rounded-xl border border-slate-100 flex items-center justify-center gap-2">
+                             <Clock size={12} className="text-indigo-400" /> Run at <span>{form.timeHour}:{String(form.timeMinute).padStart(2, '0')}</span> local time.
+                           </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Type & Priority Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Ticket Type *</label>
-                  <select
-                    value={form.type}
-                    onChange={e => {
-                      const found = availableTypes.find(t => t.label === e.target.value);
-                      handleFormChange("type", e.target.value);
-                      if (found) handleFormChange("typeCategory", found.category);
-                    }}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50 transition-all"
-                    disabled={availableTypes.length === 0}
+              {/* Modal Footer */}
+              <div className="px-10 py-8 border-t border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Sparkles size={16} className="text-amber-400" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Templates save time & prevent manual errors</span>
+                </div>
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-8 py-4 bg-white hover:bg-slate-100 text-slate-500 rounded-2.5xl text-xs font-black uppercase tracking-widest transition-all border-2 border-slate-100 active:scale-95"
                   >
-                    {availableTypes.length > 0 ? (
-                      <>
-                        <option value="" disabled>— Select Type —</option>
-                        {availableTypes.map(t => (
-                          <option key={t.id} value={t.label}>{t.label}</option>
-                        ))}
-                      </>
-                    ) : (
-                      <option value="">No types found</option>
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 tracking-widest">Priority</label>
-                  <select
-                    value={form.priority}
-                    onChange={e => handleFormChange("priority", e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                    Discard
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving || !form.title || !form.type}
+                    className="flex-1 md:flex-none px-12 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.8rem] text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-200 disabled:opacity-50 disabled:shadow-none hover:scale-[1.02] active:scale-95"
                   >
-                    {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {/* Schedule Section */}
-              <div className="pt-4 border-t border-slate-100 space-y-5">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2.5 tracking-widest flex items-center gap-1.5">
-                    <Calendar size={12} className="text-violet-500" /> Schedule Frequency *
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {FREQUENCIES.map(f => (
-                      <button
-                        key={f.value}
-                        type="button"
-                        onClick={() => handleFormChange("frequency", f.value)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border-2 ${
-                          form.frequency === f.value
-                            ? "bg-indigo-600 text-white border-indigo-600 shadow-md scale-[1.02]"
-                            : "bg-white text-slate-500 border-slate-100 hover:border-slate-200"
-                        }`}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Conditional: Days selection */}
-                {(form.frequency === "WEEKLY" || form.frequency === "BIWEEKLY") && (
-                  <div className="animate-in fade-in slide-in-from-left-2 transition-all">
-                    <label className="block text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Select Day of Week</label>
-                    <div className="flex flex-wrap gap-2">
-                      {DAYS_OF_WEEK.map((day, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleFormChange("dayOfWeek", idx)}
-                          className={`flex-1 min-w-[50px] py-2 rounded-lg text-[10px] font-black uppercase transition-all border ${
-                            form.dayOfWeek === idx
-                              ? "bg-violet-500 text-white border-violet-500 shadow-sm"
-                              : "bg-slate-50 text-slate-600 border-transparent hover:bg-slate-100"
-                          }`}
-                        >
-                          {day.slice(0, 3)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {form.frequency === "MONTHLY" && (
-                  <div className="animate-in fade-in slide-in-from-left-2 transition-all">
-                    <label className="block text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Day of Month</label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="number"
-                        min={1}
-                        max={28}
-                        value={form.dayOfMonth}
-                        onChange={e => handleFormChange("dayOfMonth", parseInt(e.target.value))}
-                        className="w-20 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400"
-                      />
-                      <span className="text-xs font-bold text-slate-400 underline underline-offset-4 decoration-dotted">of the month</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Time Selection */}
-                <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50 space-y-3">
-                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5">
-                    <Clock size={12} className="text-indigo-500" /> Start Time (Local: {userTimezone})
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 flex flex-col gap-1">
-                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest pl-1">Hour</span>
-                       <input
-                         type="number"
-                         min={0}
-                         max={23}
-                         value={form.timeHour}
-                         onChange={e => handleFormChange("timeHour", parseInt(e.target.value))}
-                         className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 text-center shadow-sm"
-                       />
-                    </div>
-                    <span className="font-black text-slate-300 pt-5">:</span>
-                    <div className="flex-1 flex flex-col gap-1">
-                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest pl-1">Minute</span>
-                       <select
-                         value={form.timeMinute}
-                         onChange={e => handleFormChange("timeMinute", parseInt(e.target.value))}
-                         className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm"
-                       >
-                         {[0, 15, 30, 45].map(m => <option key={m} value={m}>{String(m).padStart(2, "0")}</option>)}
-                       </select>
-                    </div>
-                    <div className="pt-5 flex items-center gap-1 min-w-[50px] justify-center">
-                       <span className="text-xs font-black text-slate-400">{form.timeHour >= 12 ? "PM" : "AM"}</span>
-                    </div>
-                  </div>
-                  <p className="text-[9px] text-slate-400 font-medium italic">This job will run at {form.timeHour}:{String(form.timeMinute).padStart(2, '0')} in your local time.</p>
+                    {isSaving ? "Saving..." : editingId ? "Update Template" : "Start Automating"}
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Drawer Footer */}
-          <div className="p-6 border-t border-slate-100 flex flex-col gap-3">
-            <button
-              onClick={handleSave}
-              disabled={isSaving || !form.title || !form.type}
-              className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none hover:scale-[1.01] active:scale-[0.99]"
-            >
-              {isSaving ? "Processing..." : editingId ? "Update Template" : "Create Recurring Template"}
-            </button>
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full py-3 bg-white hover:bg-slate-50 text-slate-500 rounded-xl text-xs font-bold transition-colors border border-slate-100"
-            >
-              Discard Changes
-            </button>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
