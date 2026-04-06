@@ -86,11 +86,14 @@ export async function POST(req: Request) {
 
     // Send email to the Freelancer (Admin of the workspace)
     if (user.id !== ticket.workspace.adminId) {
-       await sendEmailNotification(
-           ticket.workspace.admin.email as string,
-           `New Ticket Created: ${ticket.title}`,
-           `Customer ${ticket.creator.name} created a new ticket.\n\nPriority: ${ticket.priority}\n\n${ticket.description}`
-       );
+       await sendEmailNotification({
+           to: ticket.workspace.admin.email as string,
+           subject: "New Ticket Created",
+           ticketId: ticket.shortId,
+           ticketTitle: ticket.title,
+           message: `Customer **${ticket.creator.name}** created a new ticket.\n\n**Priority:** ${ticket.priority}\n\n${ticket.description}`,
+           actionUrl: `/dashboard/tickets/${ticket.id}`
+       });
     } else {
        // Send to all customers in the workspace? (Optional MVP, let's just assume one customer for now or none)
     }

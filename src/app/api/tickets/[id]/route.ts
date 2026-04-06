@@ -74,11 +74,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             : updated.workspace.admin.email;
 
         if (recipient) {
-            await sendEmailNotification(
-                recipient,
-                `Ticket Status Updated: ${updated.title}`,
-                `The ticket status has been changed to ${status} by ${user.name || "a user"}.`
-            );
+            await sendEmailNotification({
+                to: recipient,
+                subject: `Ticket Status Updated: ${updated.status}`,
+                ticketId: updated.shortId,
+                ticketTitle: updated.title,
+                message: `The ticket status has been changed to **${status}** by ${user.name || "a user"}.`,
+                actionUrl: `/dashboard/tickets/${updated.id}`
+            });
         }
     }
 

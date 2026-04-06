@@ -59,18 +59,75 @@ export async function sendVerificationEmail(email: string, token: string) {
   }
 }
 
-export async function sendEmailNotification(to: string, subject: string, text: string) {
+export async function sendEmailNotification(options: { 
+  to: string, 
+  subject: string, 
+  ticketId?: string, 
+  ticketTitle?: string, 
+  message: string, 
+  actionText?: string, 
+  actionUrl?: string 
+}) {
+  const { to, subject, ticketId, ticketTitle, message, actionText, actionUrl } = options;
   try {
+    const rawUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = rawUrl.trim().replace(/\/$/, "");
+    
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
+        <!-- Header / Logo Area -->
+        <div style="margin-bottom: 32px; border-bottom: 2px solid #f3f4f6; pb: 16px;">
+          <h2 style="color: #6366f1; margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">Batein</h2>
+          <p style="color: #9ca3af; font-size: 11px; margin: 4px 0 0 0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em;">Modern Support & Operations</p>
+        </div>
+
+        <!-- Subject/Ticket Header -->
+        <div style="margin-bottom: 24px;">
+          ${ticketId ? `<span style="display: inline-block; background-color: #eef2ff; color: #4f46e5; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; font-family: monospace; margin-bottom: 12px;">${ticketId}</span>` : ''}
+          <h1 style="font-size: 24px; font-weight: 800; color: #111827; margin: 0; line-height: 1.2;">${ticketTitle || subject}</h1>
+        </div>
+        
+        <!-- Main Body -->
+        <div style="background-color: #f9fafb; border-radius: 16px; padding: 32px; border: 1px solid #f3f4f6;">
+          <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">${message.replace(/\n/g, '<br>')}</p>
+          
+          ${actionUrl ? `
+          <table border="0" cellpadding="0" cellspacing="0" style="margin: 0;">
+            <tr>
+              <td align="center" bgcolor="#4f46e5" style="border-radius: 12px;">
+                <a href="${actionUrl.startsWith('http') ? actionUrl : baseUrl + actionUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;">
+                  ${actionText || 'View Ticket Details'}
+                </a>
+              </td>
+            </tr>
+          </table>
+          ` : ''}
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #f3f4f6; text-align: center;">
+          <p style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">
+            &copy; ${new Date().getFullYear()} Batein Operations. All rights reserved.
+          </p>
+          <div style="color: #d1d5db; font-size: 11px; line-height: 1.5; font-style: italic;">
+            <p style="margin: 0;">This is an automated operational message from your workspace. Please do not reply directly to this email.</p>
+            <p style="margin: 12px 0 0 0;"><strong>Confidentiality Notice:</strong> The information contained in this email message is privileged and confidential information intended only for the use of the individual or entity named above. If you are not the intended recipient, any dissemination, distribution, or copying is strictly prohibited.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "noreply@batein.com",
       to,
-      subject,
-      text,
+      subject: ticketId ? `[${ticketId}] ${subject}` : subject,
+      html,
     });
+
     if (error) {
       console.error("[Email] Notification Error:", error);
     } else {
-      console.log(`[Email] Notification Sent: ${data?.id}`);
+      console.log(`[Email] Branded Notification Sent: ${data?.id}`);
     }
   } catch (err) {
     console.error("[Email] Notification Fatal Error:", err);
