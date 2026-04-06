@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Play, Pause, Square, Clock, Plus, Edit3, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Pause, Square, Clock, Plus, Edit3, ChevronDown, ChevronUp, Trash2, Check, X } from "lucide-react";
 
 function formatSeconds(s: number) {
   const h = Math.floor(s / 3600);
@@ -48,6 +48,12 @@ export default function TimeTracker({ ticketId, totalTimeSpent: initialTotal }: 
   const [manualHours, setManualHours] = useState(0);
   const [manualMinutes, setManualMinutes] = useState(0);
   const [manualNote, setManualNote] = useState("");
+  
+  // Editing state
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  const [editHours, setEditHours] = useState(0);
+  const [editMinutes, setEditMinutes] = useState(0);
+  const [editNote, setEditNote] = useState("");
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -116,6 +122,53 @@ export default function TimeTracker({ ticketId, totalTimeSpent: initialTotal }: 
     setManualHours(0);
     setManualMinutes(0);
     setManualNote("");
+  };
+
+  const handleEditStart = (log: TimeLog) => {
+    setEditingLogId(log.id);
+    setEditHours(Math.floor(log.seconds / 3600));
+    setEditMinutes(Math.floor((log.seconds % 3600) / 60));
+    setEditNote(log.note || "");
+  };
+
+  const handleEditSave = async (id: string, oldSeconds: number) => {
+    const newSeconds = editHours * 3600 + editMinutes * 60;
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/time-logs/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seconds: newSeconds, note: editNote })
+      });
+      if (res.ok) {
+        const diff = newSeconds - oldSeconds;
+        setTotalTime(prev => prev + diff);
+        setEditingLogId(null);
+        await fetchLogs();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string, seconds: number) => {
+    if (!confirm("Are you sure you want to delete this time log?")) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/time-logs/${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        setTotalTime(prev => prev - seconds);
+        await fetchLogs();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Cleanup interval on unmount
@@ -262,20 +315,90 @@ export default function TimeTracker({ ticketId, totalTimeSpent: initialTotal }: 
               <p className="text-[10px] text-slate-400 italic">No time logged yet.</p>
             )}
             {logs.map((log) => (
-              <div key={log.id} className="flex items-start justify-between gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-100 rounded-lg">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-5 h-5 rounded bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-[9px] shrink-0">
-                    {log.user.name?.[0] || "?"}
+              <div key={log.id} className="group/log flex flex-col gap-2 p-2.5 bg-slate-50 border border-slate-100 rounded-lg">
+                {editingLogId === log.id ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          min={0}
+                          value={editHours}
+                          onChange={e => setEditHours(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[10px] font-bold outline-none"
+                          placeholder="Hrs"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          min={0}
+                          max={59}
+                          value={editMinutes}
+                          onChange={e => setEditMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                          className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[10px] font-bold outline-none"
+                          placeholder="Min"
+                        />
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      value={editNote}
+                      onChange={e => setEditNote(e.target.value)}
+                      placeholder="Note"
+                      className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[10px] outline-none"
+                    />
+                    <div className="flex justify-end gap-1.5">
+                      <button
+                        onClick={() => setEditingLogId(null)}
+                        className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleEditSave(log.id, log.seconds)}
+                        disabled={isSaving}
+                        className="p-1 text-emerald-500 hover:text-emerald-600 transition-colors"
+                      >
+                        <Check size={14} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-slate-700 truncate">{log.user.name}</p>
-                    {log.note && <p className="text-[10px] text-slate-500 italic truncate">{log.note}</p>}
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-5 h-5 rounded bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-[9px] shrink-0">
+                        {log.user.name?.[0] || "?"}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-slate-700 truncate">{log.user.name}</p>
+                        {log.note && <p className="text-[10px] text-slate-500 italic truncate">{log.note}</p>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <p className="text-xs font-black text-indigo-600">{formatSecondsShort(log.seconds)}</p>
+                        <p className="text-[9px] text-slate-400">{log.isManual ? "Manual" : "Timer"}</p>
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover/log:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEditStart(log)}
+                          className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit3 size={12} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(log.id, log.seconds)}
+                          className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-xs font-black text-indigo-600">{formatSecondsShort(log.seconds)}</p>
-                  <p className="text-[9px] text-slate-400">{log.isManual ? "Manual" : "Timer"}</p>
-                </div>
+                )}
               </div>
             ))}
           </div>
