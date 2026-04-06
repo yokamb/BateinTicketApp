@@ -107,7 +107,7 @@ export async function sendEmailNotification(options: {
         <!-- Footer -->
         <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #f3f4f6; text-align: center;">
           <p style="color: #9ca3af; font-size: 12px; margin-bottom: 8px;">
-            &copy; ${new Date().getFullYear()} Batein Operations. All rights reserved.
+            &copy; ${new Date().getFullYear()} Batein. All rights reserved.
           </p>
           <div style="color: #d1d5db; font-size: 11px; line-height: 1.5; font-style: italic;">
             <p style="margin: 0;">This is an automated operational message from your workspace. Please do not reply directly to this email.</p>
