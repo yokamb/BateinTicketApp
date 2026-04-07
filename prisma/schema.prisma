@@ -64,6 +64,8 @@ model User {
   
   mustChangePassword Boolean @default(false)
   
+  isTwoFactorEnabled Boolean @default(false)
+  twoFactorSecret    String?
   profile       UserProfile?
 
   createdAt     DateTime  @default(now())

@@ -65,6 +65,62 @@ export default function ProfileForm({ user }: { user: any }) {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMessage, setPwMessage] = useState<{text: string, type: "success"|"error"} | null>(null);
 
+  // 2FA State
+  const [mfaLoading, setMfaLoading] = useState(false);
+  const [qrCode, setQrCode] = useState("");
+  const [mfaSecret, setMfaSecret] = useState("");
+  const [mfaToken, setMfaToken] = useState("");
+  const [isMfaSetupOpen, setIsMfaSetupOpen] = useState(false);
+
+  const handleEnable2FA = async () => {
+    setMfaLoading(true);
+    try {
+      const res = await fetch("/api/auth/2fa/generate", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setQrCode(data.qrCode);
+        setMfaSecret(data.secret);
+        setIsMfaSetupOpen(true);
+      } else {
+        alert(data.error || "Failed to generate 2FA");
+      }
+    } catch(e) { console.error(e); }
+    setMfaLoading(false);
+  };
+
+  const handleVerify2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMfaLoading(true);
+    try {
+      const res = await fetch("/api/auth/2fa/verify", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: mfaToken })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("2FA Successfully Enabled!");
+        setIsMfaSetupOpen(false);
+        router.refresh();
+      } else {
+        alert(data.error || "Failed to verify code");
+      }
+    } catch(e) { console.error(e); }
+    setMfaLoading(false);
+  };
+
+  const handleDisable2FA = async () => {
+    if (!confirm("Are you sure you want to disable Two-Factor Authentication? This makes your account less secure.")) return;
+    setMfaLoading(true);
+    try {
+      const res = await fetch("/api/auth/2fa/disable", { method: "POST" });
+      if (res.ok) {
+        alert("2FA Disabled Successfully");
+        router.refresh();
+      }
+    } catch(e) { console.error(e); }
+    setMfaLoading(false);
+  };
+
   const router = useRouter();
   const { update: updateSession } = useSession();
 
@@ -452,6 +508,73 @@ export default function ProfileForm({ user }: { user: any }) {
           </form>
         )}
       </div>
+      {/* 2FA Section */}
+      <div className="border-t border-slate-100 pt-6 mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-slate-100 rounded-lg"><Lock size={18} className="text-slate-600" /></div>
+             <div>
+               <h3 className="text-lg font-bold text-slate-900">Two-Factor Authentication (2FA)</h3>
+               <p className="text-sm text-slate-500">Secure your account with an Authenticator App.</p>
+             </div>
+          </div>
+          {user.isTwoFactorEnabled ? (
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded">Enabled</span>
+              <button type="button" onClick={handleDisable2FA} disabled={mfaLoading} className="text-sm text-red-600 hover:text-red-800 font-semibold transition-colors disabled:opacity-50">
+                Disable
+              </button>
+            </div>
+          ) : (
+            <button type="button" onClick={handleEnable2FA} disabled={mfaLoading} className="text-sm text-indigo-600 hover:text-indigo-800 font-semibold transition-colors disabled:opacity-50">
+              {mfaLoading ? "Loading..." : "Enable"}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* MFA Setup Modal */}
+      <Modal 
+        opened={isMfaSetupOpen} 
+        onClose={() => setIsMfaSetupOpen(false)} 
+        title={<Title order={4}>Setup Two-Factor Authentication</Title>}
+        size="md"
+        radius="lg"
+        padding="xl"
+      >
+        <div className="space-y-6 text-slate-700">
+          <p className="text-sm">Scan this QR Code using Google Authenticator, Microsoft Authenticator, or a similar app.</p>
+          <div className="flex justify-center p-4 bg-white rounded-xl shadow-inner border border-slate-200">
+             {qrCode && <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />}
+          </div>
+          <div className="text-center">
+             <p className="text-xs text-slate-500 mb-1 font-bold">Manual Entry Secret</p>
+             <code className="text-xs px-2 py-1 bg-slate-100 text-slate-800 rounded">{mfaSecret}</code>
+          </div>
+          <form onSubmit={handleVerify2FA} className="space-y-3 pt-4 border-t border-slate-100">
+             <div>
+               <label className="block text-xs font-black text-slate-500 mb-1 uppercase tracking-wide">Enter 6-Digit Code</label>
+               <input
+                 type="text"
+                 required
+                 maxLength={6}
+                 value={mfaToken}
+                 onChange={(e) => setMfaToken(e.target.value)}
+                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow text-center text-xl tracking-widest font-black"
+                 placeholder="------"
+               />
+             </div>
+             <button
+               type="submit"
+               disabled={mfaLoading || mfaToken.length < 6}
+               className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors disabled:opacity-60"
+             >
+               {mfaLoading ? "Verifying..." : "Verify and Enable 2FA"}
+             </button>
+          </form>
+        </div>
+      </Modal>
+
     </div>
   );
 }

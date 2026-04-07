@@ -15,6 +15,9 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const verified = searchParams.get("verified") === "1";
 
+  const [isTwoFactorStep, setIsTwoFactorStep] = useState(false);
+  const [twoFactorToken, setTwoFactorToken] = useState("");
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -24,11 +27,17 @@ function LoginForm() {
       const res = await signIn("credentials", {
         email,
         password,
+        twoFactorToken: isTwoFactorStep ? twoFactorToken : undefined,
         redirect: false,
       });
 
       if (res?.error) {
-        setError(res.error);
+        if (res.error === "2FA_REQUIRED") {
+          setIsTwoFactorStep(true);
+          setError("");
+        } else {
+          setError(res.error);
+        }
       } else {
         router.push("/dashboard");
         router.refresh();
@@ -52,11 +61,17 @@ function LoginForm() {
 
       <div className="w-full max-w-[420px] p-10 bg-white sketch-border shadow-sketch relative z-10 transition-all hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,0.08)]">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-black tracking-tighter mb-3 italic">Welcome back</h1>
-          <p className="text-[#666] text-sm font-medium tracking-tight">Sign in to your <span className="text-indigo-600 font-bold underline decoration-indigo-200 decoration-4 underline-offset-4">Batein</span> account</p>
+          <h1 className="text-4xl font-black tracking-tighter mb-3 italic">
+            {isTwoFactorStep ? "Almost there" : "Welcome back"}
+          </h1>
+          <p className="text-[#666] text-sm font-medium tracking-tight">
+            {isTwoFactorStep ? "Enter your Authenticator code" : (
+              <>Sign in to your <span className="text-indigo-600 font-bold underline decoration-indigo-200 decoration-4 underline-offset-4">Batein</span> account</>
+            )}
+          </p>
         </div>
 
-        {verified && (
+        {verified && !isTwoFactorStep && (
           <div className="mb-8 p-4 bg-emerald-50 border-2 border-emerald-500/20 text-emerald-700 text-xs text-center font-black uppercase tracking-widest rounded-xl">
             ✅ Email verified! Time to talk.
           </div>
@@ -69,38 +84,67 @@ function LoginForm() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-6">
-          <div className="group">
-            <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
-              placeholder="you@example.com"
-            />
-          </div>
+          {!isTwoFactorStep ? (
+            <>
+              <div className="group">
+                <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
+                  placeholder="you@example.com"
+                />
+              </div>
 
-          <div className="group">
-            <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
-              placeholder="••••••••"
-            />
-          </div>
+              <div className="group">
+                <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-sm font-bold shadow-sm"
+                  placeholder="••••••••"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="group animate-fade-in-up">
+              <label className="block text-[10px] font-black text-[#aaa] mb-2 uppercase tracking-[0.2em] group-focus-within:text-indigo-500 transition-colors">Authenticator Code</label>
+              <input
+                type="text"
+                required
+                autoFocus
+                maxLength={6}
+                value={twoFactorToken}
+                onChange={(e) => setTwoFactorToken(e.target.value)}
+                className="w-full px-5 py-4 bg-[#fcfcfc] border-2 border-[#eee] rounded-xl focus:border-indigo-500 text-[#0d0d0d] placeholder-[#ccc] transition-all outline-none text-3xl tracking-widest text-center font-black shadow-sm"
+                placeholder="_____"
+              />
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full py-4 px-6 bg-[#111] hover:bg-indigo-600 text-white rounded-xl font-black transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed text-base shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_0px_0px_rgba(79,70,229,0.3)] mt-2"
           >
-            {loading ? "Signing in..." : "Sign In"}
+             {loading ? "Verifying..." : isTwoFactorStep ? "Verify Code" : "Sign In"}
           </button>
           
+          {isTwoFactorStep && (
+            <div className="text-center mt-4">
+               <button 
+                 type="button" 
+                 onClick={() => setIsTwoFactorStep(false)}
+                 className="text-xs text-indigo-600 hover:text-indigo-800 font-bold"
+               >
+                 « Back to Login
+               </button>
+            </div>
+          )}
           <div className="relative my-10 flex items-center gap-4">
              <div className="flex-1 border-t-2 border-[#f0f0f0]"></div>
              <span className="text-[10px] text-[#bbb] font-black uppercase tracking-[0.3em] whitespace-nowrap">Auth via</span>

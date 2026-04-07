@@ -17,7 +17,8 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        twoFactorToken: { label: "2FA Token", type: "text" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -40,6 +41,22 @@ export const authOptions: NextAuthOptions = {
         const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
+        }
+
+        // Check Two-Factor Authentication
+        if (user.isTwoFactorEnabled) {
+          if (!credentials.twoFactorToken) {
+            throw new Error("2FA_REQUIRED");
+          }
+          const speakeasy = await import('speakeasy');
+          if (!user.twoFactorSecret || !speakeasy.default.totp.verify({
+            secret: user.twoFactorSecret,
+            encoding: 'base32',
+            token: credentials.twoFactorToken,
+            window: 1
+          })) {
+            throw new Error("Invalid two-factor authentication code");
+          }
         }
 
         return {
