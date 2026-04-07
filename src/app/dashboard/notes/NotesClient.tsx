@@ -64,12 +64,10 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
       const data = await res.json();
       if (res.ok) {
         setNewSectionName("");
-        setSectionSuccess(true);
-        setTimeout(() => {
-          setIsCreatingSection(false);
-          setSectionSuccess(false);
-          fetchSections();
-        }, 1200);
+        setNewSectionName("");
+        setIsCreatingSection(false);
+        setSectionSuccess(false);
+        fetchSections();
       } else {
         setSectionError(data.error || "Failed to create section");
       }
@@ -94,12 +92,10 @@ export default function NotesClient({ workspaces, currentUser }: { workspaces: a
       const data = await res.json();
       if (res.ok) {
         setNewPageTitle("");
-        setPageSuccess(true);
-        setTimeout(() => {
-          setIsCreatingPage(false);
-          setPageSuccess(false);
-          fetchSections();
-        }, 1200);
+        setNewPageTitle("");
+        setIsCreatingPage(false);
+        setPageSuccess(false);
+        fetchSections();
       } else {
         setPageError(data.error || "Failed to create page");
       }
