@@ -17,8 +17,8 @@ export default async function NotesPage() {
   ];
 
   return (
-    <div className="h-full w-full animate-fade-in flex flex-col font-sans z-20">
-      <div className="flex-1 min-h-0 flex flex-col bg-white">
+    <div className="h-[calc(100vh-64px)] w-full animate-fade-in flex flex-col font-sans z-20 overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col bg-white overflow-hidden">
         <NotesClient workspaces={userWorkspaces} currentUser={user} />
       </div>
     </div>
