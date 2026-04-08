@@ -50,10 +50,15 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fafafa] p-6 text-[#0d0d0d] font-sans antialiased relative overflow-hidden bg-dot-grid">
-      {/* Abstract organic background elements */}
-      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-50/50 organic-blob animate-cloud-morph pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-50/50 organic-blob animate-cloud-morph delay-2 pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-[#0d0d0d] font-sans antialiased relative overflow-hidden">
+      {/* Absolute Base Layer: White Background */}
+      <div className="fixed inset-0 z-[-2] bg-white"></div>
+      
+      {/* Absolute Middle Layer: Subtle Tech Pattern Background */}
+      <div 
+        className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.08]"
+        style={{ backgroundImage: "url('/bg-pattern.png')", backgroundRepeat: "repeat", backgroundSize: "400px" }}
+      ></div>
 
       <div className="mb-12 relative z-10 hover:scale-105 transition-transform duration-500 cursor-pointer">
         <Logo className="scale-150" />

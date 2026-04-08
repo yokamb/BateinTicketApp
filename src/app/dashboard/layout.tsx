@@ -60,7 +60,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0d0d] flex relative font-sans text-sm antialiased">
+    <div className="min-h-screen text-[#0d0d0d] flex relative font-sans text-sm antialiased selection:bg-indigo-100">
+      {/* Absolute Base Layer: White Background */}
+      <div className="fixed inset-0 z-[-2] bg-white"></div>
+      
+      {/* Absolute Middle Layer: Subtle Tech Pattern Background */}
+      <div 
+        className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.08]"
+        style={{ backgroundImage: "url('/bg-pattern.png')", backgroundRepeat: "repeat", backgroundSize: "400px" }}
+      ></div>
       {/* Force password change guard */}
       <ForcePasswordReset />
 
