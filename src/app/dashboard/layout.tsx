@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import ForcePasswordReset from "@/components/ForcePasswordReset";
+import UserMenu from "@/components/UserMenu";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -80,8 +81,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
       />
 
       {/* Main Content — pt-14 on mobile accounts for the fixed top bar */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden bg-transparent text-[#0d0d0d] pt-14 md:pt-0 min-w-0">
-        {children}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden bg-transparent text-[#0d0d0d] pt-14 md:pt-0 min-w-0 relative">
+        {/* Desktop Top Header Bar */}
+        <header className="hidden md:flex absolute top-0 right-0 left-0 h-16 items-center justify-end px-8 z-30 bg-transparent pointer-events-none">
+          <div className="pointer-events-auto">
+            <UserMenu dbUser={dbUser} isGuest={isGuest} />
+          </div>
+        </header>
+
+        <div className="md:pt-16">
+          {children}
+        </div>
       </main>
     </div>
   );
