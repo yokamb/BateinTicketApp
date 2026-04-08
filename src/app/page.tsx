@@ -74,7 +74,7 @@ export default async function LandingPage() {
       </main>
 
       {/* Feature Highlights */}
-      <section id="features" className="relative z-10 py-16 sm:py-24 border-y border-[#f0f0f0]">
+      <section id="features" className="relative z-10 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-[#0d0d0d]">Everything you need to deliver.</h2>
@@ -102,7 +102,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="relative z-10 py-32 flex flex-col items-center overflow-hidden border-b border-[#f0f0f0]">
+      <section className="relative z-10 py-32 flex flex-col items-center overflow-hidden">
         <div className="text-center mb-4 px-6 relative z-10">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-amber-100 rounded-full mb-6 border border-amber-200 shadow-lg shadow-amber-500/10">
             <Star className="text-amber-500" size={24} fill="currentColor" />
@@ -193,7 +193,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-[#f0f0f0] text-center relative overflow-hidden">
+      <footer className="py-16 text-center relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <Logo className="scale-100 opacity-60 grayscale hover:grayscale-0 transition-all mb-6 mx-auto cursor-pointer" />
           <div className="flex justify-center gap-8 mb-8 text-sm font-bold text-[#888]">

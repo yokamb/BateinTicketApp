@@ -110,7 +110,7 @@ export function DynamicReviews() {
   }, [spawnReview]);
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-7xl h-[1000px] border-y border-dashed border-[#eee] bg-transparent overflow-hidden mt-12 mb-24">
+    <div ref={containerRef} className="relative w-full max-w-7xl h-[1000px] bg-transparent overflow-hidden mt-12 mb-24">
       {/* Background Decorative center element */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-0 opacity-10 pointer-events-none">
         <div className="w-40 h-40 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-6 border border-indigo-100/50 animate-pulse">
