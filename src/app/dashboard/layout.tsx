@@ -16,7 +16,6 @@ import {
   Settings
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
-import ForcePasswordReset from "@/components/ForcePasswordReset";
 import UserMenu from "@/components/UserMenu";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -70,8 +69,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.08]"
         style={{ backgroundImage: "url('/bg-pattern.png')", backgroundRepeat: "repeat", backgroundSize: "400px" }}
       ></div>
-      {/* Force password change guard */}
-      <ForcePasswordReset />
 
       {/* Sidebar */}
       <Sidebar

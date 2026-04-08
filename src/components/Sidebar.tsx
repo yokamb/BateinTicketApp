@@ -9,9 +9,7 @@ import {
   Ticket,
   NotebookIcon,
   Plus,
-  LogOut,
   Crown,
-  Settings,
   Repeat,
   BarChart2,
   Menu,
@@ -127,30 +125,7 @@ export default function Sidebar({
         </div>
       )}
 
-      {/* User Footer */}
-      <div className="p-3 border-t border-[#e5e5e5] flex flex-col gap-0.5">
-        <Link
-          href="/dashboard/profile"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#efefef] transition-colors group"
-        >
-          <div className="w-7 h-7 rounded-full bg-[#0d0d0d] flex items-center justify-center text-white font-bold shrink-0 text-[11px]">
-            {dbUser.name?.[0]?.toUpperCase() || dbUser.email?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#0d0d0d] truncate">{dbUser.name || "User"}</p>
-            <p className="text-[10px] text-[#888] truncate uppercase font-medium tracking-wider">{isGuest ? "GUEST" : dbUser.plan || "FREE"}</p>
-          </div>
-          <Settings size={14} className="text-[#aaa] group-hover:text-[#555] shrink-0" />
-        </Link>
-
-        <Link
-          href="/api/auth/signout"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#888] hover:bg-red-50 hover:text-red-500 transition-colors group"
-        >
-          <LogOut size={15} className="shrink-0" />
-          <span className="text-xs font-medium">Sign Out</span>
-        </Link>
-      </div>
+      {/* User Footer removed as it is in the top right header */}
     </>
   );
 
