@@ -11,10 +11,9 @@ import {
   Ticket, 
   NotebookIcon, 
   Plus, 
-  LogOut, 
-  Crown,
-  Settings
+  Crown
 } from "lucide-react";
+import UserMenu from "@/components/UserMenu";
 import Sidebar from "@/components/Sidebar";
 import ForcePasswordReset from "@/components/ForcePasswordReset";
 
@@ -73,6 +72,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       {/* Main Content — pt-14 on mobile accounts for the fixed top bar */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden bg-white text-[#0d0d0d] pt-14 md:pt-0 min-w-0">
+        <header className="hidden md:flex sticky top-0 bg-white/80 backdrop-blur-md z-10 h-16 border-b border-[#f0f0f0] items-center justify-end px-8">
+          <UserMenu dbUser={dbUser} isGuest={isGuest} />
+        </header>
         {children}
       </main>
     </div>
