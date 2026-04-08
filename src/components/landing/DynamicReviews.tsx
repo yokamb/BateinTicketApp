@@ -33,22 +33,22 @@ export function DynamicReviews() {
 
     // Try multiple random attempts and pick the one with most space from neighbors
     for (let i = 0; i < 50; i++) {
-        const top = Math.random() * 65 + 5; // 5% to 70%
-        const left = Math.random() * 65 + 5; // 5% to 70%
-        
-        let minDist = 1000;
-        existingPos.forEach(p => {
-            const d = Math.sqrt(Math.pow(p.top - top, 2) + Math.pow(p.left - left, 2));
-            if (d < minDist) minDist = d;
-        });
+      const top = Math.random() * 65 + 5; // 5% to 70%
+      const left = Math.random() * 65 + 5; // 5% to 70%
 
-        if (minDist > maxMinDist) {
-            maxMinDist = minDist;
-            bestPos = { top, left };
-        }
-        
-        // If we found a very safe spot (35% diameter), stop early
-        if (minDist > 35) break; 
+      let minDist = 1000;
+      existingPos.forEach(p => {
+        const d = Math.sqrt(Math.pow(p.top - top, 2) + Math.pow(p.left - left, 2));
+        if (d < minDist) minDist = d;
+      });
+
+      if (minDist > maxMinDist) {
+        maxMinDist = minDist;
+        bestPos = { top, left };
+      }
+
+      // If we found a very safe spot (35% diameter), stop early
+      if (minDist > 35) break;
     }
     return { top: `${bestPos.top}%`, left: `${bestPos.left}%`, rawTop: bestPos.top, rawLeft: bestPos.left };
   }, []);
@@ -57,7 +57,7 @@ export function DynamicReviews() {
     const available = REVIEWS.filter(r => !excludeNames.includes(r.name));
     const review = available[Math.floor(Math.random() * available.length)];
     const pos = getSafeRandomPos(existingPos);
-    
+
     return {
       id: Math.random(),
       review,
@@ -78,14 +78,14 @@ export function DynamicReviews() {
     const interval = setInterval(() => {
       setActiveReviews(prev => {
         if (prev.length < MAX_VISIBLE) return prev;
-        
+
         const newReviews = [...prev];
         const indexToReplace = Math.floor(Math.random() * MAX_VISIBLE);
         const oldId = newReviews[indexToReplace].id;
-        
+
         // 1. Mark for fade out
         newReviews[indexToReplace] = { ...newReviews[indexToReplace], visible: false };
-        
+
         // 2. Schedule replacement
         setTimeout(() => {
           setActiveReviews(current => {
@@ -100,7 +100,7 @@ export function DynamicReviews() {
             updated[targetIdx] = spawnReview(currentNames, currentPos);
             return updated;
           });
-        }, 1000); 
+        }, 1000);
 
         return newReviews;
       });
@@ -110,20 +110,20 @@ export function DynamicReviews() {
   }, [spawnReview]);
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-7xl h-[1000px] border-y border-dashed border-[#eee] bg-[#fafafa]/20 overflow-hidden mt-12 mb-24">
+    <div ref={containerRef} className="relative w-full max-w-7xl h-[1000px] border-y border-dashed border-[#eee] bg-transparent overflow-hidden mt-12 mb-24">
       {/* Background Decorative center element */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-0 opacity-10 pointer-events-none">
-          <div className="w-40 h-40 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-6 border border-indigo-100/50 animate-pulse">
-             <Star size={80} className="text-indigo-600" fill="currentColor" />
-          </div>
-          <p className="text-6xl font-black text-indigo-900 tracking-[0.4em] uppercase opacity-20 text-center">Batein Reviews</p>
+        <div className="w-40 h-40 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-6 border border-indigo-100/50 animate-pulse">
+          <Star size={80} className="text-indigo-600" fill="currentColor" />
+        </div>
+        <p className="text-6xl font-black text-indigo-900 tracking-[0.4em] uppercase opacity-20 text-center">Batein Reviews</p>
       </div>
 
       {activeReviews.map((ar) => (
-        <div 
+        <div
           key={ar.id}
-          style={{ 
-            top: ar.pos.top, 
+          style={{
+            top: ar.pos.top,
             left: ar.pos.left,
             transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
             opacity: ar.visible ? 1 : 0,
@@ -134,7 +134,7 @@ export function DynamicReviews() {
           {/* Yellow Star Icon Overlapping the top border */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
             <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center border-4 border-slate-950 shadow-[0_0_15px_rgba(251,191,36,0.5)]">
-               <Star className="text-slate-900" size={20} fill="currentColor" />
+              <Star className="text-slate-900" size={20} fill="currentColor" />
             </div>
           </div>
 
@@ -153,8 +153,8 @@ export function DynamicReviews() {
               {ar.review.name[0]}
             </div>
             <div className="min-w-0">
-               <h4 className="font-bold text-white text-xs truncate">{ar.review.name}</h4>
-               <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest truncate">{ar.review.role}</p>
+              <h4 className="font-bold text-white text-xs truncate">{ar.review.name}</h4>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest truncate">{ar.review.role}</p>
             </div>
           </div>
         </div>
