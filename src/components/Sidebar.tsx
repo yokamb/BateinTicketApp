@@ -122,7 +122,7 @@ export default function Sidebar({
 
       {/* Storage Tracker */}
       {!isGuest && (
-        <div className="px-4 pb-2 pt-1 border-t border-[#f0f0f0] mt-2">
+        <div className="px-3 pb-4 pt-2">
           <StorageTracker />
         </div>
       )}
